@@ -5,7 +5,8 @@
  *
  * @author			Stephen Lewis <stephen@experienceinternet.co.uk>
  * @copyright		Experience Internet
- * @package			Crumbly */
+ * @package			Crumbly
+ */
 
 require_once PATH_THIRD .'crumbly/models/crumbly_model' .EXT;
 
@@ -129,7 +130,7 @@ class Test_crumbly_model extends Testee_unit_test_case {
 		$this->_ee->db->expectOnce('select', array('module_id'));
 		$this->_ee->db->expectOnce('get_where', array('modules', array('module_name' => $this->_package_name), 1));
 		
-				$this->_ee->db->expectCallCount('delete', 2);
+		$this->_ee->db->expectCallCount('delete', 2);
 		$this->_ee->db->expectAt(0, 'delete', array('module_member_groups', array('module_id' => $db_module_row->module_id)));
 		$this->_ee->db->expectAt(1, 'delete', array('modules', array('module_name' => $this->_package_name)));
 				
@@ -191,7 +192,6 @@ class Test_crumbly_model extends Testee_unit_test_case {
 		// Tests.
 		$this->assertIdentical(TRUE, $this->_subject->update_module($installed_version));
 	}
-	
 	
 }
 

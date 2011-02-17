@@ -5,7 +5,9 @@
  *
  * @author			Stephen Lewis <stephen@experienceinternet.co.uk>
  * @copyright		Experience Internet
- * @package			Crumbly * @version 		0.1.0 */
+ * @package			Crumbly
+ * @version 		0.1.0
+ */
 
 class Crumbly_model extends CI_Model {
 	
@@ -119,21 +121,9 @@ class Crumbly_model extends CI_Model {
 	public function install_module()
 	{
 		$this->install_module_register();
-		$this->install_module_actions();
 		
 		return TRUE;
 	}
-	
-	
-	/**
-	 * Register the module actions in the database.
-	 *
-	 * @access	public
-	 * @return	void
-	 */
-	public function install_module_actions()
-	{
-			}
 	
 	
 	/**
@@ -176,9 +166,6 @@ class Crumbly_model extends CI_Model {
 		
 		// Delete the module from the modules table.
 		$this->_ee->db->delete('modules', array('module_name' => $this->get_package_name()));
-		
-		// Delete the module from the actions table.
-		$this->_ee->db->delete('actions', array('class' => $this->get_package_name()));
 		
 		return TRUE;
 	}
