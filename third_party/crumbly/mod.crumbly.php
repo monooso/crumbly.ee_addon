@@ -83,51 +83,81 @@ class Crumbly {
 		$tmpl	= $this->_ee->TMPL;
 		$uri	= $this->_ee->uri;
 
-		if ( ! $segments = $uri->segment_array())
+		// Breadcrumbs.
+		$breadcrumbs = array();
+
+		// Include a 'root' breadcrumb?
+		if ($tmpl->fetch_param('include_root', 'yes') == 'yes')
 		{
-			// ROOT BREADCRUMB?
-			return;
+			$breadcrumbs[] = array(
+				'breadcrumb_title'	=> $tmpl->fetch_param('root_label', $lang->line('default_root_label')),
+				'target_url'		=> $tmpl->fetch_param('root_url', $fns->fetch_site_index())
+			);
 		}
 
-		// Retrieve the module settings.
-		$settings = $this->_model->get_settings();
+		// Retrieve the array segments. If there aren't any, we're done.
+		if ( ! $segments = $this->_ee->uri->segment_array())
+		{
+			return $tmpl->parse_variables($tmpl->tagdata, $breadcrumbs);
+		}
 
-		// Retrieve the tag parameters.
-		$include_root	= $tmpl->fetch_param('include_root', 'yes');
-		$root_label		= $tmpl->fetch_param('root_label', $lang->line('default_root_label'));
-		$root_url		= $tmpl->fetch_param('root_url', $fns->fetch_site_index());
+		// Retrieve the package settings.
+		$settings = $this->_model->get_package_settings();
 
+		// What have we got?
+		$has_template_group = count($segments) > 0;
+		$has_template		= count($segments) > 1;
+		$has_entry			= count($segments) > 2;
 
-		/**
-		 * Build the breadcrumbs array.
-		 * Start with a "root" breadcrumb?
-		 */
+		if ($has_template_group)
+		{
+			$template_groups = $settings['template_groups'];
 
-		$breadcrumbs = $include_root
-			? array(array('breadcrumb_title' => $root_label, 'url_segment' => ''))
-			: array();
+			if (array_key_exists($segments[0], $template_groups))
+			{
+				$templates	= $template_groups[$segments[0]]['templates'];
+				$title		= $template_groups[$segments[0]]['title'];
+			}
+			else
+			{
+				$templates	= array();
+				$title		= $this->_model->humanize($segments[0]);
+			}
 
-		// Template Group.
-		$breadcrumbs[] = array(
-			'breadcrumb_title'	=> $settings['template_groups'][$segments[0]],
-			'url_segment'		=> $segments[0]
-		);
+			$breadcrumbs[] = array(
+				'breadcrumb_segment'	=> $segments[0],
+				'breadcrumb_title'		=> $title,
+				'breadcrumb_url'		=> $fns->create_url($segments[0])
+			);
+		}
 
 		// Template.
-		$breadcrumbs[] = array(
-			'breadcrumb_title'	=> $settings['templates'][$segments[1]],
-			'url_segment'		=> $segments[1]
-		);
+		if ($has_template)
+		{
+			$title = array_key_exists($segments[1], $templates)
+				? $templates[$segments[1]]
+				: $this->_model->humanize($segments[1]);
+
+			$breadcrumbs[] = array(
+				'breadcrumb_segment'	=> $segments[1],
+				'breadcrumb_title'		=> $settings['template_groups'][$segments[0]]['templates'][$segments[1]],
+				'breadcrumb_url'		=> $fns->create_url($segments[0] .'/' .$segments[1])
+			);
+		}
 
 		// Channel Entry.
-		$breadcrumbs[] = array(
-			'breadcrumb_title'	=> $this->_model->get_channel_entry_title_from_url_title($segments[2]),
-			'url_segment'		=> $segments[2]
-		);
+		if ($has_entry)
+		{
+			$breadcrumbs[] = array(
+				'breadcrumb_segment'	=> $segments[2],
+				'breadcrumb_title'		=> $this->_model->get_channel_entry_title_from_url_title($segments[2]),
+				'breadcrumb_url'		=> $fns->create_url($segments[0] .'/' .$segments[1] .'/' .$segments[2])
+			);
+		}
 
-		return $this->_ee->TMPL->parse_variables($this->_ee->TMPL->tagdata, $breadcrumbs);
+		return $tmpl->parse_variables($tmpl->tagdata, $breadcrumbs);
 	}
-		
+
 }
 
 
