@@ -84,6 +84,37 @@ class Crumbly_model extends CI_Model {
 	
 	
 	/**
+	 * Returns the package settings.
+	 *
+	 * @access	public
+	 * @return	array
+	 */
+	public function get_package_settings()
+	{
+		return array(
+			'glossary' => array('room' => 'Zimmer'),
+			'template_groups' => array(
+				'about' => array(
+					'title' => 'About Us',
+					'templates' => array(
+						'founder'	=> 'Our Founder',
+						'history'	=> 'Our History',
+						'team'		=> 'Our Team',
+					)
+				),
+				'blog' => array(
+					'title' => 'News',
+					'templates' => array(
+						'archive'	=> 'Archived News',
+						'story'		=> 'News Story'
+					)
+				)
+			)
+		);
+	}
+	
+	
+	/**
 	 * Returns the package version.
 	 *
 	 * @access	public
@@ -93,8 +124,8 @@ class Crumbly_model extends CI_Model {
 	{
 		return $this->_package_version;
 	}
-	
-	
+
+
 	/**
 	 * Returns the site ID.
 	 *
@@ -112,6 +143,40 @@ class Crumbly_model extends CI_Model {
 	}
 	
 	
+	/**
+	 * Takes a string and attempts to "humanise" it.
+	 *
+	 * @access	public
+	 * @param	string		$machine		The 'machine friendly' string (the URL segment).
+	 * @param	bool		$use_glossary	Consult the glossary first?
+	 * @return	string
+	 */
+	public function humanize($machine = '', $use_glossary = TRUE)
+	{
+		// Get out early.
+		if ( ! $machine OR ! is_string($machine))
+		{
+			return '';
+		}
+
+		// By default, we always start by checking the glossary.
+		if ($use_glossary !== FALSE)
+		{
+			$settings = $this->get_package_settings();
+
+			if (array_key_exists($machine, $settings['glossary']))
+			{
+				return $settings['glossary'][$machine];
+			}
+		}
+
+		// Do the best we can.
+		$separator = $this->_ee->config->item('word_separator') == 'underscore' ? '_' : '-';
+		
+		return ucwords(str_replace($separator, ' ', $machine));
+	}
+
+
 	/**
 	 * Installs the module.
 	 *

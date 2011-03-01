@@ -100,6 +100,85 @@ class Test_crumbly_model extends Testee_unit_test_case {
 	}
 	
 	
+	public function test__humanize__no_glossary_underscore_success()
+	{
+		// Dummy values.
+		$machine	= 'about_us';
+		$human		= 'About Us';
+
+		// Retrieve the word separator.
+		$this->_ee->config->expectOnce('item', array('word_separator'));
+		$this->_ee->config->setReturnValue('item', 'underscore', array('word_separator'));
+
+		// Run the tests.
+		$this->assertIdentical($human, $this->_subject->humanize($machine, FALSE));
+	}
+
+
+	public function test__humanize__no_glossary_dash_success()
+	{
+		// Dummy values.
+		$machine	= 'about-us';
+		$human		= 'About Us';
+
+		// Retrieve the word separator.
+		$this->_ee->config->expectOnce('item', array('word_separator'));
+		$this->_ee->config->setReturnValue('item', 'dash', array('word_separator'));
+
+		// Run the tests.
+		$this->assertIdentical($human, $this->_subject->humanize($machine, FALSE));
+	}
+
+
+	public function test__humanize__no_glossary_undefined_separator_dash()
+	{
+		// Dummy values.
+		$machine	= 'about-us';
+		$human		= 'About Us';
+
+		// Retrieve the word separator.
+		$this->_ee->config->expectOnce('item', array('word_separator'));
+		$this->_ee->config->setReturnValue('item', FALSE, array('word_separator'));
+
+		// Run the tests.
+		$this->assertIdentical($human, $this->_subject->humanize($machine, FALSE));
+	}
+
+
+	public function test__humanize__glossary_success()
+	{
+		/**
+		 * The settings are hard-coded in the model at present, which means
+		 * we can't mock them.
+		 *
+		 * Instead we just retrieve them, and test against the first item
+		 * in the glossary.
+		 */
+
+		$settings	= $this->_subject->get_package_settings();
+		$keys		= array_keys($settings['glossary']);
+		$machine	= $keys[0];
+		$human		= $settings['glossary'][$machine];
+
+		// Run the tests.
+		$this->assertIdentical($human, $this->_subject->humanize($machine));
+	}
+
+
+	public function test__humanize__no_machine_string()
+	{
+		// Dummy values.
+		$machine	= '';
+		$human		= '';
+
+		// Expectations.
+		$this->_ee->config->expectNever('item');
+
+		// Run the tests.
+		$this->assertIdentical($human, $this->_subject->humanize($machine));
+	}
+
+
 	public function test_install_module_register__success()
 	{
 		// Dummy values.
@@ -118,7 +197,6 @@ class Test_crumbly_model extends Testee_unit_test_case {
 	}
 	
 		
-	
 	public function test_uninstall_module__success()
 	{
 		// Dummy values.
