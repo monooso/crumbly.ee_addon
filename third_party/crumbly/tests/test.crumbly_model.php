@@ -180,7 +180,7 @@ class Test_crumbly_model extends Testee_unit_test_case {
 	}
 	
 	
-	public function test_constructor__package_name_and_version()
+	public function test__constructor__package_name_and_version()
 	{
 		// Dummy values.
 		$package_name 		= 'Example_package';
@@ -193,7 +193,7 @@ class Test_crumbly_model extends Testee_unit_test_case {
 	}
 	
 	
-	public function test_get_site_id__success()
+	public function test__get_site_id__success()
 	{
 		// Expectations.
 		$this->_ee->config->expectOnce('item', array('site_id'));
@@ -282,7 +282,7 @@ class Test_crumbly_model extends Testee_unit_test_case {
 	}
 
 
-	public function test_install_module_register__success()
+	public function test__install_module_register__success()
 	{
 		// Dummy values.
 		$query_data = array(
@@ -300,7 +300,7 @@ class Test_crumbly_model extends Testee_unit_test_case {
 	}
 	
 		
-	public function test_uninstall_module__success()
+	public function test__uninstall_module__success()
 	{
 		// Dummy values.
 		$db_module_result 			= $this->_get_mock('db_query');
@@ -325,7 +325,7 @@ class Test_crumbly_model extends Testee_unit_test_case {
 	}
 	
 	
-	public function test_uninstall_module__module_not_found()
+	public function test__uninstall_module__module_not_found()
 	{
 		// Dummy values.
 		$db_module_result = $this->_get_mock('db_query');
@@ -344,7 +344,7 @@ class Test_crumbly_model extends Testee_unit_test_case {
 	}
 	
 	
-	public function test_update_module__no_update_required()
+	public function test__update_module__no_update_required()
 	{
 		// Dummy values.
 		$installed_version = $this->_package_version;
@@ -355,7 +355,7 @@ class Test_crumbly_model extends Testee_unit_test_case {
 	
 	
 	
-	public function test_update_module__update_required()
+	public function test__update_module__update_required()
 	{
 		// Dummy values.
 		$installed_version = '0.9.0';
@@ -365,7 +365,7 @@ class Test_crumbly_model extends Testee_unit_test_case {
 	}
 	
 	
-	public function test_update_module__no_installed_version()
+	public function test__update_module__no_installed_version()
 	{
 		// Dummy values.
 		$installed_version = '';
