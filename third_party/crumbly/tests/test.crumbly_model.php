@@ -191,8 +191,55 @@ class Test_crumbly_model extends Testee_unit_test_case {
 		$this->assertIdentical($package_name, $subject->get_package_name());
 		$this->assertIdentical($package_version, $subject->get_package_version());
 	}
-	
-	
+
+
+	public function test__get_package_settings__success()
+	{
+		// Shortcuts.
+		$config = $this->_ee->config;
+
+		// Dummy values.
+		$settings = array(
+			'glossary' => array('wig' => 'Merkin'),
+			'template_groups' => array(
+				'about' => array(
+					'title' => 'About Us',
+					'templates' => array(
+						'founder'	=> 'Our Founder',
+						'history'	=> 'Our History',
+						'team'		=> 'Meet the Team'
+					)
+				),
+				'blog' => array(
+					'title' => 'Blog',
+					'templates' => array(
+						'archive' => 'Archived Posts'
+					)
+				),
+				'contact' => array(
+					'title' => 'Contact Us',
+					'templates' => array(
+						'error' => 'OMG! Teh Epic Internet Failerz! LOLZ!',
+						'thank-you' => 'Thanks You!',
+					)
+				)
+			)
+		);
+
+		// Expectations.
+		$config->expectOnce('item', array('crumbly_settings'));
+
+		// Return values.
+		$config->setReturnValue('item', $settings);
+
+		// Run the tests.
+		$this->assertIdentical($settings, $this->_subject->get_package_settings());
+
+		// Settings should be cached by the model, so the expectation counts should still pass.
+		$this->assertIdentical($settings, $this->_subject->get_package_settings());
+	}
+
+
 	public function test__get_site_id__success()
 	{
 		// Expectations.
@@ -250,18 +297,16 @@ class Test_crumbly_model extends Testee_unit_test_case {
 
 	public function test__humanize__glossary_success()
 	{
-		/**
-		 * The settings are hard-coded in the model at present, which means
-		 * we can't mock them.
-		 *
-		 * Instead we just retrieve them, and test against the first item
-		 * in the glossary.
-		 */
+		// Shortcuts.
+		$config = $this->_ee->config;
 
-		$settings	= $this->_subject->get_package_settings();
-		$keys		= array_keys($settings['glossary']);
-		$machine	= $keys[0];
-		$human		= $settings['glossary'][$machine];
+		// Dummy values.
+		$settings	= array('glossary' => array('room' => 'Zimmer'));
+		$machine	= 'room';
+		$human		= 'Zimmer';
+
+		// Return values (used in `get_package_settings`).
+		$config->setReturnValue('item', $settings);
 
 		// Run the tests.
 		$this->assertIdentical($human, $this->_subject->humanize($machine));

@@ -30,6 +30,14 @@ class Crumbly_model extends CI_Model {
 	 * @var		string
 	 */
 	private $_package_name;
+
+	/**
+	 * Package settings.
+	 *
+	 * @access	private
+	 * @var		array
+	 */
+	private $_package_settings;
 	
 	/**
 	 * Package version.
@@ -123,26 +131,12 @@ class Crumbly_model extends CI_Model {
 	 */
 	public function get_package_settings()
 	{
-		return array(
-			'glossary' => array('room' => 'Zimmer'),
-			'template_groups' => array(
-				'about' => array(
-					'title' => 'About Us',
-					'templates' => array(
-						'founder'	=> 'Our Founder',
-						'history'	=> 'Our History',
-						'team'		=> 'Our Team',
-					)
-				),
-				'blog' => array(
-					'title' => 'News',
-					'templates' => array(
-						'archive'	=> 'Archived News',
-						'story'		=> 'News Story'
-					)
-				)
-			)
-		);
+		if ( ! $this->_package_settings)
+		{
+			$this->_package_settings = $this->_ee->config->item('crumbly_settings');
+		}
+
+		return $this->_package_settings;
 	}
 	
 	
