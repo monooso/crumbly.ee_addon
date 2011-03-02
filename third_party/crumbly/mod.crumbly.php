@@ -11,6 +11,23 @@
 class Crumbly {
 	
 	/* --------------------------------------------------------------
+	 * CONSTANTS
+	 * ------------------------------------------------------------ */
+
+	/**
+	 * Custom URL pattern segment types.
+	 *
+	 * @access	public
+	 * @var		string
+	 */
+	const CRUMBLY_ENTRY				= 'entry';
+	const CRUMBLY_GLOSSARY			= 'glossary';
+	const CRUMBLY_IGNORE			= 'ignore';
+	const CRUMBLY_TEMPLATE			= 'template';
+	const CRUMBLY_TEMPLATE_GROUP	= 'template_group';
+
+	
+	/* --------------------------------------------------------------
 	 * PUBLIC PROPERTIES
 	 * ------------------------------------------------------------ */
 	
@@ -153,11 +170,11 @@ class Crumbly {
 		for ($segment_count = 0, $segment_total = count($segments); $segment_count < $segment_total; $segment_count++)
 		{
 			$segment		= $segments[$segment_count];
-			$segment_type	= $segment_count < $pattern_total ? $pattern_segments[$segment_count] : 'ignore';
+			$segment_type	= $segment_count < $pattern_total ? $pattern_segments[$segment_count] : self::CRUMBLY_IGNORE;
 
 			switch ($segment_type)
 			{
-				case 'entry':		// url_title or entry_id
+				case self::CRUMBLY_ENTRY:
 					if ( ! $breadcrumb_title = $this->_model->get_channel_entry_title_from_segment($segment))
 					{
 						$breadcrumb_title = $this->_model->humanize($segment);
@@ -165,14 +182,14 @@ class Crumbly {
 
 					break;
 
-				case 'template':
+				case self::CRUMBLY_TEMPLATE:
 					$breadcrumb_title = array_key_exists($segment, $templates)
 						? $templates[$segment]
 						: $this->_model->humanize($segment);
 
 					break;
 
-				case 'template_group':
+				case self::CRUMBLY_TEMPLATE_GROUP:
 					if (array_key_exists($segment, $settings['template_groups']))
 					{
 						$breadcrumb_title	= $settings['template_groups'][$segment]['title'];
@@ -186,16 +203,16 @@ class Crumbly {
 
 					break;
 				
-				case 'ignore':		// Ignore segment.
+				case self::CRUMBLY_IGNORE:
 					break;
 
-				case 'glossary':	// Glossary term, falling back to humanised string.
+				case self::CRUMBLY_GLOSSARY:
 				default:
 					$breadcrumb_title = $this->_model->humanize($segment);
 					break;
 			}
 
-			if ($segment_type == 'ignore')
+			if ($segment_type == self::CRUMBLY_IGNORE)
 			{
 				continue;
 			}
