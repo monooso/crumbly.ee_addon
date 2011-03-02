@@ -14,7 +14,7 @@ class Mock_crumbly_model {
 	 * PUBLIC METHODS
 	 * ------------------------------------------------------------ */
 
-	public function get_channel_entry_title_from_url_title($url_title) {}
+	public function get_channel_entry_title_from_segment($segment) {}
 	public function get_package_settings() {}
 	public function get_template_groups() {}
 	public function humanize($machine = '', $use_glossary = TRUE) {}

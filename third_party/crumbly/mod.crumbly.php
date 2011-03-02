@@ -87,11 +87,12 @@ class Crumbly {
 		$breadcrumbs = array();
 
 		// Include a 'root' breadcrumb?
-		if ($tmpl->fetch_param('include_root', 'yes') == 'yes')
+		if ($tmpl->fetch_param('root_breadcrumb:include', 'yes') == 'yes')
 		{
 			$breadcrumbs[] = array(
-				'breadcrumb_title'	=> $tmpl->fetch_param('root_label', $lang->line('default_root_label')),
-				'target_url'		=> $tmpl->fetch_param('root_url', $fns->fetch_site_index())
+				'breadcrumb_segment'	=> '',
+				'breadcrumb_title'		=> $tmpl->fetch_param('root_breadcrumb:label', $lang->line('default_root_label')),
+				'breadcrumb_url'		=> $tmpl->fetch_param('root_breadcrumb:url', $fns->fetch_site_index())
 			);
 		}
 
@@ -140,7 +141,7 @@ class Crumbly {
 
 			$breadcrumbs[] = array(
 				'breadcrumb_segment'	=> $segments[1],
-				'breadcrumb_title'		=> $settings['template_groups'][$segments[0]]['templates'][$segments[1]],
+				'breadcrumb_title'		=> $title,
 				'breadcrumb_url'		=> $fns->create_url($segments[0] .'/' .$segments[1])
 			);
 		}
@@ -150,7 +151,7 @@ class Crumbly {
 		{
 			$breadcrumbs[] = array(
 				'breadcrumb_segment'	=> $segments[2],
-				'breadcrumb_title'		=> $this->_model->get_channel_entry_title_from_url_title($segments[2]),
+				'breadcrumb_title'		=> $this->_model->get_channel_entry_title_from_segment($segments[2]),
 				'breadcrumb_url'		=> $fns->create_url($segments[0] .'/' .$segments[1] .'/' .$segments[2])
 			);
 		}

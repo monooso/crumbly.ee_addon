@@ -75,6 +75,109 @@ class Test_crumbly_model extends Testee_unit_test_case {
 		// The test subject.
 		$this->_subject = new Crumbly_model($this->_package_name, $this->_package_version);
 	}
+
+
+	public function test__get_channel_entry_title_from_segment__url_title_success()
+	{
+		// Shortcuts.
+		$db = $this->_ee->db;
+
+		// Dummy values.
+		$url_title	= 'white_stripes';
+		$title		= 'The White Stripes';
+
+		$query_result		= $this->_get_mock('db_query');
+		$query_row			= new StdClass();
+		$query_row->title	= $title;
+
+		// Expectations.
+		$db->expectOnce('select', array('title'));
+		$db->expectOnce('get_where', array('channel_titles', array('url_title' => $url_title), 1));
+
+		$query_result->expectOnce('num_rows');
+		$query_result->expectOnce('row');
+
+		// Return values.
+		$db->setReturnReference('get_where', $query_result);
+		$query_result->setReturnValue('num_rows', 1);
+		$query_result->setReturnValue('row', $query_row);
+
+		// Run the tests.
+		$this->assertIdentical($title, $this->_subject->get_channel_entry_title_from_segment($url_title));
+	}
+
+
+	public function test__get_channel_entry_title_from_segment__entry_id_success()
+	{
+		// Shortcuts.
+		$db = $this->_ee->db;
+
+		// Dummy values.
+		$entry_id	= '10';
+		$title		= 'The White Stripes';
+
+		$query_result		= $this->_get_mock('db_query');
+		$query_row			= new StdClass();
+		$query_row->title	= $title;
+
+		// Expectations.
+		$db->expectOnce('select', array('title'));
+		$db->expectOnce('get_where', array('channel_titles', array('entry_id' => $entry_id), 1));
+
+		$query_result->expectOnce('num_rows');
+		$query_result->expectOnce('row');
+
+		// Return values.
+		$db->setReturnReference('get_where', $query_result);
+		$query_result->setReturnValue('num_rows', 1);
+		$query_result->setReturnValue('row', $query_row);
+
+		// Run the tests.
+		$this->assertIdentical($title, $this->_subject->get_channel_entry_title_from_segment($entry_id));
+	}
+
+
+	public function test__get_channel_entry_title_from_segment__no_segment()
+	{
+		// Shortcuts.
+		$db = $this->_ee->db;
+
+		// Dummy values.
+		$segment = '';;
+
+		// Expectations.
+		$db->expectNever('select');
+		$db->expectNever('get_where');
+
+		// Run the tests.
+		$this->assertIdentical(FALSE, $this->_subject->get_channel_entry_title_from_segment($segment));
+
+	}
+
+
+	public function test__get_channel_entry_title_from_segment__segment_not_found()
+	{
+		// Shortcuts.
+		$db = $this->_ee->db;
+
+		// Dummy values.
+		$url_title		= 'white_stripes';
+		$query_result	= $this->_get_mock('db_query');
+
+		// Expectations.
+		$db->expectOnce('select', array('title'));
+		$db->expectOnce('get_where', array('channel_titles', array('url_title' => $url_title), 1));
+
+		$query_result->expectOnce('num_rows');
+		$query_result->expectNever('row');
+
+		// Return values.
+		$db->setReturnReference('get_where', $query_result);
+		$query_result->setReturnValue('num_rows', 0);
+
+		// Run the tests.
+		$this->assertIdentical(FALSE, $this->_subject->get_channel_entry_title_from_segment($url_title));
+	}
 	
 	
 	public function test_constructor__package_name_and_version()

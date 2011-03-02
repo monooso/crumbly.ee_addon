@@ -69,6 +69,38 @@ class Crumbly_model extends CI_Model {
 		$this->_package_name	= $package_name ? $package_name : 'crumbly';
 		$this->_package_version	= $package_version ? $package_version : '0.1.0';
 	}
+
+
+	/**
+	 * Retrieves a channel entry title, given a URL segment. Supports url_title and entry_id.
+	 * Returns FALSE if the entry cannot be found.
+	 *
+	 * @access	public
+	 * @param	int|string		$segment	The URL segment.
+	 * @return	string|FALSE
+	 */
+	public function get_channel_entry_title_from_segment($segment = '')
+	{
+		// Get out early.
+		if ( ! $segment OR is_numeric($segment) && intval($segment) <= 0)
+		{
+			return FALSE;
+		}
+
+		// Shortcuts.
+		$db = $this->_ee->db;
+
+		// Are we dealing with a URL title, or an entry ID?
+		$query_clause = is_numeric($segment) && intval($segment) == $segment
+			? array('entry_id' => $segment)
+			: array('url_title' => $segment);
+
+		$db_result = $db->select('title')->get_where('channel_titles', $query_clause, 1);
+
+		return $db_result->num_rows()
+			? $db_result->row()->title
+			: FALSE;
+	}
 	
 	
 	/**
