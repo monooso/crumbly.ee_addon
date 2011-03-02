@@ -110,10 +110,12 @@ class Crumbly {
 			 * or a custom user-supplied URL structure.
 			 */
 
-			$breadcrumbs = ($url_pattern = $tmpl->fetch_param('url_pattern'))
-				? $this->_build_breadcrumbs_from_url_pattern($segments, $url_pattern)
-				: $this->_build_standard_breadcrumbs($segments);
+			if ( ! $url_pattern = $tmpl->fetch_param('url_pattern'))
+			{
+				$url_pattern = 'template_group/template/entry';
+			}
 
+			$breadcrumbs = $this->_build_breadcrumbs_from_url_pattern($segments, $url_pattern);
 		}
 
 		// Include a 'root' breadcrumb?
@@ -223,87 +225,6 @@ class Crumbly {
 				'breadcrumb_segment'	=> $segment,
 				'breadcrumb_title'		=> $breadcrumb_title,
 				'breadcrumb_url'		=> $fns->create_url(implode('/', $segments_thus_far))
-			);
-		}
-
-		return $breadcrumbs;
-	}
-
-
-	/**
-	 * Builds a breadcrumbs array based on a 'standard' URL structure.
-	 *
-	 * @access	private
-	 * @param	array		$segments		The URL segments.
-	 * @return	array
-	 */
-	private function _build_standard_breadcrumbs(Array $segments = array())
-	{
-		// Shortcuts.
-		$fns	= $this->_ee->functions;
-		$lang	= $this->_ee->lang;
-		$tmpl	= $this->_ee->TMPL;
-		$uri	= $this->_ee->uri;
-
-		// Breadcrumbs.
-		$breadcrumbs = array();
-
-		// Retrieve the package settings.
-		$settings = $this->_model->get_package_settings();
-
-		// What have we got?
-		$has_template_group = count($segments) > 0;
-		$has_template		= count($segments) > 1;
-		$has_entry			= count($segments) > 2;
-
-		if ($has_template_group)
-		{
-			$template_groups = $settings['template_groups'];
-
-			if (array_key_exists($segments[0], $template_groups))
-			{
-				$templates	= $template_groups[$segments[0]]['templates'];
-				$title		= $template_groups[$segments[0]]['title'];
-			}
-			else
-			{
-				$templates	= array();
-				$title		= $this->_model->humanize($segments[0]);
-			}
-
-			$breadcrumbs[] = array(
-				'breadcrumb_segment'	=> $segments[0],
-				'breadcrumb_title'		=> $title,
-				'breadcrumb_url'		=> $fns->create_url($segments[0])
-			);
-		}
-
-		// Template.
-		if ($has_template)
-		{
-			$title = array_key_exists($segments[1], $templates)
-				? $templates[$segments[1]]
-				: $this->_model->humanize($segments[1]);
-
-			$breadcrumbs[] = array(
-				'breadcrumb_segment'	=> $segments[1],
-				'breadcrumb_title'		=> $title,
-				'breadcrumb_url'		=> $fns->create_url($segments[0] .'/' .$segments[1])
-			);
-		}
-
-		// Channel Entry.
-		if ($has_entry)
-		{
-			if ( ! $breadcrumb_title = $this->_model->get_channel_entry_title_from_segment($segments[2]))
-			{
-				$breadcrumb_title = $this->_model->humanize($segments[2]);
-			}
-			
-			$breadcrumbs[] = array(
-				'breadcrumb_segment'	=> $segments[2],
-				'breadcrumb_title'		=> $breadcrumb_title,
-				'breadcrumb_url'		=> $fns->create_url($segments[0] .'/' .$segments[1] .'/' .$segments[2])
 			);
 		}
 
