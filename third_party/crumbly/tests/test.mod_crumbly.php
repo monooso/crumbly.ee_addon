@@ -422,18 +422,20 @@ class Test_crumbly extends Testee_unit_test_case {
 	}
 
 
-	public function test__breadcrumbs__custom_url_pattern_success()
+	public function test__breadcrumbs__custom_url_pattern_ignore_trailing()
 	{
 		// Retrieve the segments.
-		$segments = array('destinations', 'details', 'moscow', 'hotels', 'hilton-moscow', 'facilities', 'irrelevant');
+		$segments = array('destinations', 'details', 'moscow', 'hotels', 'hilton-moscow', 'facilities', 'irrelevant', 'trailing-segment-to-ignore');
 		$this->_ee->uri->setReturnValue('segment_array', $segments);
 
 		// Retrieve the tag parameters.
 		$include_root	= 'no';
 		$url_pattern	= 'template_group/template/entry/glossary/entry/glossary/ignore';
+		$ignore_trailing = 'yes';
 
 		$this->_ee->TMPL->setReturnValue('fetch_param', $include_root, array('root_breadcrumb:include', '*'));
-		$this->_ee->TMPL->setReturnValue('fetch_param', $url_pattern, array('url_pattern'));
+		$this->_ee->TMPL->setReturnValue('fetch_param', $url_pattern, array('custom_url:pattern'));
+		$this->_ee->TMPL->setReturnValue('fetch_param', $ignore_trailing, array('custom_url:ignore_trailing_segments', 'yes'));
 
 		// Package settings.
 		$settings = array(
@@ -498,6 +500,77 @@ class Test_crumbly extends Testee_unit_test_case {
 				'breadcrumb_segment'	=> 'facilities',
 				'breadcrumb_title'		=> 'Facilities',
 				'breadcrumb_url'		=> $site_url .'destinations/details/moscow/hotels/hilton-moscow/facilities/'
+			)
+		);
+
+		// Parsed tagdata.
+		$parsed_tagdata = 'parsed_tagdata';
+		$this->_ee->TMPL->expectOnce('parse_variables', array($tagdata, $breadcrumbs));
+		$this->_ee->TMPL->setReturnValue('parse_variables', $parsed_tagdata);
+
+		// Run the tests.
+		$this->_subject->breadcrumbs();
+	}
+
+	
+	public function test__breadcrumbs__custom_url_include_trailing()
+	{
+		// Retrieve the segments.
+		$segments = array('destinations', 'moscow', 'trailing-segment');
+		$this->_ee->uri->setReturnValue('segment_array', $segments);
+
+		// Retrieve the tag parameters.
+		$include_root	= 'no';
+		$url_pattern	= 'template_group/entry';
+		$ignore_trailing = 'no';
+
+		$this->_ee->TMPL->setReturnValue('fetch_param', $include_root, array('root_breadcrumb:include', '*'));
+		$this->_ee->TMPL->setReturnValue('fetch_param', $url_pattern, array('custom_url:pattern'));
+		$this->_ee->TMPL->setReturnValue('fetch_param', $ignore_trailing, array('custom_url:ignore_trailing_segments', 'yes'));
+
+		// Package settings.
+		$settings = array(
+			'glossary' => array(),
+			'template_groups' => array(
+				'destinations' => array('title' => 'Our Destinations', 'templates' => array())
+			)
+		);
+
+		$this->_model->setReturnValue('get_package_settings', $settings);
+
+		// URL builder.
+		$site_url = 'http://example.com/';
+
+		$this->_ee->functions->setReturnValue('create_url', $site_url .'destinations/', array('destinations'));
+		$this->_ee->functions->setReturnValue('create_url', $site_url .'destinations/moscow/', array('destinations/moscow'));
+		$this->_ee->functions->setReturnValue('create_url', $site_url .'destinations/moscow/trailing-segment/', array('destinations/moscow/trailing-segment'));
+
+		// Channel entry titles.
+		$this->_model->setReturnValue('get_channel_entry_title_from_segment', 'Moscow', array('moscow'));
+
+		// Humanising the 'facilities' string.
+		$this->_model->setReturnValue('humanize', 'Trailing Segment', array('trailing-segment'));
+
+		// Tagdata.
+		$tagdata = 'tagdata';
+		$this->_ee->TMPL->setReturnValue('__get', $tagdata, array('tagdata'));
+
+		// Expected breadcrumbs.
+		$breadcrumbs = array(
+			array(
+				'breadcrumb_segment'	=> 'destinations',
+				'breadcrumb_title'		=> 'Our Destinations',
+				'breadcrumb_url'		=> $site_url .'destinations/'
+			),
+			array(
+				'breadcrumb_segment'	=> 'moscow',
+				'breadcrumb_title'		=> 'Moscow',
+				'breadcrumb_url'		=> $site_url .'destinations/moscow/'
+			),
+			array(
+				'breadcrumb_segment'	=> 'trailing-segment',
+				'breadcrumb_title'		=> 'Trailing Segment',
+				'breadcrumb_url'		=> $site_url .'destinations/moscow/trailing-segment/'
 			)
 		);
 

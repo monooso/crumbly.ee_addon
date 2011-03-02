@@ -110,7 +110,7 @@ class Crumbly {
 			 * or a custom user-supplied URL structure.
 			 */
 
-			if ( ! $url_pattern = $tmpl->fetch_param('url_pattern'))
+			if ( ! $url_pattern = $tmpl->fetch_param('custom_url:pattern'))
 			{
 				$url_pattern = 'template_group/template/entry';
 			}
@@ -164,6 +164,7 @@ class Crumbly {
 		 * group, as we loop through the URL segments.
 		 */
 
+		$ignore_trailing	= (strtolower($tmpl->fetch_param('custom_url:ignore_trailing_segments', 'yes')) == 'yes');
 		$templates			= array();
 		$pattern_total		= count($pattern_segments);
 		$segments_thus_far	= array();
@@ -171,8 +172,17 @@ class Crumbly {
 		// Deal with each segment in turn.
 		for ($segment_count = 0, $segment_total = count($segments); $segment_count < $segment_total; $segment_count++)
 		{
-			$segment		= $segments[$segment_count];
-			$segment_type	= $segment_count < $pattern_total ? $pattern_segments[$segment_count] : self::CRUMBLY_IGNORE;
+			$segment = $segments[$segment_count];
+
+			// How should we handle 'trailing' segments?
+			if ($segment_count < $pattern_total)
+			{
+				$segment_type = $pattern_segments[$segment_count];
+			}
+			else
+			{
+				$segment_type = $ignore_trailing ? self::CRUMBLY_IGNORE : self::CRUMBLY_GLOSSARY;
+			}
 
 			switch ($segment_type)
 			{
