@@ -65,7 +65,7 @@ class Crumbly {
 	/* --------------------------------------------------------------
 	 * PUBLIC METHODS
 	 * ------------------------------------------------------------ */
-	
+
 	/**
 	 * Constructor.
 	 *
@@ -106,6 +106,14 @@ class Crumbly {
 		else
 		{
 			/**
+			 * The segments array, as retrieved from the EE URI class, is 1-based.
+			 * For our purposes, this is pointless hassle, so we convert it to a
+			 * zero-based array, before proceeding.
+			 */
+
+			$segments = array_values($segments);
+			
+			/**
 			 * Are we dealing with a 'standard' URL structure, which may be decyphered automatically,
 			 * or a custom user-supplied URL structure.
 			 */
@@ -121,6 +129,8 @@ class Crumbly {
 		// Include a 'root' breadcrumb?
 		if ($tmpl->fetch_param('root_breadcrumb:include', 'yes') == 'yes')
 		{
+			$lang->loadfile($this->_model->get_package_name());
+
 			array_unshift($breadcrumbs, array(
 				'breadcrumb_segment'	=> '',
 				'breadcrumb_title'		=> $tmpl->fetch_param('root_breadcrumb:label', $lang->line('default_root_label')),
@@ -141,7 +151,7 @@ class Crumbly {
 	 * Builds a breadcrumbs array, based on a custom user-supplied URL structure.
 	 *
 	 * @access	private
-	 * @param	array		$segments		The URL segments.
+	 * @param	array		$segments		The URL segments. Zero-based.
 	 * @param	string		$pattern		The URL pattern.
 	 * @return	array
 	 */

@@ -57,7 +57,7 @@ class Crumbly_mcp {
 	 */
 	public function index()
 	{
-		return '<p>Index page.</p>';
+		return '<p>Crumbly index page.</p>';
 	}
 	
 }

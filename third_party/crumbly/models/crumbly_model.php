@@ -228,7 +228,7 @@ class Crumbly_model extends CI_Model {
 		$this->_ee->db->insert('modules', array(
 			'has_cp_backend'		=> 'y',
 			'has_publish_fields'	=> 'n',
-			'module_name'			=> $this->get_package_name(),
+			'module_name'			=> ucfirst($this->get_package_name()),		// Won't work without ucfirst.
 			'module_version'		=> $this->get_package_version()
 		));
 	}
@@ -242,10 +242,12 @@ class Crumbly_model extends CI_Model {
 	 */
 	public function uninstall_module()
 	{
+		$module_name = ucfirst($this->get_package_name());
+
 		// Retrieve the module information.
 		$db_module = $this->_ee->db
 			->select('module_id')
-			->get_where('modules', array('module_name' => $this->get_package_name()), 1);
+			->get_where('modules', array('module_name' => $module_name), 1);
 		
 		if ($db_module->num_rows() !== 1)
 		{
@@ -256,7 +258,7 @@ class Crumbly_model extends CI_Model {
 		$this->_ee->db->delete('module_member_groups', array('module_id' => $db_module->row()->module_id));
 		
 		// Delete the module from the modules table.
-		$this->_ee->db->delete('modules', array('module_name' => $this->get_package_name()));
+		$this->_ee->db->delete('modules', array('module_name' => $module_name));
 		
 		return TRUE;
 	}

@@ -65,7 +65,7 @@ class Test_crumbly_model extends Testee_unit_test_case {
 		parent::setUp();
 		
 		// Dummy package name and version.
-		$this->_package_name 	= 'Example_package';
+		$this->_package_name 	= 'example_package';
 		$this->_package_version	= '1.0.0';
 		
 		// Dummy site ID value.
@@ -333,7 +333,7 @@ class Test_crumbly_model extends Testee_unit_test_case {
 		$query_data = array(
 			'has_cp_backend'		=> 'y',
 			'has_publish_fields'	=> 'n',
-			'module_name'			=> $this->_package_name,
+			'module_name'			=> ucfirst($this->_package_name),
 			'module_version'		=> $this->_package_version
 		);
 		
@@ -351,14 +351,15 @@ class Test_crumbly_model extends Testee_unit_test_case {
 		$db_module_result 			= $this->_get_mock('db_query');
 		$db_module_row 				= new StdClass();
 		$db_module_row->module_id	= '10';
+		$module_name				= ucfirst($this->_package_name);
 		
 		// Expectations.
 		$this->_ee->db->expectOnce('select', array('module_id'));
-		$this->_ee->db->expectOnce('get_where', array('modules', array('module_name' => $this->_package_name), 1));
+		$this->_ee->db->expectOnce('get_where', array('modules', array('module_name' => $module_name), 1));
 		
 		$this->_ee->db->expectCallCount('delete', 2);
 		$this->_ee->db->expectAt(0, 'delete', array('module_member_groups', array('module_id' => $db_module_row->module_id)));
-		$this->_ee->db->expectAt(1, 'delete', array('modules', array('module_name' => $this->_package_name)));
+		$this->_ee->db->expectAt(1, 'delete', array('modules', array('module_name' => $module_name)));
 				
 		// Return values.
 		$this->_ee->db->setReturnReference('get_where', $db_module_result);

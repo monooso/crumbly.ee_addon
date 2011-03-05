@@ -66,7 +66,10 @@ class Test_crumbly extends Testee_unit_test_case {
 	public function test__breadcrumbs__template_group_template_url_title()
 	{
 		// Retrieve the segments.
-		$segments = array('about', 'team', 'leonard');
+		$segments = array();
+		$segments[1]	= 'about';
+		$segments[2]	= 'team';
+		$segments[3]	= 'leonard';
 
 		$this->_ee->uri->expectOnce('segment_array');
 		$this->_ee->uri->setReturnValue('segment_array', $segments);
@@ -158,7 +161,9 @@ class Test_crumbly extends Testee_unit_test_case {
 		$template_group_title	= 'About';
 
 		// Retrieve the segments.
-		$segments = array($template_group);
+		$segments = array();
+		$segments[1] = $template_group;
+
 		$this->_ee->uri->setReturnValue('segment_array', $segments);
 
 		// Retrieve the package settings.
@@ -210,7 +215,10 @@ class Test_crumbly extends Testee_unit_test_case {
 		$template_title			= 'Team';
 
 		// Retrieve the segments.
-		$segments = array($template_group, $template);
+		$segments = array();
+		$segments[1]	= $template_group;
+		$segments[2]	= $template;
+
 		$this->_ee->uri->setReturnValue('segment_array', $segments);
 
 		// Retrieve the package settings.
@@ -265,7 +273,9 @@ class Test_crumbly extends Testee_unit_test_case {
 	public function test__breadcrumbs__template_not_in_settings()
 	{
 		// Retrieve the segments.
-		$segments = array('about', 'team');
+		$segments		= array();
+		$segments[1]	= 'about';
+		$segments[2]	= 'team';
 
 		$this->_ee->uri->expectOnce('segment_array');
 		$this->_ee->uri->setReturnValue('segment_array', $segments);
@@ -425,7 +435,16 @@ class Test_crumbly extends Testee_unit_test_case {
 	public function test__breadcrumbs__custom_url_pattern_ignore_trailing()
 	{
 		// Retrieve the segments.
-		$segments = array('destinations', 'details', 'moscow', 'hotels', 'hilton-moscow', 'facilities', 'irrelevant', 'trailing-segment-to-ignore');
+		$segments		= array();
+		$segments[1]	= 'destinations';
+		$segments[2]	= 'details';
+		$segments[3]	= 'moscow';
+		$segments[4]	= 'hotels';
+		$segments[5]	= 'hilton-moscow';
+		$segments[6]	= 'facilities';
+		$segments[7]	= 'irrelevant';
+		$segments[8]	= 'trailing-segment-to-ignore';
+
 		$this->_ee->uri->setReturnValue('segment_array', $segments);
 
 		// Retrieve the tag parameters.
@@ -516,7 +535,11 @@ class Test_crumbly extends Testee_unit_test_case {
 	public function test__breadcrumbs__custom_url_include_trailing()
 	{
 		// Retrieve the segments.
-		$segments = array('destinations', 'moscow', 'trailing-segment');
+		$segments		= array();
+		$segments[1]	= 'destinations';
+		$segments[2]	= 'moscow';
+		$segments[3]	= 'trailing-segment';
+
 		$this->_ee->uri->setReturnValue('segment_array', $segments);
 
 		// Retrieve the tag parameters.
