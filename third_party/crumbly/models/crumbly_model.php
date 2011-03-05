@@ -5,7 +5,9 @@
  *
  * @author			Stephen Lewis <stephen@experienceinternet.co.uk>
  * @copyright		Experience Internet
- * @package			Crumbly * @version 		0.1.0 */
+ * @package			Crumbly
+ * @version 		0.1.0
+ */
 
 class Crumbly_model extends CI_Model {
 	
@@ -28,6 +30,14 @@ class Crumbly_model extends CI_Model {
 	 * @var		string
 	 */
 	private $_package_name;
+
+	/**
+	 * Package settings.
+	 *
+	 * @access	private
+	 * @var		array
+	 */
+	private $_package_settings;
 	
 	/**
 	 * Package version.
@@ -67,6 +77,38 @@ class Crumbly_model extends CI_Model {
 		$this->_package_name	= $package_name ? $package_name : 'crumbly';
 		$this->_package_version	= $package_version ? $package_version : '0.1.0';
 	}
+
+
+	/**
+	 * Retrieves a channel entry title, given a URL segment. Supports url_title and entry_id.
+	 * Returns FALSE if the entry cannot be found.
+	 *
+	 * @access	public
+	 * @param	int|string		$segment	The URL segment.
+	 * @return	string|FALSE
+	 */
+	public function get_channel_entry_title_from_segment($segment = '')
+	{
+		// Get out early.
+		if ( ! $segment OR is_numeric($segment) && intval($segment) <= 0)
+		{
+			return FALSE;
+		}
+
+		// Shortcuts.
+		$db = $this->_ee->db;
+
+		// Are we dealing with a URL title, or an entry ID?
+		$query_clause = is_numeric($segment) && intval($segment) == $segment
+			? array('entry_id' => $segment)
+			: array('url_title' => $segment);
+
+		$db_result = $db->select('title')->get_where('channel_titles', $query_clause, 1);
+
+		return $db_result->num_rows()
+			? $db_result->row()->title
+			: FALSE;
+	}
 	
 	
 	/**
@@ -82,6 +124,23 @@ class Crumbly_model extends CI_Model {
 	
 	
 	/**
+	 * Returns the package settings.
+	 *
+	 * @access	public
+	 * @return	array
+	 */
+	public function get_package_settings()
+	{
+		if ( ! $this->_package_settings)
+		{
+			$this->_package_settings = $this->_ee->config->item('crumbly_settings');
+		}
+
+		return $this->_package_settings;
+	}
+	
+	
+	/**
 	 * Returns the package version.
 	 *
 	 * @access	public
@@ -91,8 +150,8 @@ class Crumbly_model extends CI_Model {
 	{
 		return $this->_package_version;
 	}
-	
-	
+
+
 	/**
 	 * Returns the site ID.
 	 *
@@ -111,6 +170,40 @@ class Crumbly_model extends CI_Model {
 	
 	
 	/**
+	 * Takes a string and attempts to "humanise" it.
+	 *
+	 * @access	public
+	 * @param	string		$machine		The 'machine friendly' string (the URL segment).
+	 * @param	bool		$use_glossary	Consult the glossary first?
+	 * @return	string
+	 */
+	public function humanize($machine = '', $use_glossary = TRUE)
+	{
+		// Get out early.
+		if ( ! $machine OR ! is_string($machine))
+		{
+			return '';
+		}
+
+		// By default, we always start by checking the glossary.
+		if ($use_glossary !== FALSE)
+		{
+			$settings = $this->get_package_settings();
+
+			if (array_key_exists($machine, $settings['glossary']))
+			{
+				return $settings['glossary'][$machine];
+			}
+		}
+
+		// Do the best we can.
+		$separator = $this->_ee->config->item('word_separator') == 'underscore' ? '_' : '-';
+		
+		return ucwords(str_replace($separator, ' ', $machine));
+	}
+
+
+	/**
 	 * Installs the module.
 	 *
 	 * @access	public
@@ -119,21 +212,9 @@ class Crumbly_model extends CI_Model {
 	public function install_module()
 	{
 		$this->install_module_register();
-		$this->install_module_actions();
 		
 		return TRUE;
 	}
-	
-	
-	/**
-	 * Register the module actions in the database.
-	 *
-	 * @access	public
-	 * @return	void
-	 */
-	public function install_module_actions()
-	{
-			}
 	
 	
 	/**
@@ -147,7 +228,7 @@ class Crumbly_model extends CI_Model {
 		$this->_ee->db->insert('modules', array(
 			'has_cp_backend'		=> 'y',
 			'has_publish_fields'	=> 'n',
-			'module_name'			=> $this->get_package_name(),
+			'module_name'			=> ucfirst($this->get_package_name()),		// Won't work without ucfirst.
 			'module_version'		=> $this->get_package_version()
 		));
 	}
@@ -161,10 +242,12 @@ class Crumbly_model extends CI_Model {
 	 */
 	public function uninstall_module()
 	{
+		$module_name = ucfirst($this->get_package_name());
+
 		// Retrieve the module information.
 		$db_module = $this->_ee->db
 			->select('module_id')
-			->get_where('modules', array('module_name' => $this->get_package_name()), 1);
+			->get_where('modules', array('module_name' => $module_name), 1);
 		
 		if ($db_module->num_rows() !== 1)
 		{
@@ -175,10 +258,7 @@ class Crumbly_model extends CI_Model {
 		$this->_ee->db->delete('module_member_groups', array('module_id' => $db_module->row()->module_id));
 		
 		// Delete the module from the modules table.
-		$this->_ee->db->delete('modules', array('module_name' => $this->get_package_name()));
-		
-		// Delete the module from the actions table.
-		$this->_ee->db->delete('actions', array('class' => $this->get_package_name()));
+		$this->_ee->db->delete('modules', array('module_name' => $module_name));
 		
 		return TRUE;
 	}

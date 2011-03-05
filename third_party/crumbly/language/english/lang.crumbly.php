@@ -15,6 +15,11 @@ $lang = array(
 'crumbly_module_name'			=> 'Crumbly',
 'crumbly_module_description'	=> 'Automatically generate page breadcrumbs based on the current URL.',
 
+/* --------------------------------------------------------------
+ * MODULE TEMPLATE TAGS
+ * ------------------------------------------------------------ */
+'default_root_label'			=> 'Home',
+
 // All done.
 '' => ''
 	
