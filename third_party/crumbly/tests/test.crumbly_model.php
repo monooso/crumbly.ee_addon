@@ -240,6 +240,36 @@ class Test_crumbly_model extends Testee_unit_test_case {
 	}
 
 
+	public function test__get_package_theme_url__end_slash_exists()
+	{
+		// Dummy values.
+		$config_theme_url	= 'http://example.com/themes/';
+		$return_theme_url	= 'http://example.com/themes/third_party/' .$this->_package_name .'/';
+		
+		// Expectations and return values.
+		$this->_ee->config->expectOnce('item', array('theme_folder_url'));
+		$this->_ee->config->setReturnValue('item', $config_theme_url, array('theme_folder_url'));
+
+		// Run the tests.
+		$this->assertIdentical($return_theme_url, $this->_subject->get_package_theme_url());
+	}
+		
+
+	public function test__get_package_theme_url__no_end_slash_exists()
+	{
+		// Dummy values.
+		$config_theme_url	= 'http://example.com/themes';
+		$return_theme_url	= 'http://example.com/themes/third_party/' .$this->_package_name .'/';
+		
+		// Expectations and return values.
+		$this->_ee->config->expectOnce('item', array('theme_folder_url'));
+		$this->_ee->config->setReturnValue('item', $config_theme_url, array('theme_folder_url'));
+
+		// Run the tests.
+		$this->assertIdentical($return_theme_url, $this->_subject->get_package_theme_url());
+	}
+		
+
 	public function test__get_site_id__success()
 	{
 		// Expectations.

@@ -15,7 +15,9 @@ class Mock_crumbly_model {
 	 * ------------------------------------------------------------ */
 
 	public function get_channel_entry_title_from_segment($segment) {}
+	public function get_package_name() {}
 	public function get_package_settings() {}
+	public function get_package_theme_url() {}
 	public function get_template_groups() {}
 	public function humanize($machine = '', $use_glossary = TRUE) {}
 

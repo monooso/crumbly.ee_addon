@@ -20,6 +20,19 @@ $lang = array(
  * ------------------------------------------------------------ */
 'default_root_label'			=> 'Home',
 
+/* --------------------------------------------------------------
+ * CONTROL PANEL
+ * ------------------------------------------------------------ */
+// Page headings.
+'hd_crumbly_settings'			=> 'Crumbly Settings',
+
+// Form field labels.
+'lbl_save_settings'				=> 'Save Settings',
+
+// Table headings.
+'thd_display_title'				=> 'Display Title',
+'thd_url_segment'				=> 'URL Segment',
+
 // All done.
 '' => ''
 	
