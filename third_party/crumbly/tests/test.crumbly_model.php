@@ -193,6 +193,46 @@ class Test_crumbly_model extends Testee_unit_test_case {
 	}
 
 
+	public function test__delete_all_glossary_terms__success()
+	{
+		$where = array('site_id' => $this->_site_id);
+		$this->_ee->db->expectOnce('delete', array('crumbly_glossary', $where));
+	
+		$this->assertIdentical(TRUE, $this->_subject->delete_all_glossary_terms());
+	}
+
+
+	public function test__get_all_glossary_terms__success()
+	{
+		$this->_ee->db->expectOnce('select', array('glossary_definition, glossary_term, glossary_term_id'));
+		$this->_ee->db->expectOnce('get_where', array('crumbly_glossary', array('site_id' => $this->_site_id)));
+
+		$db_result	= $this->_get_mock('db_query');
+		$db_rows	= array(
+			array(
+				'glossary_definition'	=> 'Definition A',
+				'glossary_term'			=> 'term_a',
+				'glossary_term_id'		=> 10
+			),
+			array(
+				'glossary_definition'	=> 'Definition B',
+				'glossary_term'			=> 'term_b',
+				'glossary_term_id'		=> 20
+			)
+		);
+
+		$this->_ee->db->setReturnReference('get_where', $db_result);
+		$db_result->setReturnValue('result_array', $db_rows);
+
+		foreach ($db_rows AS $db_row)
+		{
+			$return[] = new Crumbly_glossary_term($db_row);
+		}
+	
+		$this->assertIdentical($return, $this->_subject->get_all_glossary_terms());
+	}
+
+
 	public function test__get_package_settings__success()
 	{
 		// Shortcuts.
@@ -464,6 +504,76 @@ class Test_crumbly_model extends Testee_unit_test_case {
 		$this->_ee->dbforge->expectOnce('create_table', array('crumbly_template_groups', TRUE));
 	
 		$this->_subject->install_module_template_groups_table();
+	}
+
+
+	public function test__save_glossary_term__create_success()
+	{
+		$definition		= 'Definition';
+		$term			= 'term';
+		$glossary_term	= new Crumbly_glossary_term(array(
+			'glossary_definition'	=> $definition,
+			'glossary_term'			=> $term
+		));
+
+		$insert_data = array(
+			'glossary_definition'	=> $definition,
+			'glossary_term'			=> $term,
+			'site_id'				=> $this->_site_id
+		);
+
+		$this->_ee->db->expectOnce('insert', array('crumbly_glossary', $insert_data));
+		$this->_ee->db->expectNever('update');
+	
+		$this->assertEqual(TRUE, $this->_subject->save_glossary_term($glossary_term));
+	}
+
+
+	public function test__save_glossary_term__update_success()
+	{
+		$definition		= 'Definition';
+		$term			= 'term';
+		$term_id		= 10;
+		$glossary_term	= new Crumbly_glossary_term(array(
+			'glossary_definition'	=> $definition,
+			'glossary_term'			=> $term,
+			'glossary_term_id'		=> $term_id
+		));
+
+		$insert_data = array(
+			'glossary_definition'	=> $definition,
+			'glossary_term'			=> $term,
+			'site_id'				=> $this->_site_id
+		);
+
+		$where = array('glossary_term_id' => $term_id);
+
+		$this->_ee->db->expectOnce('update', array('crumbly_glossary', $insert_data, $where));
+		$this->_ee->db->expectNever('insert');
+
+		$this->assertEqual(TRUE, $this->_subject->save_glossary_term($glossary_term));
+	}
+
+
+	public function test__save_glossary_term__missing_glossary_definition()
+	{
+		$glossary_term = new Crumbly_glossary_term(array('glossary_term' => 'term'));
+
+		$this->_ee->db->expectNever('insert');
+		$this->_ee->db->expectNever('update');
+	
+		$this->assertEqual(FALSE, $this->_subject->save_glossary_term($glossary_term));
+	}
+
+
+	public function test__save_glossary_term__missing_glossary_term()
+	{
+		$glossary_term = new Crumbly_glossary_term(array('glossary_definition' => 'Definition'));
+
+		$this->_ee->db->expectNever('insert');
+		$this->_ee->db->expectNever('update');
+	
+		$this->assertEqual(FALSE, $this->_subject->save_glossary_term($glossary_term));
 	}
 
 

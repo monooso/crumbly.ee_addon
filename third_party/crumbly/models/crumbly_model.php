@@ -9,6 +9,10 @@
  * @version 		0.1.0
  */
 
+require_once PATH_THIRD .'crumbly/classes/crumbly_glossary_term' .EXT;
+require_once PATH_THIRD .'crumbly/classes/crumbly_template' .EXT;
+require_once PATH_THIRD .'crumbly/classes/crumbly_template_group' .EXT;
+
 class Crumbly_model extends CI_Model {
 	
 	/* --------------------------------------------------------------
@@ -76,6 +80,41 @@ class Crumbly_model extends CI_Model {
 		$this->_ee 				=& get_instance();
 		$this->_package_name	= $package_name ? $package_name : 'crumbly';
 		$this->_package_version	= $package_version ? $package_version : '0.1.0';
+	}
+
+
+	/**
+	 * Deletes all the glossary terms for the current site from the database.
+	 *
+	 * @access	public
+	 * @return	bool
+	 */
+	public function delete_all_glossary_terms()
+	{
+		$this->_ee->db->delete('crumbly_glossary', array('site_id' => $this->get_site_id()));
+		return TRUE;
+	}
+
+
+	/**
+	 * Returns all the glossary terms for the current site.
+	 *
+	 * @access	public
+	 * @return	array
+	 */
+	public function get_all_glossary_terms()
+	{
+		$db_terms = $this->_ee->db->select('glossary_definition, glossary_term, glossary_term_id')
+			->get_where('crumbly_glossary', array('site_id' => $this->get_site_id()));
+
+		$terms = array();
+
+		foreach ($db_terms->result_array() AS $db_term)
+		{
+			$terms[] = new Crumbly_glossary_term($db_term);
+		}
+
+		return $terms;
 	}
 
 
@@ -358,6 +397,40 @@ class Crumbly_model extends CI_Model {
 		$this->_ee->dbforge->add_key('site_id');
 		$this->_ee->dbforge->add_key('group_id', TRUE);
 		$this->_ee->dbforge->create_table('crumbly_template_groups', TRUE);
+	}
+
+
+	/**
+	 * Saves the specified glossary term to the database.
+	 *
+	 * @access	public
+	 * @param	Crumbly_glossary_term		$glossary_term		The glossary term to save.
+	 * @return	bool
+	 */
+	public function save_glossary_term(Crumbly_glossary_term $glossary_term)
+	{
+		if ( ! $glossary_term->get_glossary_definition() OR ! $glossary_term->get_glossary_term())
+		{
+			return FALSE;
+		}
+
+		$data = array(
+			'glossary_definition'	=> $glossary_term->get_glossary_definition(),
+			'glossary_term'			=> $glossary_term->get_glossary_term(),
+			'site_id'				=> $this->get_site_id()
+		);
+
+		if ($glossary_term->get_glossary_term_id())
+		{
+			$where = array('glossary_term_id' => $glossary_term->get_glossary_term_id());
+			$this->_ee->db->update('crumbly_glossary', $data, $where);
+		}
+		else
+		{
+			$this->_ee->db->insert('crumbly_glossary', $data);
+		}
+
+		return TRUE;
 	}
 	
 	
