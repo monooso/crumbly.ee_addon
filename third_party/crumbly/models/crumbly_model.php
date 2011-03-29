@@ -229,11 +229,53 @@ class Crumbly_model extends CI_Model {
 	public function install_module()
 	{
 		$this->install_module_register();
+		$this->install_module_glossary_table();
+		$this->install_module_templates_table();
+		$this->install_module_template_groups_table();
 		
 		return TRUE;
 	}
-	
-	
+
+
+	/**
+	 * Creates the 'Crumbly Glossary' database table.
+	 *
+	 * @access	public
+	 * @return	void
+	 */
+	public function install_module_glossary_table()
+	{
+		$this->_ee->load->dbforge();
+
+		$fields = array(
+			'glossary_term_id' => array(
+				'auto_increment'	=> TRUE,
+				'constraint'		=> 10,
+				'type'				=> 'INT',
+				'unsigned'			=> TRUE
+			),
+			'site_id' => array(
+				'constraint'		=> 5,
+				'type'				=> 'INT',
+				'unsigned'			=> TRUE
+			),
+			'glossary_definition' => array(
+				'constraint'		=> 255,
+				'type'				=> 'VARCHAR'
+			),
+			'glossary_term' => array(
+				'constraint'		=> 255,
+				'type'				=> 'VARCHAR'
+			)
+		);
+
+		$this->_ee->dbforge->add_field($fields);
+		$this->_ee->dbforge->add_key('glossary_term_id', TRUE);
+		$this->_ee->dbforge->add_key('site_id');
+		$this->_ee->dbforge->create_table('crumbly_glossary', TRUE);
+	}
+
+
 	/**
 	 * Register the module in the database.
 	 *
@@ -248,6 +290,74 @@ class Crumbly_model extends CI_Model {
 			'module_name'			=> ucfirst($this->get_package_name()),		// Won't work without ucfirst.
 			'module_version'		=> $this->get_package_version()
 		));
+	}
+	
+	
+	/**
+	 * Creates the 'Crumbly Templates' database table.
+	 *
+	 * @access	public
+	 * @return	void
+	 */
+	public function install_module_templates_table()
+	{
+		$this->_ee->load->dbforge();
+
+		$fields = array(
+			'template_id' => array(
+				'constraint'	=> 10,
+				'type'			=> 'INT',
+				'unsigned'		=> TRUE
+			),
+			'site_id' => array(
+				'constraint'	=> 5,
+				'type'			=> 'INT',
+				'unsigned'		=> TRUE
+			),
+			'label' => array(
+				'constraint'	=> 255,
+				'type'			=> 'VARCHAR'
+			)
+		);
+
+		$this->_ee->dbforge->add_field($fields);
+		$this->_ee->dbforge->add_key('site_id');
+		$this->_ee->dbforge->add_key('template_id', TRUE);
+		$this->_ee->dbforge->create_table('crumbly_templates', TRUE);
+	}
+	
+	
+	/**
+	 * Creates the 'Crumbly Template Groups' database table.
+	 *
+	 * @access	public
+	 * @return	void
+	 */
+	public function install_module_template_groups_table()
+	{
+		$this->_ee->load->dbforge();
+
+		$fields = array(
+			'group_id' => array(
+				'constraint'	=> 10,
+				'type'			=> 'INT',
+				'unsigned'		=> TRUE
+			),
+			'site_id' => array(
+				'constraint'	=> 5,
+				'type'			=> 'INT',
+				'unsigned'		=> TRUE
+			),
+			'label' => array(
+				'constraint'	=> 255,
+				'type'			=> 'VARCHAR'
+			)
+		);
+
+		$this->_ee->dbforge->add_field($fields);
+		$this->_ee->dbforge->add_key('site_id');
+		$this->_ee->dbforge->add_key('group_id', TRUE);
+		$this->_ee->dbforge->create_table('crumbly_template_groups', TRUE);
 	}
 	
 	
@@ -271,11 +381,13 @@ class Crumbly_model extends CI_Model {
 			return FALSE;
 		}
 		
-		// Delete module from the module_member_groups table.
 		$this->_ee->db->delete('module_member_groups', array('module_id' => $db_module->row()->module_id));
-		
-		// Delete the module from the modules table.
 		$this->_ee->db->delete('modules', array('module_name' => $module_name));
+
+		$this->_ee->load->dbforge();
+		$this->_ee->dbforge->drop_table('crumbly_glossary');
+		$this->_ee->dbforge->drop_table('crumbly_templates');
+		$this->_ee->dbforge->drop_table('crumbly_template_groups');
 		
 		return TRUE;
 	}

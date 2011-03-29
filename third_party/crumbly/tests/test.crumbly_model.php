@@ -357,6 +357,40 @@ class Test_crumbly_model extends Testee_unit_test_case {
 	}
 
 
+	public function test__install_module_glossary_table__success()
+	{
+		$fields = array(
+			'glossary_term_id' => array(
+				'auto_increment'	=> TRUE,
+				'constraint'		=> 10,
+				'type'				=> 'INT',
+				'unsigned'			=> TRUE
+			),
+			'site_id' => array(
+				'constraint'		=> 5,
+				'type'				=> 'INT',
+				'unsigned'			=> TRUE
+			),
+			'glossary_definition' => array(
+				'constraint'		=> 255,
+				'type'				=> 'VARCHAR'
+			),
+			'glossary_term' => array(
+				'constraint'		=> 255,
+				'type'				=> 'VARCHAR'
+			)
+		);
+
+		$this->_ee->dbforge->expectOnce('add_field', array($fields));
+		$this->_ee->dbforge->expectCallCount('add_key', 2);
+		$this->_ee->dbforge->expectAt(0, 'add_key', array('glossary_term_id', TRUE));
+		$this->_ee->dbforge->expectAt(1, 'add_key', array('site_id'));
+		$this->_ee->dbforge->expectOnce('create_table', array('crumbly_glossary', TRUE));
+	
+		$this->_subject->install_module_glossary_table();
+	}
+
+
 	public function test__install_module_register__success()
 	{
 		// Dummy values.
@@ -375,28 +409,86 @@ class Test_crumbly_model extends Testee_unit_test_case {
 	}
 	
 		
+	public function test__install_module_templates_table__success()
+	{
+		$fields = array(
+			'template_id' => array(
+				'constraint'		=> 10,
+				'type'				=> 'INT',
+				'unsigned'			=> TRUE
+			),
+			'site_id' => array(
+				'constraint'		=> 5,
+				'type'				=> 'INT',
+				'unsigned'			=> TRUE
+			),
+			'label' => array(
+				'constraint'		=> 255,
+				'type'				=> 'VARCHAR'
+			)
+		);
+
+		$this->_ee->dbforge->expectOnce('add_field', array($fields));
+		$this->_ee->dbforge->expectCallCount('add_key', 2);
+		$this->_ee->dbforge->expectAt(0, 'add_key', array('site_id'));
+		$this->_ee->dbforge->expectAt(1, 'add_key', array('template_id', TRUE));
+		$this->_ee->dbforge->expectOnce('create_table', array('crumbly_templates', TRUE));
+	
+		$this->_subject->install_module_templates_table();
+	}
+
+
+	public function test__install_module_template_groups_table__success()
+	{
+		$fields = array(
+			'group_id' => array(
+				'constraint'		=> 10,
+				'type'				=> 'INT',
+				'unsigned'			=> TRUE
+			),
+			'site_id' => array(
+				'constraint'		=> 5,
+				'type'				=> 'INT',
+				'unsigned'			=> TRUE
+			),
+			'label' => array(
+				'constraint'		=> 255,
+				'type'				=> 'VARCHAR'
+			)
+		);
+
+		$this->_ee->dbforge->expectOnce('add_field', array($fields));
+		$this->_ee->dbforge->expectCallCount('add_key', 2);
+		$this->_ee->dbforge->expectAt(0, 'add_key', array('site_id'));
+		$this->_ee->dbforge->expectAt(1, 'add_key', array('group_id', TRUE));
+		$this->_ee->dbforge->expectOnce('create_table', array('crumbly_template_groups', TRUE));
+	
+		$this->_subject->install_module_template_groups_table();
+	}
+
+
 	public function test__uninstall_module__success()
 	{
-		// Dummy values.
 		$db_module_result 			= $this->_get_mock('db_query');
 		$db_module_row 				= new StdClass();
 		$db_module_row->module_id	= '10';
 		$module_name				= ucfirst($this->_package_name);
 		
-		// Expectations.
 		$this->_ee->db->expectOnce('select', array('module_id'));
 		$this->_ee->db->expectOnce('get_where', array('modules', array('module_name' => $module_name), 1));
+		$this->_ee->db->setReturnReference('get_where', $db_module_result);
+		$db_module_result->setReturnValue('num_rows', 1);
+		$db_module_result->setReturnValue('row', $db_module_row);
 		
 		$this->_ee->db->expectCallCount('delete', 2);
 		$this->_ee->db->expectAt(0, 'delete', array('module_member_groups', array('module_id' => $db_module_row->module_id)));
 		$this->_ee->db->expectAt(1, 'delete', array('modules', array('module_name' => $module_name)));
 				
-		// Return values.
-		$this->_ee->db->setReturnReference('get_where', $db_module_result);
-		$db_module_result->setReturnValue('num_rows', 1);
-		$db_module_result->setReturnValue('row', $db_module_row);
-		
-		// Tests.
+		$this->_ee->dbforge->expectCallCount('drop_table', 3);
+		$this->_ee->dbforge->expectAt(0, 'drop_table', array('crumbly_glossary'));
+		$this->_ee->dbforge->expectAt(1, 'drop_table', array('crumbly_templates'));
+		$this->_ee->dbforge->expectAt(2, 'drop_table', array('crumbly_template_groups'));
+
 		$this->assertIdentical(TRUE, $this->_subject->uninstall_module());
 	}
 	
