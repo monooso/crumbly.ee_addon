@@ -525,11 +525,7 @@ class Crumbly_model extends CI_Model {
 			return FALSE;
 		}
 
-		$data = array(
-			'label'			=> $template->get_label(),
-			'site_id'		=> $this->get_site_id(),
-			'template_id'	=> $template->get_template_id()
-		);
+		$data = array_merge($template->to_array(), array('site_id' => $this->get_site_id()));
 
 		$this->_ee->db->delete('crumbly_templates', array(
 			'site_id'		=> $this->get_site_id(),
@@ -537,6 +533,32 @@ class Crumbly_model extends CI_Model {
 		));
 
 		$this->_ee->db->insert('crumbly_templates', $data);
+		return TRUE;
+	}
+
+
+	/**
+	 * Saves the specified Crumbly template group to the database.
+	 *
+	 * @access	public
+	 * @param	Crumbly_template_group		$group		The template group to save.
+	 * @return	bool
+	 */
+	public function save_template_group(Crumbly_template_group $group)
+	{
+		if ( ! $group->get_group_id() OR ! $group->get_label())
+		{
+			return FALSE;
+		}
+
+		$data = array_merge($group->to_array(), array('site_id' => $this->get_site_id()));
+
+		$this->_ee->db->delete('crumbly_template_groups', array(
+			'group_id'	=> $group->get_group_id(),
+			'site_id'	=> $this->get_site_id()
+		));
+
+		$this->_ee->db->insert('crumbly_template_groups', $data);
 		return TRUE;
 	}
 	

@@ -747,7 +747,7 @@ class Test_crumbly_model extends Testee_unit_test_case {
 	}
 
 
-	public function test__save_template__create_success()
+	public function test__save_template__success()
 	{
 		$template = new Crumbly_template(array(
 			'label'			=> 'Example template',
@@ -756,8 +756,8 @@ class Test_crumbly_model extends Testee_unit_test_case {
 
 		$insert_data = array(
 			'label'			=> $template->get_label(),
-			'site_id'		=> $this->_site_id,
-			'template_id'	=> $template->get_template_id()
+			'template_id'	=> $template->get_template_id(),
+			'site_id'		=> $this->_site_id
 		);
 
 		$delete_criteria = array(
@@ -791,6 +791,53 @@ class Test_crumbly_model extends Testee_unit_test_case {
 		$this->_ee->db->expectNever('insert');
 
 		$this->assertIdentical(FALSE, $this->_subject->save_template($template));
+	}
+
+
+	public function test__save_template_group__success()
+	{
+		$group = new Crumbly_template_group(array(
+			'group_id'	=> 10,
+			'label'		=> 'Example group'
+		));
+
+		$insert_data = array(
+			'group_id'	=> $group->get_group_id(),
+			'label'		=> $group->get_label(),
+			'site_id'	=> $this->_site_id
+		);
+
+		$delete_criteria = array(
+			'group_id'	=> $group->get_group_id(),
+			'site_id'	=> $this->_site_id
+		);
+
+		$this->_ee->db->expectOnce('delete', array('crumbly_template_groups', $delete_criteria));
+		$this->_ee->db->expectOnce('insert', array('crumbly_template_groups', $insert_data));
+	
+		$this->assertIdentical(TRUE, $this->_subject->save_template_group($group));
+	}
+
+
+	public function test__save_template_group__missing_group_id()
+	{
+		$group = new Crumbly_template_group(array('label' => 'Example group'));
+
+		$this->_ee->db->expectNever('delete');
+		$this->_ee->db->expectNever('insert');
+	
+		$this->assertIdentical(FALSE, $this->_subject->save_template_group($group));
+	}
+
+
+	public function test__save_template_group__missing_label()
+	{
+		$group = new Crumbly_template_group(array('group_id' => 10));
+
+		$this->_ee->db->expectNever('delete');
+		$this->_ee->db->expectNever('insert');
+	
+		$this->assertIdentical(FALSE, $this->_subject->save_template_group($group));
 	}
 
 
