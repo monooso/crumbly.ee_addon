@@ -24,7 +24,6 @@ $lang = array(
  * CONTROL PANEL
  * ------------------------------------------------------------ */
 // Page headings.
-'hd_crumbly_settings'			=> 'Crumbly Settings',
 'hd_glossary'					=> 'Glossary',
 'hd_templates'					=> 'Templates',
 'hd_template_groups'			=> 'Template Groups',
