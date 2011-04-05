@@ -144,6 +144,29 @@ class Crumbly_model extends CI_Model {
 
 
 	/**
+	 * Returns all the Crumbly template groups for the current site.
+	 *
+	 * @access	public
+	 * @return	array
+	 */
+	public function get_all_crumbly_template_groups()
+	{
+		$db_groups = $this->_ee->db
+			->select('group_id, label')
+			->get_where('crumbly_template_groups', array('site_id' => $this->get_site_id()));
+
+		$groups = array();
+
+		foreach ($db_groups->result_array() AS $db_group)
+		{
+			$groups[] = new Crumbly_template_group($db_group);
+		}
+
+		return $groups;
+	}
+
+
+	/**
 	 * Returns all the 'webpage' templates for the current site.
 	 *
 	 * @access	public

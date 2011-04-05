@@ -289,6 +289,56 @@ class Test_crumbly_model extends Testee_unit_test_case {
 	}
 
 
+	public function test__get_all_crumbly_template_groups__success()
+	{
+		$this->_ee->db->expectOnce('select', array('group_id, label'));
+		$this->_ee->db->expectOnce('get_where', array('crumbly_template_groups', array('site_id' => $this->_site_id)));
+	
+		$db_groups	= $this->_get_mock('db_query');
+		$db_rows	= array(
+			array(
+				'group_id'	=> '10',
+				'label'		=> 'Template A'
+			),
+			array(
+				'group_id'	=> '20',
+				'label'		=> 'Template B'
+			),
+			array(
+				'group_id'	=> '30',
+				'label'		=> 'Template C'
+			)
+		);
+
+		$this->_ee->db->setReturnReference('get_where', $db_groups);
+		$db_groups->setReturnValue('result_array', $db_rows);
+
+		foreach ($db_rows AS $db_row)
+		{
+			$expected_result[] = new Crumbly_template_group($db_row);
+		}
+
+		$actual_result = $this->_subject->get_all_crumbly_template_groups();
+		$this->assertIdentical(count($actual_result), count($expected_result));
+
+		for ($count = 0, $length = count($actual_result); $count < $length; $count++)
+		{
+			$this->assertIdentical($actual_result[$count], $expected_result[$count]);
+		}
+	}
+
+
+	public function test__get_all_crumbly_template_groups__no_groups()
+	{
+		$db_groups = $this->_get_mock('db_query');
+
+		$this->_ee->db->setReturnReference('get_where', $db_groups);
+		$db_groups->setReturnValue('result_array', array());
+	
+		$this->assertIdentical(array(), $this->_subject->get_all_crumbly_template_groups());
+	}
+
+
 	public function test__get_all_templates__success()
 	{
 		$this->_ee->db->expectOnce('select', array('group_id, template_id, template_name'));
