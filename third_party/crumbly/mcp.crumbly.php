@@ -90,6 +90,41 @@ class Crumbly_mcp {
 
 
 	/**
+	 * Saves the Crumbly glossary terms.
+	 *
+	 * @access	public
+	 * @return	void
+	 */
+	public function save_glossary()
+	{
+		$glossary_input = $this->_ee->input->post('glossary');
+
+		if ( ! is_array($glossary_input))
+		{
+			$glossary_input = array();
+		}
+
+		$this->_model->delete_all_crumbly_glossary_terms();
+
+		$success = TRUE;
+
+		foreach ($glossary_input AS $term_data)
+		{
+			if ( ! $this->_model->save_crumbly_glossary_term(new Crumbly_glossary_term($term_data)))
+			{
+				$success = FALSE;
+			}
+		}
+
+		$success
+			? $this->_ee->session->set_flashdata('message_success', $this->_ee->lang->line('msg_glossary_terms_saved'))
+			: $this->_ee->session->set_flashdata('message_failure', $this->_ee->lang->line('msg_glossary_terms_not_saved'));
+
+		$this->_ee->functions->redirect($this->_base_url .AMP .'method=glossary');
+	}
+
+
+	/**
 	 * Templates.
 	 *
 	 * @access	public

@@ -34,6 +34,14 @@ $lang = array(
 'lbl_save_templates'			=> 'Save Templates',
 'lbl_save_template_groups'		=> 'Save Template Groups',
 
+// Status messages.
+'msg_glossary_terms_saved'		=> 'Your glossary terms have been saved.',
+'msg_glossary_terms_not_saved'	=> 'There was a problem saving one or more of your glossary terms.',
+'msg_templates_saved'			=> 'Your templates have been saved.',
+'msg_templates_not_saved'		=> 'There was a problem saving one or more of your templates.',
+'msg_template_groups_saved'		=> 'Your template groups have been saved.',
+'msg_template_groups_not_saved'	=> 'There was a problem saving one or more of your template groups.',
+
 // Navigation.
 'nav_glossary'					=> 'Glossary',
 'nav_templates'					=> 'Templates',
