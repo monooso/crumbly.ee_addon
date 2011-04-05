@@ -202,7 +202,7 @@ class Test_crumbly_model extends Testee_unit_test_case {
 	}
 
 
-	public function test__get_all_glossary_terms__success()
+	public function test__get_all_crumbly_glossary_terms__success()
 	{
 		$this->_ee->db->expectOnce('select', array('glossary_definition, glossary_term, glossary_term_id'));
 		$this->_ee->db->expectOnce('get_where', array('crumbly_glossary', array('site_id' => $this->_site_id)));
@@ -229,13 +229,63 @@ class Test_crumbly_model extends Testee_unit_test_case {
 			$return[] = new Crumbly_glossary_term($db_row);
 		}
 	
-		$result = $this->_subject->get_all_glossary_terms();
+		$result = $this->_subject->get_all_crumbly_glossary_terms();
 		$this->assertIdentical(count($result), count($return));
 
 		for ($count = 0, $length = count($result); $count < $length; $count++)
 		{
 			$this->assertIdentical($result[$count], $return[$count]);
 		}
+	}
+
+
+	public function test__get_all_crumbly_templates__success()
+	{
+		$this->_ee->db->expectOnce('select', array('label, template_id'));
+		$this->_ee->db->expectOnce('get_where', array('crumbly_templates', array('site_id' => $this->_site_id)));
+	
+		$db_templates	= $this->_get_mock('db_query');
+		$db_rows		= array(
+			array(
+				'label'			=> 'Template A',
+				'template_id'	=> '10'
+			),
+			array(
+				'label'			=> 'Template B',
+				'template_id'	=> '20'
+			),
+			array(
+				'label'			=> 'Template C',
+				'template_id'	=> '30'
+			)
+		);
+
+		$this->_ee->db->setReturnReference('get_where', $db_templates);
+		$db_templates->setReturnValue('result_array', $db_rows);
+
+		foreach ($db_rows AS $db_row)
+		{
+			$expected_result[] = new Crumbly_template($db_row);
+		}
+
+		$actual_result = $this->_subject->get_all_crumbly_templates();
+		$this->assertIdentical(count($actual_result), count($expected_result));
+
+		for ($count = 0, $length = count($actual_result); $count < $length; $count++)
+		{
+			$this->assertIdentical($actual_result[$count], $expected_result[$count]);
+		}
+	}
+
+
+	public function test__get_all_crumbly_templates__no_templates()
+	{
+		$db_templates = $this->_get_mock('db_query');
+
+		$this->_ee->db->setReturnReference('get_where', $db_templates);
+		$db_templates->setReturnValue('result_array', array());
+	
+		$this->assertIdentical(array(), $this->_subject->get_all_crumbly_templates());
 	}
 
 

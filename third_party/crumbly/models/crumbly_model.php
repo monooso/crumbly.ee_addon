@@ -99,12 +99,12 @@ class Crumbly_model extends CI_Model {
 
 
 	/**
-	 * Returns all the glossary terms for the current site.
+	 * Returns all the Crumbly glossary terms for the current site.
 	 *
 	 * @access	public
 	 * @return	array
 	 */
-	public function get_all_glossary_terms()
+	public function get_all_crumbly_glossary_terms()
 	{
 		$db_terms = $this->_ee->db->select('glossary_definition, glossary_term, glossary_term_id')
 			->get_where('crumbly_glossary', array('site_id' => $this->get_site_id()));
@@ -117,6 +117,29 @@ class Crumbly_model extends CI_Model {
 		}
 
 		return $terms;
+	}
+
+
+	/**
+	 * Returns all the Crumbly templates for the current site.
+	 *
+	 * @access	public
+	 * @return	array
+	 */
+	public function get_all_crumbly_templates()
+	{
+		$db_templates = $this->_ee->db
+			->select('label, template_id')
+			->get_where('crumbly_templates', array('site_id' => $this->get_site_id()));
+
+		$templates = array();
+
+		foreach ($db_templates->result_array() AS $db_template)
+		{
+			$templates[] = new Crumbly_template($db_template);
+		}
+
+		return $templates;
 	}
 
 
