@@ -91,7 +91,7 @@ class Crumbly_model extends CI_Model {
 	 * @access	public
 	 * @return	bool
 	 */
-	public function delete_all_glossary_terms()
+	public function delete_all_crumbly_glossary_terms()
 	{
 		$this->_ee->db->delete('crumbly_glossary', array('site_id' => $this->get_site_id()));
 		return TRUE;
@@ -106,7 +106,8 @@ class Crumbly_model extends CI_Model {
 	 */
 	public function get_all_crumbly_glossary_terms()
 	{
-		$db_terms = $this->_ee->db->select('glossary_definition, glossary_term, glossary_term_id')
+		$db_terms = $this->_ee->db
+			->select('glossary_definition, glossary_term, glossary_term_id')
 			->get_where('crumbly_glossary', array('site_id' => $this->get_site_id()));
 
 		$terms = array();
@@ -373,9 +374,12 @@ class Crumbly_model extends CI_Model {
 		{
 			$settings = $this->get_package_settings();
 
-			if (array_key_exists($machine, $settings['glossary']))
+			foreach ($settings['glossary'] AS $glossary_item)
 			{
-				return $settings['glossary'][$machine];
+				if ($glossary_item->get_glossary_term() == $machine)
+				{
+					return $glossary_item->get_glossary_definition();
+				}
 			}
 		}
 

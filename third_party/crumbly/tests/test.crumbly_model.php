@@ -193,12 +193,12 @@ class Test_crumbly_model extends Testee_unit_test_case {
 	}
 
 
-	public function test__delete_all_glossary_terms__success()
+	public function test__delete_all_crumbly_glossary_terms__success()
 	{
 		$where = array('site_id' => $this->_site_id);
 		$this->_ee->db->expectOnce('delete', array('crumbly_glossary', $where));
 	
-		$this->assertIdentical(TRUE, $this->_subject->delete_all_glossary_terms());
+		$this->assertIdentical(TRUE, $this->_subject->delete_all_crumbly_glossary_terms());
 	}
 
 
@@ -590,32 +590,44 @@ class Test_crumbly_model extends Testee_unit_test_case {
 
 	public function test__humanize__glossary_success()
 	{
-		// Shortcuts.
-		$config = $this->_ee->config;
+		/**
+		 * humanize calls get_package_settings, so we need to mock-up
+		 * the database return values.
+		 */
 
-		// Dummy values.
-		$settings	= array('glossary' => array('room' => 'Zimmer'));
+		$db_glossary	= $this->_get_mock('db_query');
+		$db_groups		= $this->_get_mock('db_query');
+		$db_templates	= $this->_get_mock('db_query');
+
+		$this->_ee->db->setReturnReference('get_where', $db_glossary, array('crumbly_glossary', '*'));
+		$this->_ee->db->setReturnReference('get_where', $db_groups, array('crumbly_template_groups', '*'));
+		$this->_ee->db->setReturnReference('get_where', $db_templates, array('crumbly_templates', '*'));
+
 		$machine	= 'room';
 		$human		= 'Zimmer';
 
-		// Return values (used in `get_package_settings`).
-		$config->setReturnValue('item', $settings);
+		$db_glossary_rows = array(
+			array(
+				'glossary_term_id'		=> '10',
+				'glossary_term'			=> $machine,
+				'glossary_definition'	=> $human
+			)
+		);
 
-		// Run the tests.
+		$db_glossary->setReturnValue('result_array', $db_glossary_rows);
+		$db_groups->setReturnValue('result_array', array());
+		$db_templates->setReturnValue('result_array', array());
+
 		$this->assertIdentical($human, $this->_subject->humanize($machine));
 	}
 
 
 	public function test__humanize__no_machine_string()
 	{
-		// Dummy values.
 		$machine	= '';
 		$human		= '';
 
-		// Expectations.
-		$this->_ee->config->expectNever('item');
-
-		// Run the tests.
+		$this->_ee->db->expectNever('get_where');
 		$this->assertIdentical($human, $this->_subject->humanize($machine));
 	}
 
