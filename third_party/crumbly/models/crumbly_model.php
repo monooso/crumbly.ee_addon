@@ -518,7 +518,7 @@ class Crumbly_model extends CI_Model {
 	 * @param	Crumbly_template		$template		The template to save.
 	 * @return	bool
 	 */
-	public function save_template(Crumbly_template $template)
+	public function save_crumbly_template(Crumbly_template $template)
 	{
 		if ( ! $template->get_label() OR ! $template->get_template_id())
 		{
@@ -544,7 +544,7 @@ class Crumbly_model extends CI_Model {
 	 * @param	Crumbly_template_group		$group		The template group to save.
 	 * @return	bool
 	 */
-	public function save_template_group(Crumbly_template_group $group)
+	public function save_crumbly_template_group(Crumbly_template_group $group)
 	{
 		if ( ! $group->get_group_id() OR ! $group->get_label())
 		{

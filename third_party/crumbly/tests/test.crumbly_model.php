@@ -747,7 +747,7 @@ class Test_crumbly_model extends Testee_unit_test_case {
 	}
 
 
-	public function test__save_template__success()
+	public function test__save_crumbly_template__success()
 	{
 		$template = new Crumbly_template(array(
 			'label'			=> 'Example template',
@@ -768,33 +768,33 @@ class Test_crumbly_model extends Testee_unit_test_case {
 		$this->_ee->db->expectOnce('delete', array('crumbly_templates', $delete_criteria));
 		$this->_ee->db->expectOnce('insert', array('crumbly_templates', $insert_data));
 	
-		$this->assertEqual(TRUE, $this->_subject->save_template($template));
+		$this->assertEqual(TRUE, $this->_subject->save_crumbly_template($template));
 	}
 
 
-	public function test__save_template__missing_label()
+	public function test__save_crumbly_template__missing_label()
 	{
 		$template = new Crumbly_template(array('template_id' => 20));
 	
 		$this->_ee->db->expectNever('delete');
 		$this->_ee->db->expectNever('insert');
 
-		$this->assertIdentical(FALSE, $this->_subject->save_template($template));
+		$this->assertIdentical(FALSE, $this->_subject->save_crumbly_template($template));
 	}
 
 
-	public function test__save_template__missing_template_id()
+	public function test__save_crumbly_template__missing_template_id()
 	{
 		$template = new Crumbly_template(array('label' => 'Example label'));
 	
 		$this->_ee->db->expectNever('delete');
 		$this->_ee->db->expectNever('insert');
 
-		$this->assertIdentical(FALSE, $this->_subject->save_template($template));
+		$this->assertIdentical(FALSE, $this->_subject->save_crumbly_template($template));
 	}
 
 
-	public function test__save_template_group__success()
+	public function test__save_crumbly_template_group__success()
 	{
 		$group = new Crumbly_template_group(array(
 			'group_id'	=> 10,
@@ -815,29 +815,29 @@ class Test_crumbly_model extends Testee_unit_test_case {
 		$this->_ee->db->expectOnce('delete', array('crumbly_template_groups', $delete_criteria));
 		$this->_ee->db->expectOnce('insert', array('crumbly_template_groups', $insert_data));
 	
-		$this->assertIdentical(TRUE, $this->_subject->save_template_group($group));
+		$this->assertIdentical(TRUE, $this->_subject->save_crumbly_template_group($group));
 	}
 
 
-	public function test__save_template_group__missing_group_id()
+	public function test__save_crumbly_template_group__missing_group_id()
 	{
 		$group = new Crumbly_template_group(array('label' => 'Example group'));
 
 		$this->_ee->db->expectNever('delete');
 		$this->_ee->db->expectNever('insert');
 	
-		$this->assertIdentical(FALSE, $this->_subject->save_template_group($group));
+		$this->assertIdentical(FALSE, $this->_subject->save_crumbly_template_group($group));
 	}
 
 
-	public function test__save_template_group__missing_label()
+	public function test__save_crumbly_template_group__missing_label()
 	{
 		$group = new Crumbly_template_group(array('group_id' => 10));
 
 		$this->_ee->db->expectNever('delete');
 		$this->_ee->db->expectNever('insert');
 	
-		$this->assertIdentical(FALSE, $this->_subject->save_template_group($group));
+		$this->assertIdentical(FALSE, $this->_subject->save_crumbly_template_group($group));
 	}
 
 
