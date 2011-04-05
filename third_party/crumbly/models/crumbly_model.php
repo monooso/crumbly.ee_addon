@@ -12,6 +12,8 @@
 require_once PATH_THIRD .'crumbly/classes/crumbly_glossary_term' .EXT;
 require_once PATH_THIRD .'crumbly/classes/crumbly_template' .EXT;
 require_once PATH_THIRD .'crumbly/classes/crumbly_template_group' .EXT;
+require_once PATH_THIRD .'crumbly/classes/EI_template' .EXT;
+require_once PATH_THIRD .'crumbly/classes/EI_template_group' .EXT;
 
 class Crumbly_model extends CI_Model {
 	
@@ -119,6 +121,52 @@ class Crumbly_model extends CI_Model {
 
 
 	/**
+	 * Returns all the 'webpage' templates for the current site.
+	 *
+	 * @access	public
+	 * @return	array
+	 */
+	public function get_all_templates()
+	{
+		$db_templates = $this->_ee->db
+			->select('group_id, template_id, template_name')
+			->get_where('templates', array('site_id' => $this->get_site_id(), 'template_type' => 'webpage'));
+
+		$templates = array();
+
+		foreach ($db_templates->result_array() AS $db_template)
+		{
+			$templates[] = new EI_template($db_template);
+		}
+
+		return $templates;
+	}
+
+
+	/**
+	 * Returns all the template groups for the current site.
+	 *
+	 * @access	public
+	 * @return	array
+	 */
+	public function get_all_template_groups()
+	{
+		$db_groups = $this->_ee->db
+			->select('group_id, group_name')
+			->get_where('template_groups', array('site_id' => $this->get_site_id()));
+
+		$groups = array();
+
+		foreach ($db_groups->result_array() AS $db_group)
+		{
+			$groups[] = new EI_template_group($db_group);
+		}
+
+		return $groups;
+	}
+
+
+	/**
 	 * Retrieves a channel entry title, given a URL segment. Supports url_title and entry_id.
 	 * Returns FALSE if the entry cannot be found.
 	 *
@@ -222,6 +270,35 @@ class Crumbly_model extends CI_Model {
 		}
 		
 		return $this->_site_id;
+	}
+
+
+	/**
+	 * Retrieves all of the 'webpage' templates belonging to the specified template group.
+	 *
+	 * @access	public
+	 * @param	int|string		$group_id		The template group ID.
+	 * @return	array|FALSE
+	 */
+	public function get_templates_by_template_group($group_id)
+	{
+		if ( ! valid_int($group_id, 1))
+		{
+			return FALSE;
+		}
+
+		$db_templates = $this->_ee->db
+			->select('group_id, template_id, template_name')
+			->get_where('templates', array('group_id' => $group_id, 'template_type' => 'webpage'));
+
+		$templates = array();
+
+		foreach ($db_templates->result_array() AS $db_template)
+		{
+			$templates[] = new EI_template($db_template);
+		}
+
+		return $templates;
 	}
 	
 	

@@ -79,11 +79,44 @@ class Crumbly_mcp {
 
 		// Include the CSS.
 		$this->_ee->cp->add_to_head('<link rel="stylesheet" type="text/css" href="' .$theme_url .'css/cp.css" />');
+
+		$template_groups	= $this->_model->get_all_template_groups();
+		$templates_dd		= array();
+		$template_groups_dd	= array();
+
+		foreach ($template_groups AS $template_group)
+		{
+			$template_groups_dd[$template_group->get_group_id()] = $template_group->get_group_name();
+
+			if ( ! $templates = $this->_model->get_templates_by_template_group($template_group->get_group_id()))
+			{
+				continue;
+			}
+
+			$group_templates = array();
+
+			foreach ($templates AS $template)
+			{
+				if ($template->get_template_name() != 'index')
+				{
+					$group_templates[$template->get_template_id()] = $template->get_template_name();
+				}
+			}
+
+			if ( ! $group_templates)
+			{
+				continue;
+			}
+
+			$templates_dd[$template_group->get_group_name()] = $group_templates;
+		}
 		
 		$vars = array(
 			'form_action'		=> $this->_base_qs .AMP .'method=run_test',
 			'cp_page_title'		=> $this->_ee->lang->line('hd_crumbly_settings'),
-			'settings'			=> $this->_model->get_package_settings()
+			'settings'			=> $this->_model->get_package_settings(),
+			'templates'			=> $templates_dd,
+			'template_groups'	=> $template_groups_dd
 		);
 		
 		return $this->_ee->load->view('index', $vars, TRUE);

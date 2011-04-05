@@ -25,12 +25,17 @@ $lang = array(
  * ------------------------------------------------------------ */
 // Page headings.
 'hd_crumbly_settings'			=> 'Crumbly Settings',
+'hd_glossary'					=> 'Glossary',
+'hd_templates'					=> 'Templates',
+'hd_template_groups'			=> 'Template Groups',
 
 // Form field labels.
 'lbl_save_settings'				=> 'Save Settings',
 
 // Table headings.
 'thd_display_title'				=> 'Display Title',
+'thd_template'					=> 'Template',
+'thd_template_group'			=> 'Template Group',
 'thd_url_segment'				=> 'URL Segment',
 
 // All done.
