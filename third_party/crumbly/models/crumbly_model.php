@@ -478,13 +478,13 @@ class Crumbly_model extends CI_Model {
 
 
 	/**
-	 * Saves the specified glossary term to the database.
+	 * Saves the specified Crumbly glossary term to the database.
 	 *
 	 * @access	public
 	 * @param	Crumbly_glossary_term		$glossary_term		The glossary term to save.
 	 * @return	bool
 	 */
-	public function save_glossary_term(Crumbly_glossary_term $glossary_term)
+	public function save_crumbly_glossary_term(Crumbly_glossary_term $glossary_term)
 	{
 		if ( ! $glossary_term->get_glossary_definition() OR ! $glossary_term->get_glossary_term())
 		{

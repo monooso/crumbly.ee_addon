@@ -677,7 +677,7 @@ class Test_crumbly_model extends Testee_unit_test_case {
 	}
 
 
-	public function test__save_glossary_term__create_success()
+	public function test__save_crumbly_glossary_term__create_success()
 	{
 		$definition		= 'Definition';
 		$term			= 'term';
@@ -695,11 +695,11 @@ class Test_crumbly_model extends Testee_unit_test_case {
 		$this->_ee->db->expectOnce('insert', array('crumbly_glossary', $insert_data));
 		$this->_ee->db->expectNever('update');
 	
-		$this->assertEqual(TRUE, $this->_subject->save_glossary_term($glossary_term));
+		$this->assertEqual(TRUE, $this->_subject->save_crumbly_glossary_term($glossary_term));
 	}
 
 
-	public function test__save_glossary_term__update_success()
+	public function test__save_crumbly_glossary_term__update_success()
 	{
 		$definition		= 'Definition';
 		$term			= 'term';
@@ -721,29 +721,29 @@ class Test_crumbly_model extends Testee_unit_test_case {
 		$this->_ee->db->expectOnce('update', array('crumbly_glossary', $insert_data, $where));
 		$this->_ee->db->expectNever('insert');
 
-		$this->assertEqual(TRUE, $this->_subject->save_glossary_term($glossary_term));
+		$this->assertEqual(TRUE, $this->_subject->save_crumbly_glossary_term($glossary_term));
 	}
 
 
-	public function test__save_glossary_term__missing_glossary_definition()
+	public function test__save_crumbly_glossary_term__missing_glossary_definition()
 	{
 		$glossary_term = new Crumbly_glossary_term(array('glossary_term' => 'term'));
 
 		$this->_ee->db->expectNever('insert');
 		$this->_ee->db->expectNever('update');
 	
-		$this->assertEqual(FALSE, $this->_subject->save_glossary_term($glossary_term));
+		$this->assertEqual(FALSE, $this->_subject->save_crumbly_glossary_term($glossary_term));
 	}
 
 
-	public function test__save_glossary_term__missing_glossary_term()
+	public function test__save_crumbly_glossary_term__missing_glossary_term()
 	{
 		$glossary_term = new Crumbly_glossary_term(array('glossary_definition' => 'Definition'));
 
 		$this->_ee->db->expectNever('insert');
 		$this->_ee->db->expectNever('update');
 	
-		$this->assertEqual(FALSE, $this->_subject->save_glossary_term($glossary_term));
+		$this->assertEqual(FALSE, $this->_subject->save_crumbly_glossary_term($glossary_term));
 	}
 
 
