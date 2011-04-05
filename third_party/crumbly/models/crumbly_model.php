@@ -509,6 +509,36 @@ class Crumbly_model extends CI_Model {
 
 		return TRUE;
 	}
+
+
+	/**
+	 * Saves the specified Crumbly template to the database.
+	 *
+	 * @access	public
+	 * @param	Crumbly_template		$template		The template to save.
+	 * @return	bool
+	 */
+	public function save_template(Crumbly_template $template)
+	{
+		if ( ! $template->get_label() OR ! $template->get_template_id())
+		{
+			return FALSE;
+		}
+
+		$data = array(
+			'label'			=> $template->get_label(),
+			'site_id'		=> $this->get_site_id(),
+			'template_id'	=> $template->get_template_id()
+		);
+
+		$this->_ee->db->delete('crumbly_templates', array(
+			'site_id'		=> $this->get_site_id(),
+			'template_id'	=> $template->get_template_id()
+		));
+
+		$this->_ee->db->insert('crumbly_templates', $data);
+		return TRUE;
+	}
 	
 	
 	/**
