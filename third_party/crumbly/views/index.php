@@ -11,22 +11,33 @@
 		</tr>
 	</thead>
 
-	<tbody>
+	<tbody class="roland">
 	<?php
-		$count = 0;
-		foreach ($settings['glossary'] AS $key => $val):
+		if ( ! $settings['glossary']):
 	?>
-		<tr>
-			<td><input type="text" name="glossary[<?=$count; ?>][url_segment]" value="<?=$key; ?>"></td>
-			<td><input type="text" name="glossary[<?=$count; ?>][display_title]" value="<?=$val; ?>"></td>
+		<tr class="row">
+			<td><input type="text" name="glossary[0][url_segment]"></td>
+			<td><input type="text" name="glossary[0][display_title]"></td>
 			<td class="act">
-				<a class="delete_row btn" href="#"><img height="17" src="/themes/third_party/crumbly/img/minus.png" width="16"></a>
-				<a class="add_row btn" href="#"><img height="17" src="/themes/third_party/crumbly/img/plus.png" width="16"></a>
+				<a class="remove btn" href="#"><img height="17" src="/themes/third_party/crumbly/img/minus.png" width="16"></a>
+				<a class="add btn" href="#"><img height="17" src="/themes/third_party/crumbly/img/plus.png" width="16"></a>
 			</td>
 		</tr>
 	<?php
-		$count++;
+		else:
+		foreach ($settings['glossary'] AS $glossary_item):
+	?>
+		<tr class="row">
+			<td><input type="text" name="glossary[0][url_segment]" value="<?=$glossary_item->get_glossary_term(); ?>"></td>
+			<td><input type="text" name="glossary[0][display_title]" value="<?=$glossary_item->get_glossary_definition(); ?>"></td>
+			<td class="act">
+				<a class="remove btn" href="#"><img height="17" src="/themes/third_party/crumbly/img/minus.png" width="16"></a>
+				<a class="add btn" href="#"><img height="17" src="/themes/third_party/crumbly/img/plus.png" width="16"></a>
+			</td>
+		</tr>
+	<?php
 		endforeach;
+		endif;
 	?>
 	</tbody>
 </table>
@@ -41,15 +52,32 @@
 		</tr>
 	</thead>
 
-	<tbody>
-		<tr>
+	<tbody class="roland">
+	<?php if ( ! $settings['template_groups']): ?>
+		<tr class="row">
 			<td><?=form_dropdown('template_groups[0][group_id]', $template_groups); ?></td>
 			<td><input type="text" name="template_groups[0][label]"></td>
 			<td class="act">
-				<a class="delete_row btn" href="#"><img height="17" src="/themes/third_party/crumbly/img/minus.png" width="16"></a>
-				<a class="add_row btn" href="#"><img height="17" src="/themes/third_party/crumbly/img/plus.png" width="16"></a>
+				<a class="remove btn" href="#"><img height="17" src="/themes/third_party/crumbly/img/minus.png" width="16"></a>
+				<a class="add btn" href="#"><img height="17" src="/themes/third_party/crumbly/img/plus.png" width="16"></a>
 			</td>
 		</tr>
+	<?php
+		else:
+		foreach ($settings['template_groups'] AS $crumbly_template_group):
+	?>
+		<tr class="row">
+			<td><?=form_dropdown('template_groups[0][group_id]', $template_groups, $crumbly_template_group->get_group_id()); ?></td>
+			<td><input type="text" name="template_groups[0][label]" value="<?=$crumbly_template_group->get_label(); ?>"></td>
+			<td class="act">
+				<a class="remove btn" href="#"><img height="17" src="/themes/third_party/crumbly/img/minus.png" width="16"></a>
+				<a class="add btn" href="#"><img height="17" src="/themes/third_party/crumbly/img/plus.png" width="16"></a>
+			</td>
+		</tr>
+	<?php
+		endforeach;
+		endif;
+	?>
 	</tbody>
 </table>
 
@@ -63,15 +91,32 @@
 		</tr>
 	</thead>
 
-	<tbody>
-		<tr>
+	<tbody class="roland">
+		<?php if ( ! $settings['templates']): ?>
+		<tr class="row">
 			<td><?=form_dropdown('templates[0][template_id]', $templates); ?></td>
 			<td><input type="text" name="templates[0][label]"></td>
 			<td class="act">
-				<a class="delete_row btn" href="#"><img height="17" src="/themes/third_party/crumbly/img/minus.png" width="16"></a>
-				<a class="add_row btn" href="#"><img height="17" src="/themes/third_party/crumbly/img/plus.png" width="16"></a>
+				<a class="remove btn" href="#"><img height="17" src="/themes/third_party/crumbly/img/minus.png" width="16"></a>
+				<a class="add btn" href="#"><img height="17" src="/themes/third_party/crumbly/img/plus.png" width="16"></a>
 			</td>
 		</tr>
+		<?php
+			else:
+			foreach ($settings['templates'] AS $crumbly_template):
+		?>
+			<tr class="row">
+				<td><?=form_dropdown('templates[0][template_id]', $templates, $crumbly_template->get_template_id()); ?></td>
+				<td><input type="text" name="templates[0][label]" value="<?=$crumbly_template->get_label(); ?>"></td>
+				<td class="act">
+					<a class="remove btn" href="#"><img height="17" src="/themes/third_party/crumbly/img/minus.png" width="16"></a>
+					<a class="add btn" href="#"><img height="17" src="/themes/third_party/crumbly/img/plus.png" width="16"></a>
+				</td>
+			</tr>
+		<?php
+			endforeach;
+			endif;
+		?>
 	</tbody>
 </table>
 

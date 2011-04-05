@@ -439,53 +439,6 @@ class Test_crumbly_model extends Testee_unit_test_case {
 	}
 
 
-	public function test__get_package_settings__success()
-	{
-		// Shortcuts.
-		$config = $this->_ee->config;
-
-		// Dummy values.
-		$settings = array(
-			'glossary' => array('wig' => 'Merkin'),
-			'template_groups' => array(
-				'about' => array(
-					'title' => 'About Us',
-					'templates' => array(
-						'founder'	=> 'Our Founder',
-						'history'	=> 'Our History',
-						'team'		=> 'Meet the Team'
-					)
-				),
-				'blog' => array(
-					'title' => 'Blog',
-					'templates' => array(
-						'archive' => 'Archived Posts'
-					)
-				),
-				'contact' => array(
-					'title' => 'Contact Us',
-					'templates' => array(
-						'error' => 'OMG! Teh Epic Internet Failerz! LOLZ!',
-						'thank-you' => 'Thanks You!',
-					)
-				)
-			)
-		);
-
-		// Expectations.
-		$config->expectOnce('item', array('crumbly_settings'));
-
-		// Return values.
-		$config->setReturnValue('item', $settings);
-
-		// Run the tests.
-		$this->assertIdentical($settings, $this->_subject->get_package_settings());
-
-		// Settings should be cached by the model, so the expectation counts should still pass.
-		$this->assertIdentical($settings, $this->_subject->get_package_settings());
-	}
-
-
 	public function test__get_package_theme_url__end_slash_exists()
 	{
 		// Dummy values.

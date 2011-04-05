@@ -266,7 +266,11 @@ class Crumbly_model extends CI_Model {
 	{
 		if ( ! $this->_package_settings)
 		{
-			$this->_package_settings = $this->_ee->config->item('crumbly_settings');
+			$this->_package_settings = array(
+				'glossary'		=> $this->get_all_crumbly_glossary_terms(),
+				'templates'		=> $this->get_all_crumbly_templates(),
+				'template_groups' => $this->get_all_crumbly_template_groups()
+			);
 		}
 
 		return $this->_package_settings;

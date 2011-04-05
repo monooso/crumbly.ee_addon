@@ -31,6 +31,14 @@ $lang = array(
 
 // Form field labels.
 'lbl_save_settings'				=> 'Save Settings',
+'lbl_save_glossary'				=> 'Save Glossary',
+'lbl_save_templates'			=> 'Save Templates',
+'lbl_save_template_groups'		=> 'Save Template Groups',
+
+// Navigation.
+'nav_glossary'					=> 'Glossary',
+'nav_templates'					=> 'Templates',
+'nav_template_groups'			=> 'Template Groups',
 
 // Table headings.
 'thd_display_title'				=> 'Display Title',

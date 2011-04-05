@@ -8,40 +8,8 @@
 
 @media screen {
 
-#crumbly * {
-	font			: normal 12px/18px 'Helvetica Neue', Arial, Helvetica, sans-serif;
-	margin			: 0;
-	padding			: 0;
-}
-
-#crumbly a {
-	color				: rgb(102, 102, 102);
-	text-decoration		: none;
-	text-shadow			: 0 1px 0 rgb(255, 255, 255);
-}
-
-#crumbly table {
-	border				: 1px solid rgb(204, 204, 204);
-	border-bottom		: none;
-	border-radius		: 2px;
-	text-shadow			: 0 1px 0 rgb(255, 255, 255);
-	width				: 99%;
-}
-
-#crumbly th,
-#crumbly td {
-	border-bottom		: 1px solid rgb(204, 204, 204);
-	border-top			: 1px solid rgb(255, 255, 255);
-	padding				: 6px 10px;
-	vertical-align		: top;
-}
-
-#crumbly th {
-	background-image	: -webkit-gradient(linear, left bottom, left top, from(rgba(0, 0, 0, 0.1)), to(rgba(0, 0, 0, 0)));
-	font-weight			: bold;
-	text-align			: left;
-}
-
+/* =tables
+ * ------------------------------------------------------------ */
 #crumbly .act {
 	padding-right		: 7px;
 	text-align			: right;
@@ -49,26 +17,9 @@
 	width				: 44px;
 }
 
-#crumbly .only_row .delete_row {
-	display : none;
-}
 
-#crumbly input[type='text'] {
-	-webkit-box-shadow	: 0 1px 0 rgb(255, 255, 255), inset 0 1px 3px rgba(0, 0, 0, 0.1);
-	background			: rgb(255, 255, 255);
-	border				: 1px solid rgb(204, 204, 204);
-	border-radius		: 2px;
-	box-shadow			: 0 1px 0 rgb(255, 255, 255), inset 0 1px 3px rgba(0, 0, 0, 0.1);
-	font				: normal 12px/12px 'Helvetica Neue', Arial, Helvetica, sans-serif;
-	padding				: 3px;
-	width				: 99%;
-}
-
-#crumbly select {
-	-webkit-appearance	: menulist;
-	width				: 99%;
-}
-
+/* =btn
+ * ------------------------------------------------------------ */
 #crumbly .btn {
 	display				: inline-block;
 	margin-right		: 3px;
@@ -78,11 +29,6 @@
 #crumbly .btn img {
 	display				: inline-block;
 	vertical-align		: middle;
-}
-
-#crumbly .add_template {
-	display				: none;
-	padding-top			: 6px;
 }
 
 } /* @media screen */

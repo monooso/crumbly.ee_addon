@@ -12,23 +12,10 @@ class Crumbly_mcp {
 	/* --------------------------------------------------------------
 	 * PRIVATE PROPERTIES
 	 * ------------------------------------------------------------ */
-	
-	/**
-	 * ExpressionEngine object reference.
-	 *
-	 * @access	private
-	 * @var		object
-	 */
+
 	private $_ee;
-	
-	/**
-	 * Model.
-	 *
-	 * @access	private
-	 * @var		object
-	 */
 	private $_model;
-	
+	private $_theme_url;
 	
 	
 	/* --------------------------------------------------------------
@@ -49,12 +36,44 @@ class Crumbly_mcp {
 		$this->_ee->load->model('crumbly_model');
 		$this->_model = $this->_ee->crumbly_model;
 
-		// Set the base CP query string and URL.
+		// Basic stuff required by every view.
 		$this->_base_qs 	= 'C=addons_modules' .AMP .'M=show_module_cp' .AMP .'module=' .$this->_model->get_package_name();
 		$this->_base_url	= BASE .AMP .$this->_base_qs;
+		$this->_theme_url	= $this->_model->get_package_theme_url();
 		
-		// Add a base breadcrumb.
+		$this->_ee->load->helper('form');
+		$this->_ee->load->library('table');
+
 		$this->_ee->cp->set_breadcrumb($this->_base_url, $this->_ee->lang->line('crumbly_module_name'));
+		$this->_ee->cp->add_to_foot('<script type="text/javascript" src="' .$this->_theme_url .'js/jquery.roland.js"></script>');
+		$this->_ee->cp->add_to_foot('<script type="text/javascript" src="' .$this->_theme_url .'js/cp.js"></script>');
+		$this->_ee->javascript->compile();
+
+		$this->_ee->cp->add_to_head('<link rel="stylesheet" type="text/css" href="' .$this->_theme_url .'css/cp.css" />');
+
+		$this->_ee->cp->set_right_nav(array(
+			'nav_glossary'		=> $this->_base_url .AMP .'method=glossary',
+			'nav_templates'		=> $this->_base_url .AMP .'method=templates',
+			'nav_template_groups' => $this->_base_url .AMP .'method=template_groups'
+		));
+	}
+
+
+	/**
+	 * Glossary.
+	 *
+	 * @access	public
+	 * @return	string
+	 */
+	public function glossary()
+	{
+		$vars = array(
+			'form_action'		=> $this->_base_qs .AMP .'method=save_glossary',
+			'cp_page_title'		=> $this->_ee->lang->line('hd_glossary'),
+			'settings'			=> $this->_model->get_package_settings()
+		);
+		
+		return $this->_ee->load->view('glossary', $vars, TRUE);
 	}
 	
 	
@@ -66,28 +85,24 @@ class Crumbly_mcp {
 	 */
 	public function index()
 	{
-		// Load our glamorous assistants.
-		$this->_ee->load->helper('form');
-		$this->_ee->load->library('table');
-		
-		// Retrieve the theme folder URL.
-		$theme_url = $this->_model->get_package_theme_url();
-		
-		// Include the main JS file.
-		$this->_ee->cp->add_to_foot('<script type="text/javascript" src="' .$theme_url .'js/cp.js"></script>');
-		$this->_ee->javascript->compile();
+		return $this->glossary();
+	}
 
-		// Include the CSS.
-		$this->_ee->cp->add_to_head('<link rel="stylesheet" type="text/css" href="' .$theme_url .'css/cp.css" />');
 
+	/**
+	 * Templates.
+	 *
+	 * @access	public
+	 * @return	string
+	 */
+	public function templates()
+	{
 		$template_groups	= $this->_model->get_all_template_groups();
 		$templates_dd		= array();
-		$template_groups_dd	= array();
 
+		// Prepare the drop down options arrays.
 		foreach ($template_groups AS $template_group)
 		{
-			$template_groups_dd[$template_group->get_group_id()] = $template_group->get_group_name();
-
 			if ( ! $templates = $this->_model->get_templates_by_template_group($template_group->get_group_id()))
 			{
 				continue;
@@ -112,14 +127,41 @@ class Crumbly_mcp {
 		}
 		
 		$vars = array(
-			'form_action'		=> $this->_base_qs .AMP .'method=run_test',
-			'cp_page_title'		=> $this->_ee->lang->line('hd_crumbly_settings'),
+			'form_action'		=> $this->_base_qs .AMP .'method=save_templates',
+			'cp_page_title'		=> $this->_ee->lang->line('hd_templates'),
 			'settings'			=> $this->_model->get_package_settings(),
-			'templates'			=> $templates_dd,
+			'templates'			=> $templates_dd
+		);
+		
+		return $this->_ee->load->view('templates', $vars, TRUE);
+	}
+
+
+	/**
+	 * Templates groups.
+	 *
+	 * @access	public
+	 * @return	string
+	 */
+	public function template_groups()
+	{
+		$template_groups	= $this->_model->get_all_template_groups();
+		$template_groups_dd	= array();
+
+		// Prepare the drop down options arrays.
+		foreach ($template_groups AS $template_group)
+		{
+			$template_groups_dd[$template_group->get_group_id()] = $template_group->get_group_name();
+		}
+		
+		$vars = array(
+			'form_action'		=> $this->_base_qs .AMP .'method=save_templates',
+			'cp_page_title'		=> $this->_ee->lang->line('hd_templates'),
+			'settings'			=> $this->_model->get_package_settings(),
 			'template_groups'	=> $template_groups_dd
 		);
 		
-		return $this->_ee->load->view('index', $vars, TRUE);
+		return $this->_ee->load->view('template_groups', $vars, TRUE);
 	}
 	
 }
