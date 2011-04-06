@@ -17,48 +17,12 @@ require_once PATH_THIRD .'crumbly/classes/EI_template_group' .EXT;
 
 class Crumbly_model extends CI_Model {
 	
-	/* --------------------------------------------------------------
-	 * PRIVATE PROPERTIES
-	 * ------------------------------------------------------------ */
-
-	/**
-	 * ExpressionEngine object reference.
-	 *
-	 * @access	private
-	 * @var		object
-	 */
+	private $_crumbly_glossary;
+	private $_crumbly_groups;
+	private $_crumbly_templates;
 	private $_ee;
-	
-	/**
-	 * Package name.
-	 *
-	 * @access	private
-	 * @var		string
-	 */
 	private $_package_name;
-
-	/**
-	 * Package settings.
-	 *
-	 * @access	private
-	 * @var		array
-	 */
-	private $_package_settings;
-	
-	/**
-	 * Package version.
-	 *
-	 * @access	private
-	 * @var		string
-	 */
 	private $_package_version;
-	
-	/**
-	 * The site ID.
-	 *
-	 * @access	private
-	 * @var		string
-	 */
 	private $_site_id;
 	
 	
@@ -132,18 +96,21 @@ class Crumbly_model extends CI_Model {
 	 */
 	public function get_all_crumbly_glossary_terms()
 	{
-		$db_terms = $this->_ee->db
-			->select('glossary_definition, glossary_term')
-			->get_where('crumbly_glossary', array('site_id' => $this->get_site_id()));
-
-		$terms = array();
-
-		foreach ($db_terms->result_array() AS $db_term)
+		if ( ! $this->_crumbly_glossary)
 		{
-			$terms[] = new Crumbly_glossary_term($db_term);
+			$db_terms = $this->_ee->db
+				->select('glossary_definition, glossary_term')
+				->get_where('crumbly_glossary', array('site_id' => $this->get_site_id()));
+
+			$this->_crumbly_glossary = array();
+
+			foreach ($db_terms->result_array() AS $db_term)
+			{
+				$this->_crumbly_glossary[] = new Crumbly_glossary_term($db_term);
+			}
 		}
 
-		return $terms;
+		return $this->_crumbly_glossary;
 	}
 
 
@@ -155,18 +122,21 @@ class Crumbly_model extends CI_Model {
 	 */
 	public function get_all_crumbly_templates()
 	{
-		$db_templates = $this->_ee->db
-			->select('label, template_id')
-			->get_where('crumbly_templates', array('site_id' => $this->get_site_id()));
-
-		$templates = array();
-
-		foreach ($db_templates->result_array() AS $db_template)
+		if ( ! $this->_crumbly_templates)
 		{
-			$templates[] = new Crumbly_template($db_template);
+			$db_templates = $this->_ee->db
+				->select('label, template_id')
+				->get_where('crumbly_templates', array('site_id' => $this->get_site_id()));
+
+			$this->_crumbly_templates = array();
+
+			foreach ($db_templates->result_array() AS $db_template)
+			{
+				$this->_crumbly_templates[] = new Crumbly_template($db_template);
+			}
 		}
 
-		return $templates;
+		return $this->_crumbly_templates;
 	}
 
 
@@ -178,18 +148,21 @@ class Crumbly_model extends CI_Model {
 	 */
 	public function get_all_crumbly_template_groups()
 	{
-		$db_groups = $this->_ee->db
-			->select('group_id, label')
-			->get_where('crumbly_template_groups', array('site_id' => $this->get_site_id()));
-
-		$groups = array();
-
-		foreach ($db_groups->result_array() AS $db_group)
+		if ( ! $this->_crumbly_groups)
 		{
-			$groups[] = new Crumbly_template_group($db_group);
+			$db_groups = $this->_ee->db
+				->select('group_id, label')
+				->get_where('crumbly_template_groups', array('site_id' => $this->get_site_id()));
+
+			$this->_crumbly_groups = array();
+
+			foreach ($db_groups->result_array() AS $db_group)
+			{
+				$this->_crumbly_groups[] = new Crumbly_template_group($db_group);
+			}
 		}
 
-		return $groups;
+		return $this->_crumbly_groups;
 	}
 
 
@@ -348,27 +321,6 @@ class Crumbly_model extends CI_Model {
 	
 	
 	/**
-	 * Returns the package settings.
-	 *
-	 * @access	public
-	 * @return	array
-	 */
-	public function get_package_settings()
-	{
-		if ( ! $this->_package_settings)
-		{
-			$this->_package_settings = array(
-				'glossary'		=> $this->get_all_crumbly_glossary_terms(),
-				'templates'		=> $this->get_all_crumbly_templates(),
-				'template_groups' => $this->get_all_crumbly_template_groups()
-			);
-		}
-
-		return $this->_package_settings;
-	}
-
-
-	/**
 	 * Returns the package themes folder URL, appending a forward-slash, if required.
 	 *
 	 * @access	public
@@ -462,9 +414,9 @@ class Crumbly_model extends CI_Model {
 		// By default, we always start by checking the glossary.
 		if ($use_glossary !== FALSE)
 		{
-			$settings = $this->get_package_settings();
+			$glossary = $this->get_all_crumbly_glossary_terms();
 
-			foreach ($settings['glossary'] AS $glossary_item)
+			foreach ($glossary AS $glossary_item)
 			{
 				if ($glossary_item->get_glossary_term() == $machine)
 				{

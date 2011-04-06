@@ -70,7 +70,7 @@ class Crumbly_mcp {
 		$vars = array(
 			'form_action'		=> $this->_base_qs .AMP .'method=save_glossary',
 			'cp_page_title'		=> $this->_ee->lang->line('hd_glossary'),
-			'settings'			=> $this->_model->get_package_settings()
+			'glossary'			=> $this->_model->get_all_crumbly_glossary_terms()
 		);
 		
 		return $this->_ee->load->view('glossary', $vars, TRUE);
@@ -236,8 +236,8 @@ class Crumbly_mcp {
 		$vars = array(
 			'form_action'		=> $this->_base_qs .AMP .'method=save_templates',
 			'cp_page_title'		=> $this->_ee->lang->line('hd_templates'),
-			'settings'			=> $this->_model->get_package_settings(),
-			'templates'			=> $templates_dd
+			'templates'			=> $this->_model->get_all_crumbly_templates(),
+			'templates_dd'		=> $templates_dd
 		);
 		
 		return $this->_ee->load->view('templates', $vars, TRUE);
@@ -264,8 +264,8 @@ class Crumbly_mcp {
 		$vars = array(
 			'form_action'		=> $this->_base_qs .AMP .'method=save_template_groups',
 			'cp_page_title'		=> $this->_ee->lang->line('hd_template_groups'),
-			'settings'			=> $this->_model->get_package_settings(),
-			'template_groups'	=> $template_groups_dd
+			'template_groups'	=> $this->_model->get_all_crumbly_template_groups(),
+			'template_groups_dd' => $template_groups_dd
 		);
 		
 		return $this->_ee->load->view('template_groups', $vars, TRUE);

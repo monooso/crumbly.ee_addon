@@ -12,7 +12,7 @@
 
 	<tbody class="roland">
 	<?php
-		if ( ! $settings['glossary']):
+		if ( ! $glossary):
 	?>
 		<tr class="row">
 			<td><input type="text" name="glossary[0][glossary_term]"></td>
@@ -24,7 +24,7 @@
 		</tr>
 	<?php
 		else:
-		foreach ($settings['glossary'] AS $glossary_item):
+		foreach ($glossary AS $glossary_item):
 	?>
 		<tr class="row">
 			<td><input type="text" name="glossary[0][glossary_term]" value="<?=$glossary_item->get_glossary_term(); ?>"></td>

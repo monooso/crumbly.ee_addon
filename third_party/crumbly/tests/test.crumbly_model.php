@@ -745,32 +745,14 @@ class Test_crumbly_model extends Testee_unit_test_case {
 
 	public function test__humanize__glossary_success()
 	{
-		/**
-		 * humanize calls get_package_settings, so we need to mock-up
-		 * the database return values.
-		 */
-
-		$db_glossary	= $this->_get_mock('db_query');
-		$db_groups		= $this->_get_mock('db_query');
-		$db_templates	= $this->_get_mock('db_query');
-
-		$this->_ee->db->setReturnReference('get_where', $db_glossary, array('crumbly_glossary', '*'));
-		$this->_ee->db->setReturnReference('get_where', $db_groups, array('crumbly_template_groups', '*'));
-		$this->_ee->db->setReturnReference('get_where', $db_templates, array('crumbly_templates', '*'));
-
 		$machine	= 'room';
 		$human		= 'Zimmer';
 
-		$db_glossary_rows = array(
-			array(
-				'glossary_term'			=> $machine,
-				'glossary_definition'	=> $human
-			)
-		);
+		$db_glossary		= $this->_get_mock('db_query');
+		$db_glossary_rows	= array(array('glossary_term' => $machine, 'glossary_definition' => $human));
 
+		$this->_ee->db->setReturnReference('get_where', $db_glossary, array('crumbly_glossary', '*'));
 		$db_glossary->setReturnValue('result_array', $db_glossary_rows);
-		$db_groups->setReturnValue('result_array', array());
-		$db_templates->setReturnValue('result_array', array());
 
 		$this->assertIdentical($human, $this->_subject->humanize($machine));
 	}

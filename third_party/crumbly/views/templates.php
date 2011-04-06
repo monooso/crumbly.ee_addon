@@ -11,9 +11,9 @@
 	</thead>
 
 	<tbody class="roland">
-		<?php if ( ! $settings['templates']): ?>
+		<?php if ( ! $templates): ?>
 		<tr class="row">
-			<td><?=form_dropdown('templates[0][template_id]', $templates); ?></td>
+			<td><?=form_dropdown('templates[0][template_id]', $templates_dd); ?></td>
 			<td><input type="text" name="templates[0][label]"></td>
 			<td class="act">
 				<a class="remove btn" href="#"><img height="17" src="/themes/third_party/crumbly/img/minus.png" width="16"></a>
@@ -22,11 +22,11 @@
 		</tr>
 		<?php
 			else:
-			foreach ($settings['templates'] AS $crumbly_template):
+			foreach ($templates AS $template):
 		?>
 			<tr class="row">
-				<td><?=form_dropdown('templates[0][template_id]', $templates, $crumbly_template->get_template_id()); ?></td>
-				<td><input type="text" name="templates[0][label]" value="<?=$crumbly_template->get_label(); ?>"></td>
+				<td><?=form_dropdown('templates[0][template_id]', $templates_dd, $template->get_template_id()); ?></td>
+				<td><input type="text" name="templates[0][label]" value="<?=$template->get_label(); ?>"></td>
 				<td class="act">
 					<a class="remove btn" href="#"><img height="17" src="/themes/third_party/crumbly/img/minus.png" width="16"></a>
 					<a class="add btn" href="#"><img height="17" src="/themes/third_party/crumbly/img/plus.png" width="16"></a>
