@@ -6,53 +6,23 @@
  * @author			Stephen Lewis <stephen@experienceinternet.co.uk>
  * @copyright		Experience Internet
  * @package			Crumbly
- * @version 		0.1.0
+ * @version 		0.7.0
  */
+
+require_once PATH_THIRD .'crumbly/classes/crumbly_glossary_term' .EXT;
+require_once PATH_THIRD .'crumbly/classes/crumbly_template' .EXT;
+require_once PATH_THIRD .'crumbly/classes/crumbly_template_group' .EXT;
+require_once PATH_THIRD .'crumbly/classes/EI_template' .EXT;
+require_once PATH_THIRD .'crumbly/classes/EI_template_group' .EXT;
 
 class Crumbly_model extends CI_Model {
 	
-	/* --------------------------------------------------------------
-	 * PRIVATE PROPERTIES
-	 * ------------------------------------------------------------ */
-
-	/**
-	 * ExpressionEngine object reference.
-	 *
-	 * @access	private
-	 * @var		object
-	 */
+	private $_crumbly_glossary;
+	private $_crumbly_groups;
+	private $_crumbly_templates;
 	private $_ee;
-	
-	/**
-	 * Package name.
-	 *
-	 * @access	private
-	 * @var		string
-	 */
 	private $_package_name;
-
-	/**
-	 * Package settings.
-	 *
-	 * @access	private
-	 * @var		array
-	 */
-	private $_package_settings;
-	
-	/**
-	 * Package version.
-	 *
-	 * @access	private
-	 * @var		string
-	 */
 	private $_package_version;
-	
-	/**
-	 * The site ID.
-	 *
-	 * @access	private
-	 * @var		string
-	 */
 	private $_site_id;
 	
 	
@@ -75,7 +45,170 @@ class Crumbly_model extends CI_Model {
 
 		$this->_ee 				=& get_instance();
 		$this->_package_name	= $package_name ? $package_name : 'crumbly';
-		$this->_package_version	= $package_version ? $package_version : '0.1.0';
+		$this->_package_version	= $package_version ? $package_version : '0.7.0';
+	}
+
+
+	/**
+	 * Deletes all the Crumbly glossary terms for the current site.
+	 *
+	 * @access	public
+	 * @return	bool
+	 */
+	public function delete_all_crumbly_glossary_terms()
+	{
+		$this->_ee->db->delete('crumbly_glossary', array('site_id' => $this->get_site_id()));
+		return TRUE;
+	}
+
+
+	/**
+	 * Deletes all the Crumbly templates for the current site.
+	 *
+	 * @access	public
+	 * @return	bool
+	 */
+	public function delete_all_crumbly_templates()
+	{
+		$this->_ee->db->delete('crumbly_templates', array('site_id' => $this->get_site_id()));
+		return TRUE;
+	}
+
+
+	/**
+	 * Deletes all the Crumbly template groups for the current site.
+	 *
+	 * @access	public
+	 * @return	bool
+	 */
+	public function delete_all_crumbly_template_groups()
+	{
+		$this->_ee->db->delete('crumbly_template_groups', array('site_id' => $this->get_site_id()));
+		return TRUE;
+	}
+
+
+	/**
+	 * Returns all the Crumbly glossary terms for the current site.
+	 *
+	 * @access	public
+	 * @return	array
+	 */
+	public function get_all_crumbly_glossary_terms()
+	{
+		if ( ! $this->_crumbly_glossary)
+		{
+			$db_terms = $this->_ee->db
+				->select('glossary_definition, glossary_term')
+				->get_where('crumbly_glossary', array('site_id' => $this->get_site_id()));
+
+			$this->_crumbly_glossary = array();
+
+			foreach ($db_terms->result_array() AS $db_term)
+			{
+				$this->_crumbly_glossary[] = new Crumbly_glossary_term($db_term);
+			}
+		}
+
+		return $this->_crumbly_glossary;
+	}
+
+
+	/**
+	 * Returns all the Crumbly templates for the current site.
+	 *
+	 * @access	public
+	 * @return	array
+	 */
+	public function get_all_crumbly_templates()
+	{
+		if ( ! $this->_crumbly_templates)
+		{
+			$db_templates = $this->_ee->db
+				->select('label, template_id')
+				->get_where('crumbly_templates', array('site_id' => $this->get_site_id()));
+
+			$this->_crumbly_templates = array();
+
+			foreach ($db_templates->result_array() AS $db_template)
+			{
+				$this->_crumbly_templates[] = new Crumbly_template($db_template);
+			}
+		}
+
+		return $this->_crumbly_templates;
+	}
+
+
+	/**
+	 * Returns all the Crumbly template groups for the current site.
+	 *
+	 * @access	public
+	 * @return	array
+	 */
+	public function get_all_crumbly_template_groups()
+	{
+		if ( ! $this->_crumbly_groups)
+		{
+			$db_groups = $this->_ee->db
+				->select('group_id, label')
+				->get_where('crumbly_template_groups', array('site_id' => $this->get_site_id()));
+
+			$this->_crumbly_groups = array();
+
+			foreach ($db_groups->result_array() AS $db_group)
+			{
+				$this->_crumbly_groups[] = new Crumbly_template_group($db_group);
+			}
+		}
+
+		return $this->_crumbly_groups;
+	}
+
+
+	/**
+	 * Returns all the 'webpage' templates for the current site.
+	 *
+	 * @access	public
+	 * @return	array
+	 */
+	public function get_all_templates()
+	{
+		$db_templates = $this->_ee->db
+			->select('group_id, template_id, template_name')
+			->get_where('templates', array('site_id' => $this->get_site_id(), 'template_type' => 'webpage'));
+
+		$templates = array();
+
+		foreach ($db_templates->result_array() AS $db_template)
+		{
+			$templates[] = new EI_template($db_template);
+		}
+
+		return $templates;
+	}
+
+
+	/**
+	 * Returns all the template groups for the current site.
+	 *
+	 * @access	public
+	 * @return	array
+	 */
+	public function get_all_template_groups()
+	{
+		$db_groups = $this->_ee->db
+			->select('group_id, group_name')
+			->get_where('template_groups', array('site_id' => $this->get_site_id()));
+
+		$groups = array();
+
+		foreach ($db_groups->result_array() AS $db_group)
+		{
+			$groups[] = new EI_template_group($db_group);
+		}
+
+		return $groups;
 	}
 
 
@@ -87,7 +220,7 @@ class Crumbly_model extends CI_Model {
 	 * @param	int|string		$segment	The URL segment.
 	 * @return	string|FALSE
 	 */
-	public function get_channel_entry_title_from_segment($segment = '')
+	public function get_channel_entry_title_from_segment($segment)
 	{
 		// Get out early.
 		if ( ! $segment OR is_numeric($segment) && intval($segment) <= 0)
@@ -109,6 +242,70 @@ class Crumbly_model extends CI_Model {
 			? $db_result->row()->title
 			: FALSE;
 	}
+
+
+	/**
+	 * Retrieves a Crumbly template from the specified template group, matching the given URL segment,
+	 * if one exists.
+	 *
+	 * @access	public
+	 * @param	string			$group_segment			The template group URL title.
+	 * @param	string			$template_segment		The template URL title.
+	 * @return	Crumbly_template|FALSE
+	 */
+	public function get_crumbly_template_from_segments($group_segment, $template_segment)
+	{
+		if ( ! $group_segment OR ! is_string($group_segment)
+			OR ! $template_segment OR ! is_string($template_segment))
+		{
+			return FALSE;
+		}
+
+		$db_template = $this->_ee->db
+			->select('crumbly_templates.template_id, crumbly_templates.label')
+			->from('crumbly_templates')
+			->join('templates', 'templates.template_id = crumbly_templates.template_id', 'inner')
+			->join('template_groups', 'template_groups.group_id = templates.group_id', 'inner')
+			->where(array(
+				'crumbly_templates.site_id'	=> $this->get_site_id(),
+				'templates.template_name'	=> $template_segment,
+				'template_groups.group_name' => $group_segment
+			))
+			->limit(1)
+			->get();
+
+		return $db_template->num_rows()
+			? new Crumbly_template($db_template->row_array())
+			: FALSE;
+	}
+
+
+	/**
+	 * Retrieves a Crumbly template group for the given URL segment, if one exists.
+	 *
+	 * @access	public
+	 * @param	string		$segment		The URL segment.
+	 * @return	Crumbly_template_group|FALSE
+	 */
+	public function get_crumbly_template_group_from_segment($segment)
+	{
+		if ( ! $segment OR ! is_string($segment))
+		{
+			return FALSE;
+		}
+
+		$db_group = $this->_ee->db
+			->select('crumbly_template_groups.group_id, crumbly_template_groups.label')
+			->from('crumbly_template_groups')
+			->join('template_groups', 'template_groups.group_id = crumbly_template_groups.group_id', 'inner')
+			->where(array('crumbly_template_groups.site_id' => $this->get_site_id(), 'template_groups.group_name' => $segment))
+			->limit(1)
+			->get();
+
+		return $db_group->num_rows()
+			? new Crumbly_template_group($db_group->row_array())
+			: FALSE;
+	}
 	
 	
 	/**
@@ -124,19 +321,19 @@ class Crumbly_model extends CI_Model {
 	
 	
 	/**
-	 * Returns the package settings.
+	 * Returns the package themes folder URL, appending a forward-slash, if required.
 	 *
 	 * @access	public
-	 * @return	array
+	 * @return	string
 	 */
-	public function get_package_settings()
+	public function get_package_theme_url()
 	{
-		if ( ! $this->_package_settings)
-		{
-			$this->_package_settings = $this->_ee->config->item('crumbly_settings');
-		}
+		$theme_url = $this->_ee->config->item('theme_folder_url');
+		$theme_url .= substr($theme_url, -1) == '/'
+			? 'third_party/'
+			: '/third_party/';
 
-		return $this->_package_settings;
+		return $theme_url .$this->get_package_name() .'/';
 	}
 	
 	
@@ -167,6 +364,35 @@ class Crumbly_model extends CI_Model {
 		
 		return $this->_site_id;
 	}
+
+
+	/**
+	 * Retrieves all of the 'webpage' templates belonging to the specified template group.
+	 *
+	 * @access	public
+	 * @param	int|string		$group_id		The template group ID.
+	 * @return	array|FALSE
+	 */
+	public function get_templates_by_template_group($group_id)
+	{
+		if ( ! valid_int($group_id, 1))
+		{
+			return FALSE;
+		}
+
+		$db_templates = $this->_ee->db
+			->select('group_id, template_id, template_name')
+			->get_where('templates', array('group_id' => $group_id, 'template_type' => 'webpage'));
+
+		$templates = array();
+
+		foreach ($db_templates->result_array() AS $db_template)
+		{
+			$templates[] = new EI_template($db_template);
+		}
+
+		return $templates;
+	}
 	
 	
 	/**
@@ -188,11 +414,14 @@ class Crumbly_model extends CI_Model {
 		// By default, we always start by checking the glossary.
 		if ($use_glossary !== FALSE)
 		{
-			$settings = $this->get_package_settings();
+			$glossary = $this->get_all_crumbly_glossary_terms();
 
-			if (array_key_exists($machine, $settings['glossary']))
+			foreach ($glossary AS $glossary_item)
 			{
-				return $settings['glossary'][$machine];
+				if ($glossary_item->get_glossary_term() == $machine)
+				{
+					return $glossary_item->get_glossary_definition();
+				}
 			}
 		}
 
@@ -212,11 +441,46 @@ class Crumbly_model extends CI_Model {
 	public function install_module()
 	{
 		$this->install_module_register();
+		$this->install_module_glossary_table();
+		$this->install_module_templates_table();
+		$this->install_module_template_groups_table();
 		
 		return TRUE;
 	}
-	
-	
+
+
+	/**
+	 * Creates the 'Crumbly Glossary' database table.
+	 *
+	 * @access	public
+	 * @return	void
+	 */
+	public function install_module_glossary_table()
+	{
+		$this->_ee->load->dbforge();
+
+		$fields = array(
+			'site_id' => array(
+				'constraint'		=> 5,
+				'type'				=> 'INT',
+				'unsigned'			=> TRUE
+			),
+			'glossary_definition' => array(
+				'constraint'		=> 255,
+				'type'				=> 'VARCHAR'
+			),
+			'glossary_term' => array(
+				'constraint'		=> 255,
+				'type'				=> 'VARCHAR'
+			)
+		);
+
+		$this->_ee->dbforge->add_field($fields);
+		$this->_ee->dbforge->add_key('site_id');
+		$this->_ee->dbforge->create_table('crumbly_glossary', TRUE);
+	}
+
+
 	/**
 	 * Register the module in the database.
 	 *
@@ -231,6 +495,134 @@ class Crumbly_model extends CI_Model {
 			'module_name'			=> ucfirst($this->get_package_name()),		// Won't work without ucfirst.
 			'module_version'		=> $this->get_package_version()
 		));
+	}
+	
+	
+	/**
+	 * Creates the 'Crumbly Templates' database table.
+	 *
+	 * @access	public
+	 * @return	void
+	 */
+	public function install_module_templates_table()
+	{
+		$this->_ee->load->dbforge();
+
+		$fields = array(
+			'template_id' => array(
+				'constraint'	=> 10,
+				'type'			=> 'INT',
+				'unsigned'		=> TRUE
+			),
+			'site_id' => array(
+				'constraint'	=> 5,
+				'type'			=> 'INT',
+				'unsigned'		=> TRUE
+			),
+			'label' => array(
+				'constraint'	=> 255,
+				'type'			=> 'VARCHAR'
+			)
+		);
+
+		$this->_ee->dbforge->add_field($fields);
+		$this->_ee->dbforge->add_key('site_id');
+		$this->_ee->dbforge->add_key('template_id', TRUE);
+		$this->_ee->dbforge->create_table('crumbly_templates', TRUE);
+	}
+	
+	
+	/**
+	 * Creates the 'Crumbly Template Groups' database table.
+	 *
+	 * @access	public
+	 * @return	void
+	 */
+	public function install_module_template_groups_table()
+	{
+		$this->_ee->load->dbforge();
+
+		$fields = array(
+			'group_id' => array(
+				'constraint'	=> 10,
+				'type'			=> 'INT',
+				'unsigned'		=> TRUE
+			),
+			'site_id' => array(
+				'constraint'	=> 5,
+				'type'			=> 'INT',
+				'unsigned'		=> TRUE
+			),
+			'label' => array(
+				'constraint'	=> 255,
+				'type'			=> 'VARCHAR'
+			)
+		);
+
+		$this->_ee->dbforge->add_field($fields);
+		$this->_ee->dbforge->add_key('site_id');
+		$this->_ee->dbforge->add_key('group_id', TRUE);
+		$this->_ee->dbforge->create_table('crumbly_template_groups', TRUE);
+	}
+
+
+	/**
+	 * Saves the specified Crumbly glossary term to the database.
+	 *
+	 * @access	public
+	 * @param	Crumbly_glossary_term		$glossary_term		The glossary term to save.
+	 * @return	bool
+	 */
+	public function save_crumbly_glossary_term(Crumbly_glossary_term $glossary_term)
+	{
+		if ( ! $glossary_term->get_glossary_definition() OR ! $glossary_term->get_glossary_term())
+		{
+			return FALSE;
+		}
+
+		$data = array_merge($glossary_term->to_array(), array('site_id' => $this->get_site_id()));
+		$this->_ee->db->insert('crumbly_glossary', $data);
+		return TRUE;
+	}
+
+
+	/**
+	 * Saves the specified Crumbly template to the database.
+	 *
+	 * @access	public
+	 * @param	Crumbly_template		$template		The template to save.
+	 * @return	bool
+	 */
+	public function save_crumbly_template(Crumbly_template $template)
+	{
+		if ( ! $template->get_label() OR ! $template->get_template_id())
+		{
+			return FALSE;
+		}
+
+		$data = array_merge($template->to_array(), array('site_id' => $this->get_site_id()));
+		$this->_ee->db->insert('crumbly_templates', $data);
+		return TRUE;
+	}
+
+
+	/**
+	 * Saves the specified Crumbly template group to the database.
+	 *
+	 * @access	public
+	 * @param	Crumbly_template_group		$group		The template group to save.
+	 * @return	bool
+	 */
+	public function save_crumbly_template_group(Crumbly_template_group $group)
+	{
+		if ( ! $group->get_group_id() OR ! $group->get_label())
+		{
+			return FALSE;
+		}
+
+		$data = array_merge($group->to_array(), array('site_id' => $this->get_site_id()));
+		$this->_ee->db->insert('crumbly_template_groups', $data);
+		return TRUE;
 	}
 	
 	
@@ -254,11 +646,13 @@ class Crumbly_model extends CI_Model {
 			return FALSE;
 		}
 		
-		// Delete module from the module_member_groups table.
 		$this->_ee->db->delete('module_member_groups', array('module_id' => $db_module->row()->module_id));
-		
-		// Delete the module from the modules table.
 		$this->_ee->db->delete('modules', array('module_name' => $module_name));
+
+		$this->_ee->load->dbforge();
+		$this->_ee->dbforge->drop_table('crumbly_glossary');
+		$this->_ee->dbforge->drop_table('crumbly_templates');
+		$this->_ee->dbforge->drop_table('crumbly_template_groups');
 		
 		return TRUE;
 	}

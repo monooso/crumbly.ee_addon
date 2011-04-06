@@ -163,21 +163,12 @@ class Crumbly {
 		$tmpl	= $this->_ee->TMPL;
 		$uri	= $this->_ee->uri;
 
-		$breadcrumbs		= array();
-		$pattern_segments	= explode('/', strtolower($pattern));
-		$settings			= $this->_model->get_package_settings();
-
-		/**
-		 * TRICKY:
-		 * If one of the custom segments is a template, we need to know the parent template group.
-		 * To accomplish this, we make a note of the templates from the last-encountered template
-		 * group, as we loop through the URL segments.
-		 */
-
-		$ignore_trailing	= (strtolower($tmpl->fetch_param('custom_url:ignore_trailing_segments', 'yes')) == 'yes');
-		$templates			= array();
-		$pattern_total		= count($pattern_segments);
-		$segments_thus_far	= array();
+		$breadcrumbs			= array();
+		$pattern_segments		= explode('/', strtolower($pattern));
+		$ignore_trailing		= (strtolower($tmpl->fetch_param('custom_url:ignore_trailing_segments', 'yes')) == 'yes');
+		$template_group_segment	= '';
+		$pattern_total			= count($pattern_segments);
+		$segments_thus_far		= array();
 
 		// Deal with each segment in turn.
 		for ($segment_count = 0, $segment_total = count($segments); $segment_count < $segment_total; $segment_count++)
@@ -205,23 +196,18 @@ class Crumbly {
 					break;
 
 				case self::CRUMBLY_TEMPLATE:
-					$breadcrumb_title = array_key_exists($segment, $templates)
-						? $templates[$segment]
+					$breadcrumb_title = ($template = $this->_model->get_crumbly_template_from_segments($template_group_segment, $segment))
+						? $template->get_label()
 						: $this->_model->humanize($segment);
 
 					break;
 
 				case self::CRUMBLY_TEMPLATE_GROUP:
-					if (array_key_exists($segment, $settings['template_groups']))
-					{
-						$breadcrumb_title	= $settings['template_groups'][$segment]['title'];
-						$templates			= $settings['template_groups'][$segment]['templates'];
-					}
-					else
-					{
-						$breadcrumb_title	= $this->_model->humanize($segment);
-						$templates			= array();
-					}
+					$template_group_segment = $segment;
+
+					$breadcrumb_title = ($template_group = $this->_model->get_crumbly_template_group_from_segment($segment))
+						? $template_group->get_label()
+						: $this->_model->humanize($segment);
 
 					break;
 				

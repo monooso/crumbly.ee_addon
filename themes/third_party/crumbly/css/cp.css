@@ -1,0 +1,37 @@
+/**
+ * Crumbly control panel styles.
+ *
+ * @author			Stephen Lewis <stephen@experienceinternet.co.uk>
+ * @copyright		Experience Internet
+ * @package			Crumbly
+ */
+
+@media screen {
+
+/* =tables
+ * ------------------------------------------------------------ */
+#crumbly .act {
+	padding-right		: 7px;
+	text-align			: right;
+	white-space			: nowrap;
+	width				: 44px;
+}
+
+
+/* =btn
+ * ------------------------------------------------------------ */
+#crumbly .btn {
+	display				: inline-block;
+	margin-right		: 3px;
+	vertical-align		: middle;
+}
+
+#crumbly .btn img {
+	display				: inline-block;
+	vertical-align		: middle;
+}
+
+} /* @media screen */
+
+/* End of file		: cp.css */
+/* File location	: themes/third_party/crumbly/css/cp.css */
