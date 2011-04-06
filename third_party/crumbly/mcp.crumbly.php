@@ -124,6 +124,78 @@ class Crumbly_mcp {
 	}
 
 
+
+	/**
+	 * Saves the Crumbly templates.
+	 *
+	 * @access	public
+	 * @return	void
+	 */
+	public function save_templates()
+	{
+		$templates_input = $this->_ee->input->post('templates');
+
+		if ( ! is_array($templates_input))
+		{
+			$templates_input = array();
+		}
+
+		$this->_model->delete_all_crumbly_templates();
+
+		$success = TRUE;
+
+		foreach ($templates_input AS $template_data)
+		{
+			if ( ! $this->_model->save_crumbly_template(new Crumbly_template($template_data)))
+			{
+				$success = FALSE;
+			}
+		}
+
+		$success
+			? $this->_ee->session->set_flashdata('message_success', $this->_ee->lang->line('msg_templates_saved'))
+			: $this->_ee->session->set_flashdata('message_failure', $this->_ee->lang->line('msg_templates_not_saved'));
+
+		$this->_ee->functions->redirect($this->_base_url .AMP .'method=templates');
+	}
+
+
+	/**
+	 * Saves the Crumbly template groups.
+	 *
+	 * @access	public
+	 * @return	void
+	 */
+	public function save_template_groups()
+	{
+		$groups_input = $this->_ee->input->post('template_groups');
+
+		if ( ! is_array($groups_input))
+		{
+			$groups_input = array();
+		}
+
+		$this->_model->delete_all_crumbly_template_groups();
+
+		$success = TRUE;
+
+		foreach ($groups_input AS $group_data)
+		{
+			if ( ! $this->_model->save_crumbly_template_group(new Crumbly_template_group($group_data)))
+			{
+				$success = FALSE;
+			}
+		}
+
+		$success
+			? $this->_ee->session->set_flashdata('message_success', $this->_ee->lang->line('msg_template_groups_saved'))
+			: $this->_ee->session->set_flashdata('message_failure', $this->_ee->lang->line('msg_template_groups_not_saved'));
+
+		$this->_ee->functions->redirect($this->_base_url .AMP .'method=template_groups');
+		
+	}
+
+
 	/**
 	 * Templates.
 	 *
@@ -190,8 +262,8 @@ class Crumbly_mcp {
 		}
 		
 		$vars = array(
-			'form_action'		=> $this->_base_qs .AMP .'method=save_templates',
-			'cp_page_title'		=> $this->_ee->lang->line('hd_templates'),
+			'form_action'		=> $this->_base_qs .AMP .'method=save_template_groups',
+			'cp_page_title'		=> $this->_ee->lang->line('hd_template_groups'),
 			'settings'			=> $this->_model->get_package_settings(),
 			'template_groups'	=> $template_groups_dd
 		);

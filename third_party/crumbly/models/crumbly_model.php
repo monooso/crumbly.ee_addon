@@ -86,7 +86,7 @@ class Crumbly_model extends CI_Model {
 
 
 	/**
-	 * Deletes all the glossary terms for the current site from the database.
+	 * Deletes all the Crumbly glossary terms for the current site.
 	 *
 	 * @access	public
 	 * @return	bool
@@ -94,6 +94,32 @@ class Crumbly_model extends CI_Model {
 	public function delete_all_crumbly_glossary_terms()
 	{
 		$this->_ee->db->delete('crumbly_glossary', array('site_id' => $this->get_site_id()));
+		return TRUE;
+	}
+
+
+	/**
+	 * Deletes all the Crumbly templates for the current site.
+	 *
+	 * @access	public
+	 * @return	bool
+	 */
+	public function delete_all_crumbly_templates()
+	{
+		$this->_ee->db->delete('crumbly_templates', array('site_id' => $this->get_site_id()));
+		return TRUE;
+	}
+
+
+	/**
+	 * Deletes all the Crumbly template groups for the current site.
+	 *
+	 * @access	public
+	 * @return	bool
+	 */
+	public function delete_all_crumbly_template_groups()
+	{
+		$this->_ee->db->delete('crumbly_template_groups', array('site_id' => $this->get_site_id()));
 		return TRUE;
 	}
 
@@ -107,7 +133,7 @@ class Crumbly_model extends CI_Model {
 	public function get_all_crumbly_glossary_terms()
 	{
 		$db_terms = $this->_ee->db
-			->select('glossary_definition, glossary_term, glossary_term_id')
+			->select('glossary_definition, glossary_term')
 			->get_where('crumbly_glossary', array('site_id' => $this->get_site_id()));
 
 		$terms = array();
@@ -418,12 +444,6 @@ class Crumbly_model extends CI_Model {
 		$this->_ee->load->dbforge();
 
 		$fields = array(
-			'glossary_term_id' => array(
-				'auto_increment'	=> TRUE,
-				'constraint'		=> 10,
-				'type'				=> 'INT',
-				'unsigned'			=> TRUE
-			),
 			'site_id' => array(
 				'constraint'		=> 5,
 				'type'				=> 'INT',
@@ -440,7 +460,6 @@ class Crumbly_model extends CI_Model {
 		);
 
 		$this->_ee->dbforge->add_field($fields);
-		$this->_ee->dbforge->add_key('glossary_term_id', TRUE);
 		$this->_ee->dbforge->add_key('site_id');
 		$this->_ee->dbforge->create_table('crumbly_glossary', TRUE);
 	}
@@ -545,22 +564,8 @@ class Crumbly_model extends CI_Model {
 			return FALSE;
 		}
 
-		$data = array(
-			'glossary_definition'	=> $glossary_term->get_glossary_definition(),
-			'glossary_term'			=> $glossary_term->get_glossary_term(),
-			'site_id'				=> $this->get_site_id()
-		);
-
-		if ($glossary_term->get_glossary_term_id())
-		{
-			$where = array('glossary_term_id' => $glossary_term->get_glossary_term_id());
-			$this->_ee->db->update('crumbly_glossary', $data, $where);
-		}
-		else
-		{
-			$this->_ee->db->insert('crumbly_glossary', $data);
-		}
-
+		$data = array_merge($glossary_term->to_array(), array('site_id' => $this->get_site_id()));
+		$this->_ee->db->insert('crumbly_glossary', $data);
 		return TRUE;
 	}
 
@@ -580,12 +585,6 @@ class Crumbly_model extends CI_Model {
 		}
 
 		$data = array_merge($template->to_array(), array('site_id' => $this->get_site_id()));
-
-		$this->_ee->db->delete('crumbly_templates', array(
-			'site_id'		=> $this->get_site_id(),
-			'template_id'	=> $template->get_template_id()
-		));
-
 		$this->_ee->db->insert('crumbly_templates', $data);
 		return TRUE;
 	}
@@ -606,12 +605,6 @@ class Crumbly_model extends CI_Model {
 		}
 
 		$data = array_merge($group->to_array(), array('site_id' => $this->get_site_id()));
-
-		$this->_ee->db->delete('crumbly_template_groups', array(
-			'group_id'	=> $group->get_group_id(),
-			'site_id'	=> $this->get_site_id()
-		));
-
 		$this->_ee->db->insert('crumbly_template_groups', $data);
 		return TRUE;
 	}

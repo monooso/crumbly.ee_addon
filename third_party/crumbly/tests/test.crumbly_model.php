@@ -202,22 +202,38 @@ class Test_crumbly_model extends Testee_unit_test_case {
 	}
 
 
+	public function test__delete_all_crumbly_templates__success()
+	{
+		$where = array('site_id' => $this->_site_id);
+		$this->_ee->db->expectOnce('delete', array('crumbly_templates', $where));
+	
+		$this->assertIdentical(TRUE, $this->_subject->delete_all_crumbly_templates());
+	}
+
+
+	public function test__delete_all_crumbly_template_groups__success()
+	{
+		$where = array('site_id' => $this->_site_id);
+		$this->_ee->db->expectOnce('delete', array('crumbly_template_groups', $where));
+	
+		$this->assertIdentical(TRUE, $this->_subject->delete_all_crumbly_template_groups());
+	}
+
+
 	public function test__get_all_crumbly_glossary_terms__success()
 	{
-		$this->_ee->db->expectOnce('select', array('glossary_definition, glossary_term, glossary_term_id'));
+		$this->_ee->db->expectOnce('select', array('glossary_definition, glossary_term'));
 		$this->_ee->db->expectOnce('get_where', array('crumbly_glossary', array('site_id' => $this->_site_id)));
 
 		$db_result	= $this->_get_mock('db_query');
 		$db_rows	= array(
 			array(
 				'glossary_definition'	=> 'Definition A',
-				'glossary_term'			=> 'term_a',
-				'glossary_term_id'		=> 10
+				'glossary_term'			=> 'term_a'
 			),
 			array(
 				'glossary_definition'	=> 'Definition B',
-				'glossary_term'			=> 'term_b',
-				'glossary_term_id'		=> 20
+				'glossary_term'			=> 'term_b'
 			)
 		);
 
@@ -608,7 +624,6 @@ class Test_crumbly_model extends Testee_unit_test_case {
 
 		$db_glossary_rows = array(
 			array(
-				'glossary_term_id'		=> '10',
 				'glossary_term'			=> $machine,
 				'glossary_definition'	=> $human
 			)
@@ -635,12 +650,6 @@ class Test_crumbly_model extends Testee_unit_test_case {
 	public function test__install_module_glossary_table__success()
 	{
 		$fields = array(
-			'glossary_term_id' => array(
-				'auto_increment'	=> TRUE,
-				'constraint'		=> 10,
-				'type'				=> 'INT',
-				'unsigned'			=> TRUE
-			),
 			'site_id' => array(
 				'constraint'		=> 5,
 				'type'				=> 'INT',
@@ -657,9 +666,7 @@ class Test_crumbly_model extends Testee_unit_test_case {
 		);
 
 		$this->_ee->dbforge->expectOnce('add_field', array($fields));
-		$this->_ee->dbforge->expectCallCount('add_key', 2);
-		$this->_ee->dbforge->expectAt(0, 'add_key', array('glossary_term_id', TRUE));
-		$this->_ee->dbforge->expectAt(1, 'add_key', array('site_id'));
+		$this->_ee->dbforge->expectOnce('add_key', array('site_id'));
 		$this->_ee->dbforge->expectOnce('create_table', array('crumbly_glossary', TRUE));
 	
 		$this->_subject->install_module_glossary_table();
@@ -742,7 +749,7 @@ class Test_crumbly_model extends Testee_unit_test_case {
 	}
 
 
-	public function test__save_crumbly_glossary_term__create_success()
+	public function test__save_crumbly_glossary_term__success()
 	{
 		$definition		= 'Definition';
 		$term			= 'term';
@@ -758,34 +765,6 @@ class Test_crumbly_model extends Testee_unit_test_case {
 		);
 
 		$this->_ee->db->expectOnce('insert', array('crumbly_glossary', $insert_data));
-		$this->_ee->db->expectNever('update');
-	
-		$this->assertEqual(TRUE, $this->_subject->save_crumbly_glossary_term($glossary_term));
-	}
-
-
-	public function test__save_crumbly_glossary_term__update_success()
-	{
-		$definition		= 'Definition';
-		$term			= 'term';
-		$term_id		= 10;
-		$glossary_term	= new Crumbly_glossary_term(array(
-			'glossary_definition'	=> $definition,
-			'glossary_term'			=> $term,
-			'glossary_term_id'		=> $term_id
-		));
-
-		$insert_data = array(
-			'glossary_definition'	=> $definition,
-			'glossary_term'			=> $term,
-			'site_id'				=> $this->_site_id
-		);
-
-		$where = array('glossary_term_id' => $term_id);
-
-		$this->_ee->db->expectOnce('update', array('crumbly_glossary', $insert_data, $where));
-		$this->_ee->db->expectNever('insert');
-
 		$this->assertEqual(TRUE, $this->_subject->save_crumbly_glossary_term($glossary_term));
 	}
 
@@ -793,10 +772,7 @@ class Test_crumbly_model extends Testee_unit_test_case {
 	public function test__save_crumbly_glossary_term__missing_glossary_definition()
 	{
 		$glossary_term = new Crumbly_glossary_term(array('glossary_term' => 'term'));
-
 		$this->_ee->db->expectNever('insert');
-		$this->_ee->db->expectNever('update');
-	
 		$this->assertEqual(FALSE, $this->_subject->save_crumbly_glossary_term($glossary_term));
 	}
 
@@ -804,10 +780,7 @@ class Test_crumbly_model extends Testee_unit_test_case {
 	public function test__save_crumbly_glossary_term__missing_glossary_term()
 	{
 		$glossary_term = new Crumbly_glossary_term(array('glossary_definition' => 'Definition'));
-
 		$this->_ee->db->expectNever('insert');
-		$this->_ee->db->expectNever('update');
-	
 		$this->assertEqual(FALSE, $this->_subject->save_crumbly_glossary_term($glossary_term));
 	}
 
@@ -825,14 +798,7 @@ class Test_crumbly_model extends Testee_unit_test_case {
 			'site_id'		=> $this->_site_id
 		);
 
-		$delete_criteria = array(
-			'site_id'		=> $this->_site_id,
-			'template_id'	=> $template->get_template_id()
-		);
-
-		$this->_ee->db->expectOnce('delete', array('crumbly_templates', $delete_criteria));
 		$this->_ee->db->expectOnce('insert', array('crumbly_templates', $insert_data));
-	
 		$this->assertEqual(TRUE, $this->_subject->save_crumbly_template($template));
 	}
 
@@ -840,10 +806,7 @@ class Test_crumbly_model extends Testee_unit_test_case {
 	public function test__save_crumbly_template__missing_label()
 	{
 		$template = new Crumbly_template(array('template_id' => 20));
-	
-		$this->_ee->db->expectNever('delete');
 		$this->_ee->db->expectNever('insert');
-
 		$this->assertIdentical(FALSE, $this->_subject->save_crumbly_template($template));
 	}
 
@@ -851,10 +814,7 @@ class Test_crumbly_model extends Testee_unit_test_case {
 	public function test__save_crumbly_template__missing_template_id()
 	{
 		$template = new Crumbly_template(array('label' => 'Example label'));
-	
-		$this->_ee->db->expectNever('delete');
 		$this->_ee->db->expectNever('insert');
-
 		$this->assertIdentical(FALSE, $this->_subject->save_crumbly_template($template));
 	}
 
@@ -872,14 +832,7 @@ class Test_crumbly_model extends Testee_unit_test_case {
 			'site_id'	=> $this->_site_id
 		);
 
-		$delete_criteria = array(
-			'group_id'	=> $group->get_group_id(),
-			'site_id'	=> $this->_site_id
-		);
-
-		$this->_ee->db->expectOnce('delete', array('crumbly_template_groups', $delete_criteria));
 		$this->_ee->db->expectOnce('insert', array('crumbly_template_groups', $insert_data));
-	
 		$this->assertIdentical(TRUE, $this->_subject->save_crumbly_template_group($group));
 	}
 
@@ -887,10 +840,7 @@ class Test_crumbly_model extends Testee_unit_test_case {
 	public function test__save_crumbly_template_group__missing_group_id()
 	{
 		$group = new Crumbly_template_group(array('label' => 'Example group'));
-
-		$this->_ee->db->expectNever('delete');
 		$this->_ee->db->expectNever('insert');
-	
 		$this->assertIdentical(FALSE, $this->_subject->save_crumbly_template_group($group));
 	}
 
@@ -898,10 +848,7 @@ class Test_crumbly_model extends Testee_unit_test_case {
 	public function test__save_crumbly_template_group__missing_label()
 	{
 		$group = new Crumbly_template_group(array('group_id' => 10));
-
-		$this->_ee->db->expectNever('delete');
 		$this->_ee->db->expectNever('insert');
-	
 		$this->assertIdentical(FALSE, $this->_subject->save_crumbly_template_group($group));
 	}
 

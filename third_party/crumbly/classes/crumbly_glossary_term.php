@@ -14,7 +14,6 @@ class Crumbly_glossary_term {
 
 	private $_glossary_definition;
 	private $_glossary_term;
-	private $_glossary_term_id;
 
 
 	/* --------------------------------------------------------------
@@ -69,18 +68,6 @@ class Crumbly_glossary_term {
 
 
 	/**
-	 * Returns glossary term ID.
-	 *
-	 * @access	public
-	 * @return	int
-	 */
-	public function get_glossary_term_id()
-	{
-		return $this->_glossary_term_id;
-	}
-
-
-	/**
 	 * Resets the instance properties.
 	 *
 	 * @access	public
@@ -90,7 +77,6 @@ class Crumbly_glossary_term {
 	{
 		$this->_glossary_definition	= '';
 		$this->_glossary_term		= '';
-		$this->_glossary_term_id	= 0;
 
 		return $this;
 	}
@@ -133,24 +119,6 @@ class Crumbly_glossary_term {
 	
 	
 	/**
-	 * Sets glossary term ID.
-	 *
-	 * @access	public
-	 * @param	int		$glossary_term_id		The glossary term ID.
-	 * @return	int
-	 */
-	public function set_glossary_term_id($glossary_term_id)
-	{
-		if (valid_int($glossary_term_id, 1))
-		{
-			$this->_glossary_term_id = intval($glossary_term_id);
-		}
-
-		return $this->get_glossary_term_id();
-	}
-
-
-	/**
 	 * Returns the instance properties as an associative array.
 	 *
 	 * @access	public
@@ -160,8 +128,7 @@ class Crumbly_glossary_term {
 	{
 		return array(
 			'glossary_definition'	=> $this->get_glossary_definition(),
-			'glossary_term'			=> $this->get_glossary_term(),
-			'glossary_term_id'		=> $this->get_glossary_term_id()
+			'glossary_term'			=> $this->get_glossary_term()
 		);
 	}
 	
