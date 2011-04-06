@@ -77,109 +77,6 @@ class Test_crumbly_model extends Testee_unit_test_case {
 	}
 
 
-	public function test__get_channel_entry_title_from_segment__url_title_success()
-	{
-		// Shortcuts.
-		$db = $this->_ee->db;
-
-		// Dummy values.
-		$url_title	= 'white_stripes';
-		$title		= 'The White Stripes';
-
-		$query_result		= $this->_get_mock('db_query');
-		$query_row			= new StdClass();
-		$query_row->title	= $title;
-
-		// Expectations.
-		$db->expectOnce('select', array('title'));
-		$db->expectOnce('get_where', array('channel_titles', array('url_title' => $url_title), 1));
-
-		$query_result->expectOnce('num_rows');
-		$query_result->expectOnce('row');
-
-		// Return values.
-		$db->setReturnReference('get_where', $query_result);
-		$query_result->setReturnValue('num_rows', 1);
-		$query_result->setReturnValue('row', $query_row);
-
-		// Run the tests.
-		$this->assertIdentical($title, $this->_subject->get_channel_entry_title_from_segment($url_title));
-	}
-
-
-	public function test__get_channel_entry_title_from_segment__entry_id_success()
-	{
-		// Shortcuts.
-		$db = $this->_ee->db;
-
-		// Dummy values.
-		$entry_id	= '10';
-		$title		= 'The White Stripes';
-
-		$query_result		= $this->_get_mock('db_query');
-		$query_row			= new StdClass();
-		$query_row->title	= $title;
-
-		// Expectations.
-		$db->expectOnce('select', array('title'));
-		$db->expectOnce('get_where', array('channel_titles', array('entry_id' => $entry_id), 1));
-
-		$query_result->expectOnce('num_rows');
-		$query_result->expectOnce('row');
-
-		// Return values.
-		$db->setReturnReference('get_where', $query_result);
-		$query_result->setReturnValue('num_rows', 1);
-		$query_result->setReturnValue('row', $query_row);
-
-		// Run the tests.
-		$this->assertIdentical($title, $this->_subject->get_channel_entry_title_from_segment($entry_id));
-	}
-
-
-	public function test__get_channel_entry_title_from_segment__no_segment()
-	{
-		// Shortcuts.
-		$db = $this->_ee->db;
-
-		// Dummy values.
-		$segment = '';;
-
-		// Expectations.
-		$db->expectNever('select');
-		$db->expectNever('get_where');
-
-		// Run the tests.
-		$this->assertIdentical(FALSE, $this->_subject->get_channel_entry_title_from_segment($segment));
-
-	}
-
-
-	public function test__get_channel_entry_title_from_segment__segment_not_found()
-	{
-		// Shortcuts.
-		$db = $this->_ee->db;
-
-		// Dummy values.
-		$url_title		= 'white_stripes';
-		$query_result	= $this->_get_mock('db_query');
-
-		// Expectations.
-		$db->expectOnce('select', array('title'));
-		$db->expectOnce('get_where', array('channel_titles', array('url_title' => $url_title), 1));
-
-		$query_result->expectOnce('num_rows');
-		$query_result->expectNever('row');
-
-		// Return values.
-		$db->setReturnReference('get_where', $query_result);
-		$query_result->setReturnValue('num_rows', 0);
-
-		// Run the tests.
-		$this->assertIdentical(FALSE, $this->_subject->get_channel_entry_title_from_segment($url_title));
-	}
-	
-	
 	public function test__constructor__package_name_and_version()
 	{
 		// Dummy values.
@@ -455,6 +352,248 @@ class Test_crumbly_model extends Testee_unit_test_case {
 	}
 
 
+	public function test__get_channel_entry_title_from_segment__url_title_success()
+	{
+		// Shortcuts.
+		$db = $this->_ee->db;
+
+		// Dummy values.
+		$url_title	= 'white_stripes';
+		$title		= 'The White Stripes';
+
+		$query_result		= $this->_get_mock('db_query');
+		$query_row			= new StdClass();
+		$query_row->title	= $title;
+
+		// Expectations.
+		$db->expectOnce('select', array('title'));
+		$db->expectOnce('get_where', array('channel_titles', array('url_title' => $url_title), 1));
+
+		$query_result->expectOnce('num_rows');
+		$query_result->expectOnce('row');
+
+		// Return values.
+		$db->setReturnReference('get_where', $query_result);
+		$query_result->setReturnValue('num_rows', 1);
+		$query_result->setReturnValue('row', $query_row);
+
+		// Run the tests.
+		$this->assertIdentical($title, $this->_subject->get_channel_entry_title_from_segment($url_title));
+	}
+
+
+	public function test__get_channel_entry_title_from_segment__entry_id_success()
+	{
+		// Shortcuts.
+		$db = $this->_ee->db;
+
+		// Dummy values.
+		$entry_id	= '10';
+		$title		= 'The White Stripes';
+
+		$query_result		= $this->_get_mock('db_query');
+		$query_row			= new StdClass();
+		$query_row->title	= $title;
+
+		// Expectations.
+		$db->expectOnce('select', array('title'));
+		$db->expectOnce('get_where', array('channel_titles', array('entry_id' => $entry_id), 1));
+
+		$query_result->expectOnce('num_rows');
+		$query_result->expectOnce('row');
+
+		// Return values.
+		$db->setReturnReference('get_where', $query_result);
+		$query_result->setReturnValue('num_rows', 1);
+		$query_result->setReturnValue('row', $query_row);
+
+		// Run the tests.
+		$this->assertIdentical($title, $this->_subject->get_channel_entry_title_from_segment($entry_id));
+	}
+
+
+	public function test__get_channel_entry_title_from_segment__no_segment()
+	{
+		// Shortcuts.
+		$db = $this->_ee->db;
+
+		// Dummy values.
+		$segment = '';;
+
+		// Expectations.
+		$db->expectNever('select');
+		$db->expectNever('get_where');
+
+		// Run the tests.
+		$this->assertIdentical(FALSE, $this->_subject->get_channel_entry_title_from_segment($segment));
+
+	}
+
+
+	public function test__get_channel_entry_title_from_segment__segment_not_found()
+	{
+		// Shortcuts.
+		$db = $this->_ee->db;
+
+		// Dummy values.
+		$url_title		= 'white_stripes';
+		$query_result	= $this->_get_mock('db_query');
+
+		// Expectations.
+		$db->expectOnce('select', array('title'));
+		$db->expectOnce('get_where', array('channel_titles', array('url_title' => $url_title), 1));
+
+		$query_result->expectOnce('num_rows');
+		$query_result->expectNever('row');
+
+		// Return values.
+		$db->setReturnReference('get_where', $query_result);
+		$query_result->setReturnValue('num_rows', 0);
+
+		// Run the tests.
+		$this->assertIdentical(FALSE, $this->_subject->get_channel_entry_title_from_segment($url_title));
+	}
+
+
+	public function test__get_crumbly_template_from_segments__success()
+	{
+		$group_segment		= 'bands';
+		$template_segment	= 'white-stripes';
+		$db_result			= $this->_get_mock('db_query');
+		$db_row				= array('template_id' => '10', 'label' => 'The White Stripes');
+
+		$this->_ee->db->expectOnce('select', array('crumbly_templates.template_id, crumbly_templates.label'));
+		$this->_ee->db->expectOnce('from', array('crumbly_templates'));
+		$this->_ee->db->expectCallCount('join', 2);
+		$this->_ee->db->expectAt(0, 'join', array('templates', 'templates.template_id = crumbly_templates.template_id', 'inner'));
+		$this->_ee->db->expectAt(1, 'join', array('template_groups', 'template_groups.group_id = templates.group_id', 'inner'));
+		$this->_ee->db->expectOnce('where', array(array(
+			'crumbly_templates.site_id'	=> $this->_site_id,
+			'templates.template_name'	=> $template_segment,
+			'template_groups.group_name' => $group_segment
+		)));
+		$this->_ee->db->expectOnce('limit', array(1));
+		$this->_ee->db->expectOnce('get');
+
+		$db_result->expectOnce('num_rows');
+		$db_result->expectOnce('row_array');
+
+		$this->_ee->db->setReturnReference('get', $db_result);
+		$db_result->setReturnValue('num_rows', 1);
+		$db_result->setReturnValue('row_array', $db_row);
+		
+		$expected_result = new Crumbly_template($db_row);
+
+		$this->assertIdentical($expected_result, $this->_subject->get_crumbly_template_from_segments($group_segment, $template_segment));
+	}
+
+
+	public function test__get_crumbly_template_from_segments__no_matches()
+	{
+		$group_segment		= 'bands';
+		$template_segment	= 'white-stripes';
+		$db_result			= $this->_get_mock('db_query');
+
+		$this->_ee->db->setReturnReference('get', $db_result);
+		$db_result->setReturnValue('num_rows', 0);
+		$db_result->expectNever('row_array');
+	
+		$this->assertIdentical(FALSE, $this->_subject->get_crumbly_template_from_segments($group_segment, $template_segment));
+	}
+
+
+	public function test__get_crumbly_template_from_segments__invalid_template_segment()
+	{
+		$group_segment		= 'bands';
+		$template_segment	= '';
+
+		$this->_ee->db->expectNever('select');
+		$this->_ee->db->expectNever('from');
+		$this->_ee->db->expectNever('join');
+		$this->_ee->db->expectNever('where');
+		$this->_ee->db->expectNever('limit');
+		$this->_ee->db->expectNever('get');
+	
+		$this->assertIdentical(FALSE, $this->_subject->get_crumbly_template_from_segments($group_segment, $template_segment));
+	}
+
+
+	public function test__get_crumbly_template_from_segments__invalid_group_segment()
+	{
+		$group_segment		= '';
+		$template_segment	= 'white-stripes';
+
+		$this->_ee->db->expectNever('select');
+		$this->_ee->db->expectNever('from');
+		$this->_ee->db->expectNever('join');
+		$this->_ee->db->expectNever('where');
+		$this->_ee->db->expectNever('limit');
+		$this->_ee->db->expectNever('get');
+	
+		$this->assertIdentical(FALSE, $this->_subject->get_crumbly_template_from_segments($group_segment, $template_segment));
+	}
+
+
+	public function test__get_crumbly_template_group_from_segment__success()
+	{
+		$segment	= 'bands';
+		$db_result	= $this->_get_mock('db_query');
+		$db_row		= array(
+			'group_id'		=> '10',
+			'label'			=> 'Awesome Bands'
+		);
+
+		$this->_ee->db->expectOnce('select', array('crumbly_template_groups.group_id, crumbly_template_groups.label'));
+		$this->_ee->db->expectOnce('from', array('crumbly_template_groups'));
+		$this->_ee->db->expectOnce('join', array('template_groups', 'template_groups.group_id = crumbly_template_groups.group_id', 'inner'));
+		$this->_ee->db->expectOnce('where', array(array(
+			'crumbly_template_groups.site_id'	=> $this->_site_id,
+			'template_groups.group_name'		=> $segment
+		)));
+		$this->_ee->db->expectOnce('limit', array(1));
+		$this->_ee->db->expectOnce('get');
+
+		$db_result->expectOnce('num_rows');
+		$db_result->expectOnce('row_array');
+
+		$this->_ee->db->setReturnReference('get', $db_result);
+		$db_result->setReturnValue('num_rows', 1);
+		$db_result->setReturnValue('row_array', $db_row);
+		
+		$expected_result = new Crumbly_template_group($db_row);
+
+		$this->assertIdentical($expected_result, $this->_subject->get_crumbly_template_group_from_segment($segment));
+	}
+
+
+	public function test__get_crumbly_template_group_from_segment__no_matches()
+	{
+		$segment	= 'bands';
+		$db_result	= $this->_get_mock('db_query');
+
+		$this->_ee->db->setReturnReference('get', $db_result);
+		$db_result->setReturnValue('num_rows', 0);
+		$db_result->expectNever('row_array');
+	
+		$this->assertIdentical(FALSE, $this->_subject->get_crumbly_template_group_from_segment($segment));
+	}
+
+
+	public function test__get_crumbly_template_group_from_segment__invalid_segment()
+	{
+		$segment = '';
+
+		$this->_ee->db->expectNever('select');
+		$this->_ee->db->expectNever('from');
+		$this->_ee->db->expectNever('join');
+		$this->_ee->db->expectNever('where');
+		$this->_ee->db->expectNever('limit');
+		$this->_ee->db->expectNever('get');
+	
+		$this->assertIdentical(FALSE, $this->_subject->get_crumbly_template_group_from_segment($segment));
+	}
+	
+	
 	public function test__get_package_theme_url__end_slash_exists()
 	{
 		// Dummy values.

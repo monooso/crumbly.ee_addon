@@ -74,31 +74,6 @@ class Test_crumbly extends Testee_unit_test_case {
 		$this->_ee->uri->expectOnce('segment_array');
 		$this->_ee->uri->setReturnValue('segment_array', $segments);
 
-		// Retrieve the package settings.
-		$settings = array(
-			'glossary' => array(),
-			'template_groups' => array(
-				'about' => array(
-					'title' => 'About Us',
-					'templates' => array(
-						'company'	=> 'Our Company',
-						'team'		=> 'Our Team'
-					)
-				),
-				'blog' => array(
-					'title' => 'Blog',
-					'templates' => array()
-				),
-				'contact' => array(
-					'title' => 'Contact Us',
-					'templates' => array()
-				)
-			)
-		);
-
-		$this->_model->expectOnce('get_package_settings');
-		$this->_model->setReturnValue('get_package_settings', $settings);
-
 		// No root breadcrumb (tested separately).
 		$this->_ee->functions->expectNever('fetch_site_index');
 		$this->_ee->TMPL->setReturnValue('fetch_param', 'no', array('root_breadcrumb:include', '*'));
@@ -112,10 +87,18 @@ class Test_crumbly extends Testee_unit_test_case {
 		$this->_ee->functions->expectCallCount('create_url', 3);
 
 		// Template group URL.
+		$template_group = new Crumbly_template_group(array('group_id' => 10, 'label' => 'About Us'));
+		$this->_model->expectOnce('get_crumbly_template_group_from_segment', array($segments[1]));
+		$this->_model->setReturnValue('get_crumbly_template_group_from_segment', $template_group);
+
 		$this->_ee->functions->expectAt(0, 'create_url', array('about'));
 		$this->_ee->functions->setReturnValueAt(0, 'create_url', $site_url .'about/');
 
 		// Template URL.
+		$template = new Crumbly_template(array('template_id' => 10, 'label' => 'Meet the Team'));
+		$this->_model->expectOnce('get_crumbly_template_from_segments', array($segments[1], $segments[2]));
+		$this->_model->setReturnValue('get_crumbly_template_from_segments', $template);
+
 		$this->_ee->functions->expectAt(1, 'create_url', array('about/team'));
 		$this->_ee->functions->setReturnValueAt(1, 'create_url', $site_url .'about/team/');
 
@@ -134,7 +117,7 @@ class Test_crumbly extends Testee_unit_test_case {
 			),
 			array(
 				'breadcrumb_segment'	=> 'team',
-				'breadcrumb_title'		=> 'Our Team',
+				'breadcrumb_title'		=> 'Meet the Team',
 				'breadcrumb_url'		=> $site_url .'about/team/'
 			),
 			array(
@@ -154,9 +137,9 @@ class Test_crumbly extends Testee_unit_test_case {
 	}
 
 
-	public function test__breadcrumbs__template_group_not_in_settings()
+	public function test__breadcrumbs__template_group_not_found()
 	{
-		// Dummy values.
+		$site_url				= 'http://example.com/';
 		$template_group			= 'about';
 		$template_group_title	= 'About';
 
@@ -166,24 +149,18 @@ class Test_crumbly extends Testee_unit_test_case {
 
 		$this->_ee->uri->setReturnValue('segment_array', $segments);
 
-		// Retrieve the package settings.
-		$settings = array(
-			'glossary' => array(),
-			'template_groups' => array()
-		);
-
-		$this->_model->setReturnValue('get_package_settings', $settings);
-
 		// Retrieve the tag parameters (no root breadcrumb).
 		$this->_ee->TMPL->setReturnValue('fetch_param', 'no', array('root_breadcrumb:include', 'yes'));
 
 		// Template group URL.
-		$site_url = 'http://example.com/';
-		$this->_ee->functions->expectOnce('create_url', array($template_group));
-		$this->_ee->functions->setReturnValue('create_url', $site_url .$template_group .'/');
+		$this->_model->expectOnce('get_crumbly_template_group_from_segment', array($template_group));
+		$this->_model->setReturnValue('get_crumbly_template_group_from_segment', FALSE);
 
 		$this->_model->expectOnce('humanize', array($template_group));
 		$this->_model->setReturnValue('humanize', $template_group_title, array($template_group));
+
+		$this->_ee->functions->expectOnce('create_url', array($template_group));
+		$this->_ee->functions->setReturnValue('create_url', $site_url .$template_group .'/');
 
 		// Template tag parser.
 		$tagdata = 'Tagdata';
@@ -206,7 +183,7 @@ class Test_crumbly extends Testee_unit_test_case {
 	}
 
 
-	public function test__breadcrumbs__template_group_not_in_settings_url_includes_template()
+	public function test__breadcrumbs__template_group_not_found_url_includes_template()
 	{
 		// Dummy values.
 		$template_group			= 'about';
@@ -237,10 +214,14 @@ class Test_crumbly extends Testee_unit_test_case {
 		$this->_model->expectCallCount('humanize', 2);
 
 		// Template group URL.
-		$this->_ee->functions->setReturnValueAt(0, 'create_url', $site_url .$template_group .'/');
+		$this->_model->expectOnce('get_crumbly_template_group_from_segment', array($template_group));
+		$this->_model->setReturnValue('get_crumbly_template_group_from_segment', FALSE);
+
 		$this->_model->setReturnValue('humanize', $template_group_title, array($template_group));
+		$this->_ee->functions->setReturnValueAt(0, 'create_url', $site_url .$template_group .'/');
 		
 		// Template URL.
+		$this->_model->setReturnValue('get_crumbly_template_from_segments', FALSE);
 		$this->_ee->functions->setReturnValueAt(1, 'create_url', $site_url .$template_group .'/' .$template .'/');
 		$this->_model->setReturnValue('humanize', $template_title, array($template));
 
@@ -270,7 +251,7 @@ class Test_crumbly extends Testee_unit_test_case {
 	}
 
 
-	public function test__breadcrumbs__template_not_in_settings()
+	public function test__breadcrumbs__template_not_found()
 	{
 		// Retrieve the segments.
 		$segments		= array();
@@ -279,20 +260,6 @@ class Test_crumbly extends Testee_unit_test_case {
 
 		$this->_ee->uri->expectOnce('segment_array');
 		$this->_ee->uri->setReturnValue('segment_array', $segments);
-
-		// Retrieve the package settings.
-		$settings = array(
-			'glossary' => array(),
-			'template_groups' => array(
-				'about' => array(
-					'title' => 'About Us',
-					'templates' => array()
-				)
-			)
-		);
-
-		$this->_model->expectOnce('get_package_settings');
-		$this->_model->setReturnValue('get_package_settings', $settings);
 
 		// No root breadcrumb (tested separately).
 		$this->_ee->functions->expectNever('fetch_site_index');
@@ -307,10 +274,17 @@ class Test_crumbly extends Testee_unit_test_case {
 		$this->_ee->functions->expectCallCount('create_url', 2);
 
 		// Template group URL.
+		$template_group = new Crumbly_template_group(array('group_id' => 10, 'label' => 'About Us'));
+		$this->_model->expectOnce('get_crumbly_template_group_from_segment', array($segments[1]));
+		$this->_model->setReturnValue('get_crumbly_template_group_from_segment', $template_group);
+
 		$this->_ee->functions->expectAt(0, 'create_url', array('about'));
 		$this->_ee->functions->setReturnValueAt(0, 'create_url', $site_url .'about/');
 
 		// Template URL.
+		$this->_model->expectOnce('get_crumbly_template_from_segments', array($segments[1], $segments[2]));
+		$this->_model->setReturnValue('get_crumbly_template_from_segments', FALSE);
+
 		$this->_ee->functions->expectAt(1, 'create_url', array('about/team'));
 		$this->_ee->functions->setReturnValueAt(1, 'create_url', $site_url .'about/team/');
 
@@ -344,10 +318,6 @@ class Test_crumbly extends Testee_unit_test_case {
 	{
 		// Retrieve the segments (no segments).
 		$this->_ee->uri->setReturnValue('segment_array', array());
-
-		// Retrieve the package settings.
-		$settings = array('glossary' => array(), 'template_groups' => array());
-		$this->_model->setReturnValue('get_package_settings', $settings);
 
 		// Retrieve the tag parameters.
 		$root_label = 'Home';
@@ -389,10 +359,6 @@ class Test_crumbly extends Testee_unit_test_case {
 	{
 		// Retrieve the segments (no segments).
 		$this->_ee->uri->setReturnValue('segment_array', array());
-
-		// Retrieve the package settings.
-		$settings = array('glossary' => array(), 'template_groups' => array());
-		$this->_model->setReturnValue('get_package_settings', $settings);
 
 		// Retrieve the tag parameters.
 		$default_root_label		= 'Home';
@@ -456,16 +422,6 @@ class Test_crumbly extends Testee_unit_test_case {
 		$this->_ee->TMPL->setReturnValue('fetch_param', $url_pattern, array('custom_url:pattern'));
 		$this->_ee->TMPL->setReturnValue('fetch_param', $ignore_trailing, array('custom_url:ignore_trailing_segments', 'yes'));
 
-		// Package settings.
-		$settings = array(
-			'glossary' => array('hotels' => 'Exclusive Hotels'),
-			'template_groups' => array(
-				'destinations' => array('title' => 'Our Destinations', 'templates' => array('details' => 'Destination Details'))
-			)
-		);
-
-		$this->_model->setReturnValue('get_package_settings', $settings);
-
 		// URL builder.
 		$site_url = 'http://example.com/';
 
@@ -475,6 +431,16 @@ class Test_crumbly extends Testee_unit_test_case {
 		$this->_ee->functions->setReturnValue('create_url', $site_url .'destinations/details/moscow/hotels/', array('destinations/details/moscow/hotels'));
 		$this->_ee->functions->setReturnValue('create_url', $site_url .'destinations/details/moscow/hotels/hilton-moscow/', array('destinations/details/moscow/hotels/hilton-moscow'));
 		$this->_ee->functions->setReturnValue('create_url', $site_url .'destinations/details/moscow/hotels/hilton-moscow/facilities/', array('destinations/details/moscow/hotels/hilton-moscow/facilities'));
+
+		// Template group URL.
+		$template_group = new Crumbly_template_group(array('group_id' => 10, 'label' => 'Our Destinations'));
+		$this->_model->expectOnce('get_crumbly_template_group_from_segment', array($segments[1]));
+		$this->_model->setReturnValue('get_crumbly_template_group_from_segment', $template_group);
+
+		// Template URL.
+		$template = new Crumbly_template(array('template_id' => 10, 'label' => 'Destination Details'));
+		$this->_model->expectOnce('get_crumbly_template_from_segments', array($segments[1], $segments[2]));
+		$this->_model->setReturnValue('get_crumbly_template_from_segments', $template);
 
 		// Channel entry titles.
 		$this->_model->setReturnValue('get_channel_entry_title_from_segment', 'Moscow', array('moscow'));
@@ -551,22 +517,20 @@ class Test_crumbly extends Testee_unit_test_case {
 		$this->_ee->TMPL->setReturnValue('fetch_param', $url_pattern, array('custom_url:pattern'));
 		$this->_ee->TMPL->setReturnValue('fetch_param', $ignore_trailing, array('custom_url:ignore_trailing_segments', 'yes'));
 
-		// Package settings.
-		$settings = array(
-			'glossary' => array(),
-			'template_groups' => array(
-				'destinations' => array('title' => 'Our Destinations', 'templates' => array())
-			)
-		);
-
-		$this->_model->setReturnValue('get_package_settings', $settings);
-
 		// URL builder.
 		$site_url = 'http://example.com/';
 
 		$this->_ee->functions->setReturnValue('create_url', $site_url .'destinations/', array('destinations'));
 		$this->_ee->functions->setReturnValue('create_url', $site_url .'destinations/moscow/', array('destinations/moscow'));
 		$this->_ee->functions->setReturnValue('create_url', $site_url .'destinations/moscow/trailing-segment/', array('destinations/moscow/trailing-segment'));
+
+		// Template group URL.
+		$template_group = new Crumbly_template_group(array('group_id' => 10, 'label' => 'Our Destinations'));
+		$this->_model->expectOnce('get_crumbly_template_group_from_segment', array($segments[1]));
+		$this->_model->setReturnValue('get_crumbly_template_group_from_segment', $template_group);
+
+		// Template URL.
+		$this->_model->expectNever('get_crumbly_template_from_segments');
 
 		// Channel entry titles.
 		$this->_model->setReturnValue('get_channel_entry_title_from_segment', 'Moscow', array('moscow'));

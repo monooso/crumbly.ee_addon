@@ -247,7 +247,7 @@ class Crumbly_model extends CI_Model {
 	 * @param	int|string		$segment	The URL segment.
 	 * @return	string|FALSE
 	 */
-	public function get_channel_entry_title_from_segment($segment = '')
+	public function get_channel_entry_title_from_segment($segment)
 	{
 		// Get out early.
 		if ( ! $segment OR is_numeric($segment) && intval($segment) <= 0)
@@ -267,6 +267,70 @@ class Crumbly_model extends CI_Model {
 
 		return $db_result->num_rows()
 			? $db_result->row()->title
+			: FALSE;
+	}
+
+
+	/**
+	 * Retrieves a Crumbly template from the specified template group, matching the given URL segment,
+	 * if one exists.
+	 *
+	 * @access	public
+	 * @param	string			$group_segment			The template group URL title.
+	 * @param	string			$template_segment		The template URL title.
+	 * @return	Crumbly_template|FALSE
+	 */
+	public function get_crumbly_template_from_segments($group_segment, $template_segment)
+	{
+		if ( ! $group_segment OR ! is_string($group_segment)
+			OR ! $template_segment OR ! is_string($template_segment))
+		{
+			return FALSE;
+		}
+
+		$db_template = $this->_ee->db
+			->select('crumbly_templates.template_id, crumbly_templates.label')
+			->from('crumbly_templates')
+			->join('templates', 'templates.template_id = crumbly_templates.template_id', 'inner')
+			->join('template_groups', 'template_groups.group_id = templates.group_id', 'inner')
+			->where(array(
+				'crumbly_templates.site_id'	=> $this->get_site_id(),
+				'templates.template_name'	=> $template_segment,
+				'template_groups.group_name' => $group_segment
+			))
+			->limit(1)
+			->get();
+
+		return $db_template->num_rows()
+			? new Crumbly_template($db_template->row_array())
+			: FALSE;
+	}
+
+
+	/**
+	 * Retrieves a Crumbly template group for the given URL segment, if one exists.
+	 *
+	 * @access	public
+	 * @param	string		$segment		The URL segment.
+	 * @return	Crumbly_template_group|FALSE
+	 */
+	public function get_crumbly_template_group_from_segment($segment)
+	{
+		if ( ! $segment OR ! is_string($segment))
+		{
+			return FALSE;
+		}
+
+		$db_group = $this->_ee->db
+			->select('crumbly_template_groups.group_id, crumbly_template_groups.label')
+			->from('crumbly_template_groups')
+			->join('template_groups', 'template_groups.group_id = crumbly_template_groups.group_id', 'inner')
+			->where(array('crumbly_template_groups.site_id' => $this->get_site_id(), 'template_groups.group_name' => $segment))
+			->limit(1)
+			->get();
+
+		return $db_group->num_rows()
+			? new Crumbly_template_group($db_group->row_array())
 			: FALSE;
 	}
 	
