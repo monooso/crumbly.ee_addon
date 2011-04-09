@@ -117,6 +117,67 @@ class Test_crumbly_model extends Testee_unit_test_case {
 	}
 
 
+	public function test__get_all_categories__success()
+	{
+		$this->_ee->db->expectOnce('select', array('cat_id, cat_name, cat_url_title'));
+		$this->_ee->db->expectOnce('get_where', array('categories', array('site_id' => $this->_site_id)));
+
+		$db_result	= $this->_get_mock('db_query');
+		$db_rows	= array(
+			array(
+				'cat_id'		=> '10',
+				'cat_name'		=> 'Mammals',
+				'cat_url_title'	=> 'mammals'
+			),
+			array(
+				'cat_id'		=> '20',
+				'cat_name'		=> 'Reptiles',
+				'cat_url_title'	=> 'reptiles'
+			),
+			array(
+				'cat_id'		=> '30',
+				'cat_name'		=> 'Birds',
+				'cat_url_title'	=> 'birds'
+			)
+		);
+
+		$this->_ee->db->setReturnReference('get_where', $db_result);
+		$db_result->setReturnValue('num_rows', count($db_rows));
+		$db_result->setReturnValue('result_array', $db_rows);
+
+		$expected_result = array();
+
+		foreach ($db_rows AS $db_row)
+		{
+			$expected_result[] = new EI_category($db_row);
+		}
+	
+		$actual_result = $this->_subject->get_all_categories();
+
+		$this->assertIdentical(count($actual_result), count($expected_result));
+
+		for ($count = 0, $length = count($actual_result); $count < $length; $count++)
+		{
+			$this->assertIdentical($actual_result[$count], $expected_result[$count]);
+		}
+	}
+
+	public function test__get_all_categories__no_categories()
+	{
+		$this->_ee->db->expectOnce('select', array('cat_id, cat_name, cat_url_title'));
+		$this->_ee->db->expectOnce('get_where', array('categories', array('site_id' => $this->_site_id)));
+
+		$db_result	= $this->_get_mock('db_query');
+		$db_rows	= array();
+
+		$this->_ee->db->setReturnReference('get_where', $db_result);
+		$db_result->setReturnValue('result_array', $db_rows);
+
+		$this->assertIdentical(array(), $this->_subject->get_all_categories());
+	}
+
+
+
 	public function test__get_all_crumbly_glossary_terms__success()
 	{
 		$this->_ee->db->expectOnce('select', array('glossary_definition, glossary_term'));

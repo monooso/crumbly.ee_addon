@@ -12,6 +12,7 @@
 require_once PATH_THIRD .'crumbly/classes/crumbly_glossary_term' .EXT;
 require_once PATH_THIRD .'crumbly/classes/crumbly_template' .EXT;
 require_once PATH_THIRD .'crumbly/classes/crumbly_template_group' .EXT;
+require_once PATH_THIRD .'crumbly/classes/EI_category' .EXT;
 require_once PATH_THIRD .'crumbly/classes/EI_template' .EXT;
 require_once PATH_THIRD .'crumbly/classes/EI_template_group' .EXT;
 
@@ -85,6 +86,29 @@ class Crumbly_model extends CI_Model {
 	{
 		$this->_ee->db->delete('crumbly_template_groups', array('site_id' => $this->get_site_id()));
 		return TRUE;
+	}
+
+
+	/**
+	 * Returns all the categories for the current site.
+	 *
+	 * @access	public
+	 * @return	array
+	 */
+	public function get_all_categories()
+	{
+		$db_categories = $this->_ee->db
+			->select('cat_id, cat_name, cat_url_title')
+			->get_where('categories', array('site_id' => $this->get_site_id()));
+
+		$categories = array();
+
+		foreach ($db_categories->result_array() AS $db_category)
+		{
+			$categories[] = new EI_category($db_category);
+		}
+
+		return $categories;
 	}
 
 
