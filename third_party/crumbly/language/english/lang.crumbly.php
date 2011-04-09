@@ -24,17 +24,21 @@ $lang = array(
  * CONTROL PANEL
  * ------------------------------------------------------------ */
 // Page headings.
+'hd_categories'					=> 'Categories',
 'hd_glossary'					=> 'Glossary',
 'hd_templates'					=> 'Templates',
 'hd_template_groups'			=> 'Template Groups',
 
 // Form field labels.
 'lbl_save_settings'				=> 'Save Settings',
+'lbl_save_categories'			=> 'Save Categories',
 'lbl_save_glossary'				=> 'Save Glossary',
 'lbl_save_templates'			=> 'Save Templates',
 'lbl_save_template_groups'		=> 'Save Template Groups',
 
 // Status messages.
+'msg_categories_saved'			=> 'Your categories have been saved.',
+'msg_categories_not_saved'		=> 'There was a problem saving one or more of your categories.',
 'msg_glossary_terms_saved'		=> 'Your glossary terms have been saved.',
 'msg_glossary_terms_not_saved'	=> 'There was a problem saving one or more of your glossary terms.',
 'msg_templates_saved'			=> 'Your templates have been saved.',
@@ -43,11 +47,13 @@ $lang = array(
 'msg_template_groups_not_saved'	=> 'There was a problem saving one or more of your template groups.',
 
 // Navigation.
+'nav_categories'				=> 'Categories',
 'nav_glossary'					=> 'Glossary',
 'nav_templates'					=> 'Templates',
 'nav_template_groups'			=> 'Template Groups',
 
 // Table headings.
+'thd_category'					=> 'Category',
 'thd_display_title'				=> 'Display Title',
 'thd_template'					=> 'Template',
 'thd_template_group'			=> 'Template Group',

@@ -51,11 +51,47 @@ class Crumbly_mcp {
 
 		$this->_ee->cp->add_to_head('<link rel="stylesheet" type="text/css" href="' .$this->_theme_url .'css/cp.css" />');
 
-		$this->_ee->cp->set_right_nav(array(
+		$nav_array = array(
 			'nav_glossary'		=> $this->_base_url .AMP .'method=glossary',
 			'nav_templates'		=> $this->_base_url .AMP .'method=templates',
 			'nav_template_groups' => $this->_base_url .AMP .'method=template_groups'
-		));
+		);
+
+		if ($this->_model->get_all_categories())
+		{
+			$nav_array['nav_categories'] = $this->_base_url .AMP .'method=categories';
+		}
+
+		ksort($nav_array);
+		$this->_ee->cp->set_right_nav($nav_array);
+	}
+
+
+	/**
+	 * Categories.
+	 *
+	 * @access	public
+	 * @return	string
+	 */
+	public function categories()
+	{
+		$categories		= $this->_model->get_all_categories();
+		$categories_dd	= array();
+
+		// Prepare the drop down options arrays.
+		foreach ($categories AS $category)
+		{
+			$categories_dd[$category->get_cat_id()] = $category->get_cat_name();
+		}
+		
+		$vars = array(
+			'form_action'		=> $this->_base_qs .AMP .'method=save_categories',
+			'categories'		=> array(),
+			'categories_dd'		=> $categories_dd,
+			'cp_page_title'		=> $this->_ee->lang->line('hd_categories')
+		);
+		
+		return $this->_ee->load->view('categories', $vars, TRUE);
 	}
 
 
