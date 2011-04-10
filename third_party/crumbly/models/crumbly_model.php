@@ -9,6 +9,7 @@
  * @version 		0.7.0
  */
 
+require_once PATH_THIRD .'crumbly/classes/crumbly_category' .EXT;
 require_once PATH_THIRD .'crumbly/classes/crumbly_glossary_term' .EXT;
 require_once PATH_THIRD .'crumbly/classes/crumbly_template' .EXT;
 require_once PATH_THIRD .'crumbly/classes/crumbly_template_group' .EXT;
@@ -47,6 +48,19 @@ class Crumbly_model extends CI_Model {
 		$this->_ee 				=& get_instance();
 		$this->_package_name	= $package_name ? $package_name : 'crumbly';
 		$this->_package_version	= $package_version ? $package_version : '0.7.0';
+	}
+
+
+	/**
+	 * Deletes all the Crumbly categories for the current site.
+	 *
+	 * @access	public
+	 * @return	bool
+	 */
+	public function delete_all_crumbly_categories()
+	{
+		$this->_ee->db->delete('crumbly_categories', array('site_id' => $this->get_site_id()));
+		return TRUE;
 	}
 
 
@@ -465,11 +479,45 @@ class Crumbly_model extends CI_Model {
 	public function install_module()
 	{
 		$this->install_module_register();
+		$this->install_module_categories_table();
 		$this->install_module_glossary_table();
 		$this->install_module_templates_table();
 		$this->install_module_template_groups_table();
 		
 		return TRUE;
+	}
+
+
+	/**
+	 * Creates the 'Crumbly Categories' database table.
+	 *
+	 * @access	public
+	 * @return	void
+	 */
+	public function install_module_categories_table()
+	{
+		$this->_ee->load->dbforge();
+
+		$fields = array(
+			'site_id' => array(
+				'constraint'	=> 5,
+				'type'			=> 'INT',
+				'unsigned'		=> TRUE
+			),
+			'cat_id' => array(
+				'constraint'	=> 10,
+				'type'			=> 'INT',
+				'unsigned'		=> TRUE
+			),
+			'label' => array(
+				'constraint'	=> 255,
+				'type'			=> 'VARCHAR'
+			)
+		);
+
+		$this->_ee->dbforge->add_field($fields);
+		$this->_ee->dbforge->add_key('site_id');
+		$this->_ee->dbforge->create_table('crumbly_categories', TRUE);
 	}
 
 
@@ -591,6 +639,26 @@ class Crumbly_model extends CI_Model {
 
 
 	/**
+	 * Saves the specified Crumbly category to the database.
+	 *
+	 * @access	public
+	 * @param	Crumbly_category		$category		The category to save.
+	 * @return	bool
+	 */
+	public function save_crumbly_category(Crumbly_category $category)
+	{
+		if ( ! $category->get_cat_id() OR ! $category->get_label())
+		{
+			return FALSE;
+		}
+
+		$data = array_merge($category->to_array(), array('site_id' => $this->get_site_id()));
+		$this->_ee->db->insert('crumbly_categories', $data);
+		return TRUE;
+	}
+
+
+	/**
 	 * Saves the specified Crumbly glossary term to the database.
 	 *
 	 * @access	public
@@ -674,6 +742,7 @@ class Crumbly_model extends CI_Model {
 		$this->_ee->db->delete('modules', array('module_name' => $module_name));
 
 		$this->_ee->load->dbforge();
+		$this->_ee->dbforge->drop_table('crumbly_categories');
 		$this->_ee->dbforge->drop_table('crumbly_glossary');
 		$this->_ee->dbforge->drop_table('crumbly_templates');
 		$this->_ee->dbforge->drop_table('crumbly_template_groups');

@@ -90,6 +90,15 @@ class Test_crumbly_model extends Testee_unit_test_case {
 	}
 
 
+	public function test__delete_all_crumbly_categories__success()
+	{
+		$where = array('site_id' => $this->_site_id);
+		$this->_ee->db->expectOnce('delete', array('crumbly_categories', $where));
+	
+		$this->assertIdentical(TRUE, $this->_subject->delete_all_crumbly_categories());
+	}
+
+
 	public function test__delete_all_crumbly_glossary_terms__success()
 	{
 		$where = array('site_id' => $this->_site_id);
@@ -175,7 +184,6 @@ class Test_crumbly_model extends Testee_unit_test_case {
 
 		$this->assertIdentical(array(), $this->_subject->get_all_categories());
 	}
-
 
 
 	public function test__get_all_crumbly_glossary_terms__success()
@@ -829,6 +837,33 @@ class Test_crumbly_model extends Testee_unit_test_case {
 	}
 
 
+	public function test__install_module_categories_table__success()
+	{
+		$fields = array(
+			'site_id' => array(
+				'constraint'		=> 5,
+				'type'				=> 'INT',
+				'unsigned'			=> TRUE
+			),
+			'cat_id' => array(
+				'constraint'		=> 10,
+				'type'				=> 'INT',
+				'unsigned'			=> TRUE
+			),
+			'label' => array(
+				'constraint'		=> 255,
+				'type'				=> 'VARCHAR'
+			)
+		);
+
+		$this->_ee->dbforge->expectOnce('add_field', array($fields));
+		$this->_ee->dbforge->expectOnce('add_key', array('site_id'));
+		$this->_ee->dbforge->expectOnce('create_table', array('crumbly_categories', TRUE));
+	
+		$this->_subject->install_module_categories_table();
+	}
+
+
 	public function test__install_module_glossary_table__success()
 	{
 		$fields = array(
@@ -931,6 +966,45 @@ class Test_crumbly_model extends Testee_unit_test_case {
 	}
 
 
+	public function test__save_crumbly_category__success()
+	{
+		$cat_id		= 10;
+		$label		= 'Creepy Crawly';
+		$category	= new Crumbly_category(array('cat_id' => $cat_id, 'label' => $label));
+
+		$insert_data = array(
+			'cat_id'	=> $cat_id,
+			'label'		=> $label,
+			'site_id'	=> $this->_site_id
+		);
+
+		$this->_ee->db->expectOnce('insert', array('crumbly_categories', $insert_data));
+		$this->assertIdentical(TRUE, $this->_subject->save_crumbly_category($category));
+	}
+
+
+	public function test__save_crumbly_category__missing_cat_id()
+	{
+		$cat_id		= NULL;
+		$label		= 'Creepy Crawly';
+		$category	= new Crumbly_category(array('cat_id' => $cat_id, 'label' => $label));
+
+		$this->_ee->db->expectNever('insert');
+		$this->assertIdentical(FALSE, $this->_subject->save_crumbly_category($category));
+	}
+
+
+	public function test__save_crumbly_category__missing_label()
+	{
+		$cat_id		= 10;
+		$label		= '';
+		$category	= new Crumbly_category(array('cat_id' => $cat_id, 'label' => $label));
+
+		$this->_ee->db->expectNever('insert');
+		$this->assertIdentical(FALSE, $this->_subject->save_crumbly_category($category));
+	}
+
+
 	public function test__save_crumbly_glossary_term__success()
 	{
 		$definition		= 'Definition';
@@ -947,7 +1021,7 @@ class Test_crumbly_model extends Testee_unit_test_case {
 		);
 
 		$this->_ee->db->expectOnce('insert', array('crumbly_glossary', $insert_data));
-		$this->assertEqual(TRUE, $this->_subject->save_crumbly_glossary_term($glossary_term));
+		$this->assertIdentical(TRUE, $this->_subject->save_crumbly_glossary_term($glossary_term));
 	}
 
 
@@ -1052,10 +1126,11 @@ class Test_crumbly_model extends Testee_unit_test_case {
 		$this->_ee->db->expectAt(0, 'delete', array('module_member_groups', array('module_id' => $db_module_row->module_id)));
 		$this->_ee->db->expectAt(1, 'delete', array('modules', array('module_name' => $module_name)));
 				
-		$this->_ee->dbforge->expectCallCount('drop_table', 3);
-		$this->_ee->dbforge->expectAt(0, 'drop_table', array('crumbly_glossary'));
-		$this->_ee->dbforge->expectAt(1, 'drop_table', array('crumbly_templates'));
-		$this->_ee->dbforge->expectAt(2, 'drop_table', array('crumbly_template_groups'));
+		$this->_ee->dbforge->expectCallCount('drop_table', 4);
+		$this->_ee->dbforge->expectAt(0, 'drop_table', array('crumbly_categories'));
+		$this->_ee->dbforge->expectAt(1, 'drop_table', array('crumbly_glossary'));
+		$this->_ee->dbforge->expectAt(2, 'drop_table', array('crumbly_templates'));
+		$this->_ee->dbforge->expectAt(3, 'drop_table', array('crumbly_template_groups'));
 
 		$this->assertIdentical(TRUE, $this->_subject->uninstall_module());
 	}

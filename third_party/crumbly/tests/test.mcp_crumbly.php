@@ -56,6 +56,73 @@ class Test_crumbly_cp extends Testee_unit_test_case {
 	}
 
 
+	public function test__save_categories__success()
+	{
+		$input = array(
+			array('cat_id' => '10', 'label' => 'Creepy Crawlies'),
+			array('cat_id' => '20', 'label' => 'Fur Balls')
+		);
+
+		$this->_ee->input->setReturnValue('post', $input, array('categories'));
+
+		$this->_model->expectOnce('delete_all_crumbly_categories');
+		$this->_model->expectCallCount('save_crumbly_category', count($input));
+		$this->_model->setReturnValue('save_crumbly_category', TRUE);
+
+		for ($count = 0, $length = count($input); $count < $length; $count++)
+		{
+			$category = new Crumbly_category($input[$count]);
+			$this->_model->expectAt($count, 'save_crumbly_category', array($category));
+		}
+	
+		$message = 'message';
+		$this->_ee->lang->setReturnValue('line', $message, array('msg_categories_saved'));
+		$this->_ee->session->expectOnce('set_flashdata', array('message_success', $message));
+		$this->_ee->functions->expectOnce('redirect', array(new PatternExpectation('/method=categories/')));
+
+		$this->_subject->save_categories();
+	}
+
+
+	public function test__save_categories__unable_to_save()
+	{
+		$input = array(
+			array('cat_id' => '10', 'label' => 'Creepy Crawlies'),
+			array('cat_id' => '20', 'label' => 'Fur Balls')
+		);
+
+		$this->_ee->input->setReturnValue('post', $input, array('categories'));
+
+		$this->_model->expectOnce('delete_all_crumbly_categories');
+		$this->_model->expectCallCount('save_crumbly_category', count($input));
+		$this->_model->setReturnValue('save_crumbly_category', FALSE);
+
+		$message = 'message';
+		$this->_ee->lang->setReturnValue('line', $message, array('msg_categories_not_saved'));
+		$this->_ee->session->expectOnce('set_flashdata', array('message_failure', $message));
+		$this->_ee->functions->expectOnce('redirect', array(new PatternExpectation('/method=categories/')));
+
+		$this->_subject->save_categories();
+	}
+
+
+	public function test__save_categories__no_input()
+	{
+		$input = FALSE;
+		$this->_ee->input->setReturnValue('post', $input, array('categories'));
+
+		$this->_model->expectOnce('delete_all_crumbly_categories');
+		$this->_model->expectNever('save_crumbly_category');
+
+		$message = 'message';
+		$this->_ee->lang->setReturnValue('line', $message, array('msg_categories_saved'));
+		$this->_ee->session->expectOnce('set_flashdata', array('message_success', $message));
+		$this->_ee->functions->expectOnce('redirect', array(new PatternExpectation('/method=categories/')));
+
+		$this->_subject->save_categories();
+	}
+
+
 	public function test__save_glossary__success()
 	{
 		$input = array(
