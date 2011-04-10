@@ -86,7 +86,7 @@ class Crumbly_mcp {
 		
 		$vars = array(
 			'form_action'		=> $this->_base_qs .AMP .'method=save_categories',
-			'categories'		=> array(),
+			'categories'		=> $this->_model->get_all_crumbly_categories(),
 			'categories_dd'		=> $categories_dd,
 			'cp_page_title'		=> $this->_ee->lang->line('hd_categories')
 		);

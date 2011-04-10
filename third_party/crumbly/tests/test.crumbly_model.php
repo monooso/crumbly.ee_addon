@@ -186,6 +186,41 @@ class Test_crumbly_model extends Testee_unit_test_case {
 	}
 
 
+	public function test__get_all_crumbly_categories__success()
+	{
+		$this->_ee->db->expectOnce('select', array('cat_id, label'));
+		$this->_ee->db->expectOnce('get_where', array('crumbly_categories', array('site_id' => $this->_site_id)));
+
+		$db_result	= $this->_get_mock('db_query');
+		$db_rows	= array(
+			array(
+				'cat_id'	=> '10',
+				'label'		=> 'Creepy Crawlies'
+			),
+			array(
+				'cat_id'	=> '20',
+				'label'		=> 'Flappy Flappies'
+			)
+		);
+
+		$this->_ee->db->setReturnReference('get_where', $db_result);
+		$db_result->setReturnValue('result_array', $db_rows);
+	
+		foreach ($db_rows AS $db_row)
+		{
+			$expected_result[] = new Crumbly_category($db_row);
+		}
+	
+		$actual_result = $this->_subject->get_all_crumbly_categories();
+		$this->assertIdentical(count($actual_result), count($expected_result));
+
+		for ($count = 0, $length = count($actual_result); $count < $length; $count++)
+		{
+			$this->assertIdentical($actual_result[$count], $expected_result[$count]);
+		}
+	}
+
+
 	public function test__get_all_crumbly_glossary_terms__success()
 	{
 		$this->_ee->db->expectOnce('select', array('glossary_definition, glossary_term'));
