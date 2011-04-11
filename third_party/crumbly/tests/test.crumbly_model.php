@@ -659,6 +659,79 @@ class Test_crumbly_model extends Testee_unit_test_case {
 	}
 
 
+	public function test__get_crumbly_category_from_segment__category_id_segment_success()
+	{
+		$cat_id		= '12';
+		$segment	= 'C' .$cat_id;
+		$db_result	= $this->_get_mock('db_query');
+		$db_row		= array(
+			'cat_id'		=> $cat_id,
+			'cat_name'		=> 'Chairs & Sofas',
+			'cat_url_title'	=> 'seating'
+		);
+
+		$this->_ee->db->expectOnce('select', array('cat_id, cat_name, cat_url_title'));
+		$this->_ee->db->expectOnce('get_where', array('categories', array('cat_id' => $cat_id), 1));
+
+		$this->_ee->db->setReturnReference('get_where', $db_result);
+		$db_result->setReturnValue('num_rows', 1);
+		$db_result->setReturnValue('row_array', $db_row);
+
+		$expected_result = new Crumbly_category($db_row);
+		$this->assertIdentical($expected_result, $this->_subject->get_crumbly_category_from_segment($segment));
+	}
+
+
+	public function test__get_crumbly_category_from_segment__category_id_segment_failure()
+	{
+		$cat_id		= '12';
+		$segment	= 'C' .$cat_id;
+		$db_result	= $this->_get_mock('db_query');
+
+		$this->_ee->db->expectOnce('select', array('cat_id, cat_name, cat_url_title'));
+		$this->_ee->db->expectOnce('get_where', array('categories', array('cat_id' => $cat_id), 1));
+
+		$this->_ee->db->setReturnReference('get_where', $db_result);
+		$db_result->setReturnValue('num_rows', 0);
+		$db_result->expectNever('row_array');
+
+		$this->assertIdentical(FALSE, $this->_subject->get_crumbly_category_from_segment($segment));
+	}
+
+
+	public function test__get_crumbly_category_from_segment__category_url_title_segment_success()
+	{
+		$segment	= 'seating';
+		$db_result	= $this->_get_mock('db_query');
+		$db_row		= array(
+			'cat_id'		=> '10',
+			'cat_name'		=> 'Chairs & Sofas',
+			'cat_url_title'	=> $segment
+		);
+
+		$this->_ee->db->expectOnce('select', array('cat_id, cat_name, cat_url_title'));
+		$this->_ee->db->expectOnce('get_where', array('categories', array('cat_url_title' => $segment), 1));
+
+		$this->_ee->db->setReturnReference('get_where', $db_result);
+		$db_result->setReturnValue('num_rows', 1);
+		$db_result->setReturnValue('row_array', $db_row);
+
+		$expected_result = new Crumbly_category($db_row);
+		$this->assertIdentical($expected_result, $this->_subject->get_crumbly_category_from_segment($segment));
+	}
+
+
+	public function test__get_crumbly_category_from_segment__invalid_segment()
+	{
+		$segment = FALSE;
+
+		$this->_ee->db->expectNever('select');
+		$this->_ee->db->expectNever('get_where');
+	
+		$this->assertIdentical(FALSE, $this->_subject->get_crumbly_category_from_segment($segment));
+	}
+
+
 	public function test__get_crumbly_template_from_segments__success()
 	{
 		$group_segment		= 'bands';

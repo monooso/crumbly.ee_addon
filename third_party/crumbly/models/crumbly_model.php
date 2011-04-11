@@ -359,6 +359,35 @@ class Crumbly_model extends CI_Model {
 
 
 	/**
+	 * Retrieves a Crumbly category from the specified category ID, or category
+	 * URL title.
+	 *
+	 * @access	public
+	 * @param	string		$segment		The URL segment containing the category ID or URL title.
+	 * @return	Crumbly_category|FALSE
+	 */
+	public function get_crumbly_category_from_segment($segment)
+	{
+		if ( ! is_string($segment))
+		{
+			return FALSE;
+		}
+
+		$clause = preg_match('/^c[0-9]+$/i', $segment)
+			? array('cat_id' => substr($segment, 1))
+			: array('cat_url_title' => $segment);
+
+		$db_category = $this->_ee->db
+			->select('cat_id, cat_name, cat_url_title')
+			->get_where('categories', $clause, 1);
+
+		return $db_category->num_rows()
+			? new Crumbly_category($db_category->row_array())
+			: FALSE;
+	}
+
+
+	/**
 	 * Retrieves a Crumbly template from the specified template group, matching the given URL segment,
 	 * if one exists.
 	 *
