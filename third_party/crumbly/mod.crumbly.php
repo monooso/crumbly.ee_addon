@@ -225,7 +225,7 @@ class Crumbly {
 						// Category ID, or category title?
 						if ($use_category_name)
 						{
-							$breadcrumb_title = ($category = $this->_model->get_category_from_cat_name($segment))
+							$breadcrumb_title = ($category = $this->_model->get_category_from_cat_url_title($segment))
 								? $category->get_cat_name()
 								: $this->_model->humanize($segment, FALSE);
 						}

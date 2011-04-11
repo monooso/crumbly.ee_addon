@@ -302,6 +302,31 @@ class Crumbly_model extends CI_Model {
 
 
 	/**
+	 * Returns a category, given the category URL title. Returns FALSE if the category cannot
+	 * be found.
+	 *
+	 * @access	public
+	 * @param	string		$cat_url_title		The category URL title.
+	 * @return	EI_category|FALSE
+	 */
+	public function get_category_from_cat_url_title($cat_url_title)
+	{
+		if ( ! is_string($cat_url_title))
+		{
+			return FALSE;
+		}
+
+		$db_category = $this->_ee->db
+			->select('cat_id, cat_name, cat_url_title')
+			->get_where('categories', array('cat_url_title' => $cat_url_title), 1);
+
+		return $db_category->num_rows()
+			? new EI_category($db_category->row_array())
+			: FALSE;
+	}
+
+
+	/**
 	 * Retrieves a channel entry title, given a URL segment. Supports url_title and entry_id.
 	 * Returns FALSE if the entry cannot be found.
 	 *

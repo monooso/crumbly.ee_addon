@@ -639,8 +639,8 @@ class Test_crumbly extends Testee_unit_test_case {
 			'cat_url_title'	=> $segments[3]
 		));
 
-		$this->_model->expectOnce('get_category_from_cat_name', array($segments[3]));
-		$this->_model->setReturnValue('get_category_from_cat_name', $category);
+		$this->_model->expectOnce('get_category_from_cat_url_title', array($segments[3]));
+		$this->_model->setReturnValue('get_category_from_cat_url_title', $category);
 
 		$this->_ee->functions->expectAt(2, 'create_url', array($segments[1] .'/' .$segments[2] .'/' .$segments[3]));
 		$this->_ee->functions->setReturnValueAt(2, 'create_url', $site_url .$segments[1] .'/' .$segments[2] .'/' .$segments[3] .'/');
@@ -719,8 +719,8 @@ class Test_crumbly extends Testee_unit_test_case {
 		// Category.
 		$this->_model->expectOnce('get_crumbly_category_from_segment', array($segments[3]));
 		$this->_model->setReturnValue('get_crumbly_category_from_segment', FALSE);
-		$this->_model->expectOnce('get_category_from_cat_name', array($segments[3]));
-		$this->_model->setReturnValue('get_category_from_cat_name', FALSE);
+		$this->_model->expectOnce('get_category_from_cat_url_title', array($segments[3]));
+		$this->_model->setReturnValue('get_category_from_cat_url_title', FALSE);
 
 		$this->_model->expectAt(1, 'humanize', array($segments[3], FALSE));
 		$this->_model->setReturnValueAt(1, 'humanize', 'Chairs');
