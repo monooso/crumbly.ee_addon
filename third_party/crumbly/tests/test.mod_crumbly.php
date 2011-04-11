@@ -314,6 +314,448 @@ class Test_crumbly extends Testee_unit_test_case {
 	}
 
 
+	public function test__breadcrumbs__template_group_category()
+	{
+		// Retrieve the segments.
+		$segments = array();
+		$segments[1]	= 'products';
+		$segments[2]	= 'C12';
+
+		$this->_ee->uri->expectOnce('segment_array');
+		$this->_ee->uri->setReturnValue('segment_array', $segments);
+
+		// No root breadcrumb (tested separately).
+		$this->_ee->functions->expectNever('fetch_site_index');
+		$this->_ee->TMPL->setReturnValue('fetch_param', 'no', array('root_breadcrumb:include', '*'));
+
+		// Template tag parser.
+		$tagdata = 'Tagdata';
+		$this->_ee->TMPL->expectOnce('__get', array('tagdata'));
+		$this->_ee->TMPL->setReturnValue('__get', $tagdata, array('tagdata'));
+		
+		$site_url = 'http://example.com/';
+		$this->_ee->functions->expectCallCount('create_url', 2);
+
+		// Template group URL.
+		$template_group = new Crumbly_template_group(array('group_id' => 10, 'label' => 'Products'));
+		$this->_model->expectOnce('get_crumbly_template_group_from_segment', array($segments[1]));
+		$this->_model->setReturnValue('get_crumbly_template_group_from_segment', $template_group);
+
+		$this->_ee->functions->expectAt(0, 'create_url', array($segments[1]));
+		$this->_ee->functions->setReturnValueAt(0, 'create_url', $site_url .$segments[1] .'/');
+
+		// Category.
+		$category = new Crumbly_category(array('cat_id' => 10, 'label' => 'Chairs'));
+		$this->_model->expectOnce('get_crumbly_category_from_segment', array($segments[2]));
+		$this->_model->setReturnValue('get_crumbly_category_from_segment', $category);
+
+		$this->_ee->functions->expectAt(1, 'create_url', array($segments[1] .'/' .$segments[2]));
+		$this->_ee->functions->setReturnValueAt(1, 'create_url', $site_url .$segments[1] .'/' .$segments[2] .'/');
+
+		$breadcrumbs = array(
+			array(
+				'breadcrumb_segment'	=> $segments[1],
+				'breadcrumb_title'		=> 'Products',
+				'breadcrumb_url'		=> $site_url .$segments[1] .'/'
+			),
+			array(
+				'breadcrumb_segment'	=> $segments[2],
+				'breadcrumb_title'		=> 'Chairs',
+				'breadcrumb_url'		=> $site_url .$segments[1] .'/' .$segments[2] .'/'
+			)
+		);
+
+		$parsed_tagdata = 'Parsed tagdata';
+
+		$this->_ee->TMPL->expectOnce('parse_variables', array($tagdata, $breadcrumbs));
+		$this->_ee->TMPL->setReturnValue('parse_variables', $parsed_tagdata);
+
+		// Tests.
+		$this->_subject->breadcrumbs();
+	}
+
+
+	public function test__breadcrumbs__template_group_category_no_crumbly_category()
+	{
+		// Retrieve the segments.
+		$segments = array();
+		$segments[1]	= 'products';
+		$segments[2]	= 'C12';
+
+		$this->_ee->uri->expectOnce('segment_array');
+		$this->_ee->uri->setReturnValue('segment_array', $segments);
+
+		// No root breadcrumb (tested separately).
+		$this->_ee->functions->expectNever('fetch_site_index');
+		$this->_ee->TMPL->setReturnValue('fetch_param', 'no', array('root_breadcrumb:include', '*'));
+
+		// Template tag parser.
+		$tagdata = 'Tagdata';
+		$this->_ee->TMPL->expectOnce('__get', array('tagdata'));
+		$this->_ee->TMPL->setReturnValue('__get', $tagdata, array('tagdata'));
+		
+		$site_url = 'http://example.com/';
+		$this->_ee->functions->expectCallCount('create_url', 2);
+
+		// Template group URL.
+		$template_group = new Crumbly_template_group(array('group_id' => 10, 'label' => 'Products'));
+		$this->_model->expectOnce('get_crumbly_template_group_from_segment', array($segments[1]));
+		$this->_model->setReturnValue('get_crumbly_template_group_from_segment', $template_group);
+
+		$this->_ee->functions->expectAt(0, 'create_url', array($segments[1]));
+		$this->_ee->functions->setReturnValueAt(0, 'create_url', $site_url .$segments[1] .'/');
+
+		// Category.
+		$this->_model->expectOnce('get_crumbly_category_from_segment', array($segments[2]));
+		$this->_model->setReturnValue('get_crumbly_category_from_segment', FALSE);
+
+		$category = new EI_category(array(
+			'cat_id'		=> 12,
+			'cat_name'		=> 'Single Serving Seating',
+			'cat_url_title'	=> 'chairs'
+		));
+		
+		$this->_model->expectOnce('get_category_from_cat_id', array(12));
+		$this->_model->setReturnValue('get_category_from_cat_id', $category);
+
+		$this->_ee->functions->expectAt(1, 'create_url', array($segments[1] .'/' .$segments[2]));
+		$this->_ee->functions->setReturnValueAt(1, 'create_url', $site_url .$segments[1] .'/' .$segments[2] .'/');
+
+		$breadcrumbs = array(
+			array(
+				'breadcrumb_segment'	=> $segments[1],
+				'breadcrumb_title'		=> 'Products',
+				'breadcrumb_url'		=> $site_url .$segments[1] .'/'
+			),
+			array(
+				'breadcrumb_segment'	=> $segments[2],
+				'breadcrumb_title'		=> 'Single Serving Seating',
+				'breadcrumb_url'		=> $site_url .$segments[1] .'/' .$segments[2] .'/'
+			)
+		);
+
+		$parsed_tagdata = 'Parsed tagdata';
+
+		$this->_ee->TMPL->expectOnce('parse_variables', array($tagdata, $breadcrumbs));
+		$this->_ee->TMPL->setReturnValue('parse_variables', $parsed_tagdata);
+
+		// Tests.
+		$this->_subject->breadcrumbs();
+	}
+
+
+	public function test__breadcrumbs__template_group_category_unknown_category()
+	{
+		// Retrieve the segments.
+		$segments = array();
+		$segments[1]	= 'products';
+		$segments[2]	= 'C12';
+
+		$this->_ee->uri->expectOnce('segment_array');
+		$this->_ee->uri->setReturnValue('segment_array', $segments);
+
+		// No root breadcrumb (tested separately).
+		$this->_ee->functions->expectNever('fetch_site_index');
+		$this->_ee->TMPL->setReturnValue('fetch_param', 'no', array('root_breadcrumb:include', '*'));
+
+		// Template tag parser.
+		$tagdata = 'Tagdata';
+		$this->_ee->TMPL->expectOnce('__get', array('tagdata'));
+		$this->_ee->TMPL->setReturnValue('__get', $tagdata, array('tagdata'));
+		
+		$site_url = 'http://example.com/';
+		$this->_ee->functions->expectCallCount('create_url', 2);
+
+		// Template group URL.
+		$template_group = new Crumbly_template_group(array('group_id' => 10, 'label' => 'Products'));
+		$this->_model->expectOnce('get_crumbly_template_group_from_segment', array($segments[1]));
+		$this->_model->setReturnValue('get_crumbly_template_group_from_segment', $template_group);
+
+		$this->_ee->functions->expectAt(0, 'create_url', array($segments[1]));
+		$this->_ee->functions->setReturnValueAt(0, 'create_url', $site_url .$segments[1] .'/');
+
+		// Category.
+		$this->_model->expectOnce('get_crumbly_category_from_segment', array($segments[2]));
+		$this->_model->setReturnValue('get_crumbly_category_from_segment', FALSE);
+		$this->_model->expectOnce('get_category_from_cat_id', array(12));
+		$this->_model->setReturnValue('get_category_from_cat_id', FALSE);
+
+		$this->_model->expectOnce('humanize', array($segments[2], FALSE));
+		$this->_model->setReturnValue('humanize', 'C12');
+
+		$this->_ee->functions->expectAt(1, 'create_url', array($segments[1] .'/' .$segments[2]));
+		$this->_ee->functions->setReturnValueAt(1, 'create_url', $site_url .$segments[1] .'/' .$segments[2] .'/');
+
+		$breadcrumbs = array(
+			array(
+				'breadcrumb_segment'	=> $segments[1],
+				'breadcrumb_title'		=> 'Products',
+				'breadcrumb_url'		=> $site_url .$segments[1] .'/'
+			),
+			array(
+				'breadcrumb_segment'	=> $segments[2],
+				'breadcrumb_title'		=> 'C12',
+				'breadcrumb_url'		=> $site_url .$segments[1] .'/' .$segments[2] .'/'
+			)
+		);
+
+		$parsed_tagdata = 'Parsed tagdata';
+
+		$this->_ee->TMPL->expectOnce('parse_variables', array($tagdata, $breadcrumbs));
+		$this->_ee->TMPL->setReturnValue('parse_variables', $parsed_tagdata);
+
+		// Tests.
+		$this->_subject->breadcrumbs();
+	}
+
+
+	public function test__breadcrumbs__template_group_category_trigger_category()
+	{
+		// Use category names.
+		$this->_ee->config->setReturnValue('item', 'y', array('use_category_name'));
+		$this->_ee->config->setReturnValue('item', 'seating', array('reserved_category_word'));
+
+		// Retrieve the segments.
+		$segments = array();
+		$segments[1]	= 'products';
+		$segments[2]	= 'seating';
+		$segments[3]	= 'chairs';
+
+		$this->_ee->uri->expectOnce('segment_array');
+		$this->_ee->uri->setReturnValue('segment_array', $segments);
+
+		// No root breadcrumb (tested separately).
+		$this->_ee->functions->expectNever('fetch_site_index');
+		$this->_ee->TMPL->setReturnValue('fetch_param', 'no', array('root_breadcrumb:include', '*'));
+
+		// Template tag parser.
+		$tagdata = 'Tagdata';
+		$this->_ee->TMPL->expectOnce('__get', array('tagdata'));
+		$this->_ee->TMPL->setReturnValue('__get', $tagdata, array('tagdata'));
+		
+		$site_url = 'http://example.com/';
+		$this->_ee->functions->expectCallCount('create_url', 3);
+
+		// Template group URL.
+		$template_group = new Crumbly_template_group(array('group_id' => 10, 'label' => 'Our Products'));
+		$this->_model->expectOnce('get_crumbly_template_group_from_segment', array($segments[1]));
+		$this->_model->setReturnValue('get_crumbly_template_group_from_segment', $template_group);
+
+		$this->_ee->functions->expectAt(0, 'create_url', array($segments[1]));
+		$this->_ee->functions->setReturnValueAt(0, 'create_url', $site_url .$segments[1] .'/');
+
+		// Category trigger.
+		$this->_model->expectOnce('humanize', array($segments[2]));
+		$this->_model->setReturnValue('humanize', 'Seating');
+
+		$this->_ee->functions->expectAt(1, 'create_url', array($segments[1] .'/' .$segments[2]));
+		$this->_ee->functions->setReturnValueAt(1, 'create_url', $site_url .$segments[1] .'/' .$segments[2] .'/');
+
+		// Category.
+		$category = new Crumbly_category(array('cat_id' => 10, 'label' => 'Single Serving Seating'));
+		$this->_model->expectOnce('get_crumbly_category_from_segment', array($segments[3]));
+		$this->_model->setReturnValue('get_crumbly_category_from_segment', $category);
+
+		$this->_ee->functions->expectAt(2, 'create_url', array($segments[1] .'/' .$segments[2] .'/' .$segments[3]));
+		$this->_ee->functions->setReturnValueAt(2, 'create_url', $site_url .$segments[1] .'/' .$segments[2] .'/' .$segments[3] .'/');
+
+		$breadcrumbs = array(
+			array(
+				'breadcrumb_segment'	=> $segments[1],
+				'breadcrumb_title'		=> 'Our Products',
+				'breadcrumb_url'		=> $site_url .$segments[1] .'/'
+			),
+			array(
+				'breadcrumb_segment'	=> $segments[2],
+				'breadcrumb_title'		=> 'Seating',
+				'breadcrumb_url'		=> $site_url .$segments[1] .'/' .$segments[2] .'/'
+			),
+			array(
+				'breadcrumb_segment'	=> $segments[3],
+				'breadcrumb_title'		=> 'Single Serving Seating',
+				'breadcrumb_url'		=> $site_url .$segments[1] .'/' .$segments[2] .'/' .$segments[3] .'/'
+			)
+		);
+
+		$parsed_tagdata = 'Parsed tagdata';
+
+		$this->_ee->TMPL->expectOnce('parse_variables', array($tagdata, $breadcrumbs));
+		$this->_ee->TMPL->setReturnValue('parse_variables', $parsed_tagdata);
+
+		// Tests.
+		$this->_subject->breadcrumbs();
+	}
+
+
+	public function test__breadcrumbs__template_group_category_trigger_category_no_crumbly_category()
+	{
+		// Use category names.
+		$this->_ee->config->setReturnValue('item', 'y', array('use_category_name'));
+		$this->_ee->config->setReturnValue('item', 'seating', array('reserved_category_word'));
+
+		// Retrieve the segments.
+		$segments = array();
+		$segments[1]	= 'products';
+		$segments[2]	= 'seating';
+		$segments[3]	= 'chairs';
+
+		$this->_ee->uri->expectOnce('segment_array');
+		$this->_ee->uri->setReturnValue('segment_array', $segments);
+
+		// No root breadcrumb (tested separately).
+		$this->_ee->functions->expectNever('fetch_site_index');
+		$this->_ee->TMPL->setReturnValue('fetch_param', 'no', array('root_breadcrumb:include', '*'));
+
+		// Template tag parser.
+		$tagdata = 'Tagdata';
+		$this->_ee->TMPL->expectOnce('__get', array('tagdata'));
+		$this->_ee->TMPL->setReturnValue('__get', $tagdata, array('tagdata'));
+		
+		$site_url = 'http://example.com/';
+		$this->_ee->functions->expectCallCount('create_url', 3);
+
+		// Template group URL.
+		$template_group = new Crumbly_template_group(array('group_id' => 10, 'label' => 'Our Products'));
+		$this->_model->expectOnce('get_crumbly_template_group_from_segment', array($segments[1]));
+		$this->_model->setReturnValue('get_crumbly_template_group_from_segment', $template_group);
+
+		$this->_ee->functions->expectAt(0, 'create_url', array($segments[1]));
+		$this->_ee->functions->setReturnValueAt(0, 'create_url', $site_url .$segments[1] .'/');
+
+		// Category trigger.
+		$this->_model->expectOnce('humanize', array($segments[2]));
+		$this->_model->setReturnValue('humanize', 'Seating');
+
+		$this->_ee->functions->expectAt(1, 'create_url', array($segments[1] .'/' .$segments[2]));
+		$this->_ee->functions->setReturnValueAt(1, 'create_url', $site_url .$segments[1] .'/' .$segments[2] .'/');
+
+		// Category.
+		$this->_model->expectOnce('get_crumbly_category_from_segment', array($segments[3]));
+		$this->_model->setReturnValue('get_crumbly_category_from_segment', FALSE);
+
+		$category = new EI_category(array(
+			'cat_id'		=> '10',
+			'cat_name'		=> 'Comfy Chairs',
+			'cat_url_title'	=> $segments[3]
+		));
+
+		$this->_model->expectOnce('get_category_from_cat_name', array($segments[3]));
+		$this->_model->setReturnValue('get_category_from_cat_name', $category);
+
+		$this->_ee->functions->expectAt(2, 'create_url', array($segments[1] .'/' .$segments[2] .'/' .$segments[3]));
+		$this->_ee->functions->setReturnValueAt(2, 'create_url', $site_url .$segments[1] .'/' .$segments[2] .'/' .$segments[3] .'/');
+
+		$breadcrumbs = array(
+			array(
+				'breadcrumb_segment'	=> $segments[1],
+				'breadcrumb_title'		=> 'Our Products',
+				'breadcrumb_url'		=> $site_url .$segments[1] .'/'
+			),
+			array(
+				'breadcrumb_segment'	=> $segments[2],
+				'breadcrumb_title'		=> 'Seating',
+				'breadcrumb_url'		=> $site_url .$segments[1] .'/' .$segments[2] .'/'
+			),
+			array(
+				'breadcrumb_segment'	=> $segments[3],
+				'breadcrumb_title'		=> 'Comfy Chairs',
+				'breadcrumb_url'		=> $site_url .$segments[1] .'/' .$segments[2] .'/' .$segments[3] .'/'
+			)
+		);
+
+		$parsed_tagdata = 'Parsed tagdata';
+
+		$this->_ee->TMPL->expectOnce('parse_variables', array($tagdata, $breadcrumbs));
+		$this->_ee->TMPL->setReturnValue('parse_variables', $parsed_tagdata);
+
+		// Tests.
+		$this->_subject->breadcrumbs();
+	}
+
+
+	public function test__breadcrumbs__template_group_category_trigger_category_unknown_category()
+	{
+		// Use category names.
+		$this->_ee->config->setReturnValue('item', 'y', array('use_category_name'));
+		$this->_ee->config->setReturnValue('item', 'seating', array('reserved_category_word'));
+
+		// Retrieve the segments.
+		$segments = array();
+		$segments[1]	= 'products';
+		$segments[2]	= 'seating';
+		$segments[3]	= 'chairs';
+
+		$this->_ee->uri->expectOnce('segment_array');
+		$this->_ee->uri->setReturnValue('segment_array', $segments);
+
+		// No root breadcrumb (tested separately).
+		$this->_ee->functions->expectNever('fetch_site_index');
+		$this->_ee->TMPL->setReturnValue('fetch_param', 'no', array('root_breadcrumb:include', '*'));
+
+		// Template tag parser.
+		$tagdata = 'Tagdata';
+		$this->_ee->TMPL->expectOnce('__get', array('tagdata'));
+		$this->_ee->TMPL->setReturnValue('__get', $tagdata, array('tagdata'));
+		
+		$site_url = 'http://example.com/';
+		$this->_ee->functions->expectCallCount('create_url', 3);
+		$this->_model->expectCallCount('humanize', 2);
+
+		// Template group URL.
+		$template_group = new Crumbly_template_group(array('group_id' => 10, 'label' => 'Our Products'));
+		$this->_model->expectOnce('get_crumbly_template_group_from_segment', array($segments[1]));
+		$this->_model->setReturnValue('get_crumbly_template_group_from_segment', $template_group);
+
+		$this->_ee->functions->expectAt(0, 'create_url', array($segments[1]));
+		$this->_ee->functions->setReturnValueAt(0, 'create_url', $site_url .$segments[1] .'/');
+
+		// Category trigger.
+		$this->_model->expectAt(0, 'humanize', array($segments[2]));
+		$this->_model->setReturnValueAt(0, 'humanize', 'Seating');
+
+		$this->_ee->functions->expectAt(1, 'create_url', array($segments[1] .'/' .$segments[2]));
+		$this->_ee->functions->setReturnValueAt(1, 'create_url', $site_url .$segments[1] .'/' .$segments[2] .'/');
+
+		// Category.
+		$this->_model->expectOnce('get_crumbly_category_from_segment', array($segments[3]));
+		$this->_model->setReturnValue('get_crumbly_category_from_segment', FALSE);
+		$this->_model->expectOnce('get_category_from_cat_name', array($segments[3]));
+		$this->_model->setReturnValue('get_category_from_cat_name', FALSE);
+
+		$this->_model->expectAt(1, 'humanize', array($segments[3], FALSE));
+		$this->_model->setReturnValueAt(1, 'humanize', 'Chairs');
+
+		$this->_ee->functions->expectAt(2, 'create_url', array($segments[1] .'/' .$segments[2] .'/' .$segments[3]));
+		$this->_ee->functions->setReturnValueAt(2, 'create_url', $site_url .$segments[1] .'/' .$segments[2] .'/' .$segments[3] .'/');
+
+		$breadcrumbs = array(
+			array(
+				'breadcrumb_segment'	=> $segments[1],
+				'breadcrumb_title'		=> 'Our Products',
+				'breadcrumb_url'		=> $site_url .$segments[1] .'/'
+			),
+			array(
+				'breadcrumb_segment'	=> $segments[2],
+				'breadcrumb_title'		=> 'Seating',
+				'breadcrumb_url'		=> $site_url .$segments[1] .'/' .$segments[2] .'/'
+			),
+			array(
+				'breadcrumb_segment'	=> $segments[3],
+				'breadcrumb_title'		=> 'Chairs',
+				'breadcrumb_url'		=> $site_url .$segments[1] .'/' .$segments[2] .'/' .$segments[3] .'/'
+			)
+		);
+
+		$parsed_tagdata = 'Parsed tagdata';
+
+		$this->_ee->TMPL->expectOnce('parse_variables', array($tagdata, $breadcrumbs));
+		$this->_ee->TMPL->setReturnValue('parse_variables', $parsed_tagdata);
+
+		// Tests.
+		$this->_subject->breadcrumbs();
+	}
+
+
 	public function test__breadcrumbs__include_default_root()
 	{
 		// Retrieve the segments (no segments).
