@@ -345,9 +345,9 @@ class Test_crumbly extends Testee_unit_test_case {
 		$this->_ee->functions->setReturnValueAt(0, 'create_url', $site_url .$segments[1] .'/');
 
 		// Category.
-		$category = new Crumbly_category(array('cat_id' => 10, 'label' => 'Chairs'));
-		$this->_model->expectOnce('get_crumbly_category_from_segment', array($segments[2]));
-		$this->_model->setReturnValue('get_crumbly_category_from_segment', $category);
+		$category = new EI_category(array('cat_id' => 12, 'cat_url_title' => 'chairs', 'cat_name' => 'Chairs'));
+		$this->_model->expectOnce('get_category_from_segment', array($segments[2]));
+		$this->_model->setReturnValue('get_category_from_segment', $category);
 
 		$this->_ee->functions->expectAt(1, 'create_url', array($segments[1] .'/' .$segments[2]));
 		$this->_ee->functions->setReturnValueAt(1, 'create_url', $site_url .$segments[1] .'/' .$segments[2] .'/');
@@ -406,17 +406,14 @@ class Test_crumbly extends Testee_unit_test_case {
 		$this->_ee->functions->setReturnValueAt(0, 'create_url', $site_url .$segments[1] .'/');
 
 		// Category.
-		$this->_model->expectOnce('get_crumbly_category_from_segment', array($segments[2]));
-		$this->_model->setReturnValue('get_crumbly_category_from_segment', FALSE);
-
 		$category = new EI_category(array(
 			'cat_id'		=> 12,
 			'cat_name'		=> 'Single Serving Seating',
 			'cat_url_title'	=> 'chairs'
 		));
 		
-		$this->_model->expectOnce('get_category_from_cat_id', array(12));
-		$this->_model->setReturnValue('get_category_from_cat_id', $category);
+		$this->_model->expectOnce('get_category_from_segment', array($segments[2]));
+		$this->_model->setReturnValue('get_category_from_segment', $category);
 
 		$this->_ee->functions->expectAt(1, 'create_url', array($segments[1] .'/' .$segments[2]));
 		$this->_ee->functions->setReturnValueAt(1, 'create_url', $site_url .$segments[1] .'/' .$segments[2] .'/');
@@ -475,10 +472,8 @@ class Test_crumbly extends Testee_unit_test_case {
 		$this->_ee->functions->setReturnValueAt(0, 'create_url', $site_url .$segments[1] .'/');
 
 		// Category.
-		$this->_model->expectOnce('get_crumbly_category_from_segment', array($segments[2]));
-		$this->_model->setReturnValue('get_crumbly_category_from_segment', FALSE);
-		$this->_model->expectOnce('get_category_from_cat_id', array(12));
-		$this->_model->setReturnValue('get_category_from_cat_id', FALSE);
+		$this->_model->expectOnce('get_category_from_segment', array($segments[2]));
+		$this->_model->setReturnValue('get_category_from_segment', FALSE);
 
 		$this->_model->expectOnce('humanize', array($segments[2], FALSE));
 		$this->_model->setReturnValue('humanize', 'C12');
@@ -552,9 +547,9 @@ class Test_crumbly extends Testee_unit_test_case {
 		$this->_ee->functions->setReturnValueAt(1, 'create_url', $site_url .$segments[1] .'/' .$segments[2] .'/');
 
 		// Category.
-		$category = new Crumbly_category(array('cat_id' => 10, 'label' => 'Single Serving Seating'));
-		$this->_model->expectOnce('get_crumbly_category_from_segment', array($segments[3]));
-		$this->_model->setReturnValue('get_crumbly_category_from_segment', $category);
+		$category = new EI_category(array('cat_id' => 10, 'cat_url_title' => 'Chairs', 'cat_name' => 'Single Serving Seating'));
+		$this->_model->expectOnce('get_category_from_segment', array($segments[3]));
+		$this->_model->setReturnValue('get_category_from_segment', $category);
 
 		$this->_ee->functions->expectAt(2, 'create_url', array($segments[1] .'/' .$segments[2] .'/' .$segments[3]));
 		$this->_ee->functions->setReturnValueAt(2, 'create_url', $site_url .$segments[1] .'/' .$segments[2] .'/' .$segments[3] .'/');
@@ -630,17 +625,14 @@ class Test_crumbly extends Testee_unit_test_case {
 		$this->_ee->functions->setReturnValueAt(1, 'create_url', $site_url .$segments[1] .'/' .$segments[2] .'/');
 
 		// Category.
-		$this->_model->expectOnce('get_crumbly_category_from_segment', array($segments[3]));
-		$this->_model->setReturnValue('get_crumbly_category_from_segment', FALSE);
-
 		$category = new EI_category(array(
 			'cat_id'		=> '10',
 			'cat_name'		=> 'Comfy Chairs',
 			'cat_url_title'	=> $segments[3]
 		));
 
-		$this->_model->expectOnce('get_category_from_cat_url_title', array($segments[3]));
-		$this->_model->setReturnValue('get_category_from_cat_url_title', $category);
+		$this->_model->expectOnce('get_category_from_segment', array($segments[3]));
+		$this->_model->setReturnValue('get_category_from_segment', $category);
 
 		$this->_ee->functions->expectAt(2, 'create_url', array($segments[1] .'/' .$segments[2] .'/' .$segments[3]));
 		$this->_ee->functions->setReturnValueAt(2, 'create_url', $site_url .$segments[1] .'/' .$segments[2] .'/' .$segments[3] .'/');
@@ -717,10 +709,8 @@ class Test_crumbly extends Testee_unit_test_case {
 		$this->_ee->functions->setReturnValueAt(1, 'create_url', $site_url .$segments[1] .'/' .$segments[2] .'/');
 
 		// Category.
-		$this->_model->expectOnce('get_crumbly_category_from_segment', array($segments[3]));
-		$this->_model->setReturnValue('get_crumbly_category_from_segment', FALSE);
-		$this->_model->expectOnce('get_category_from_cat_url_title', array($segments[3]));
-		$this->_model->setReturnValue('get_category_from_cat_url_title', FALSE);
+		$this->_model->expectOnce('get_category_from_segment', array($segments[3]));
+		$this->_model->setReturnValue('get_category_from_segment', FALSE);
 
 		$this->_model->expectAt(1, 'humanize', array($segments[3], FALSE));
 		$this->_model->setReturnValueAt(1, 'humanize', 'Chairs');
@@ -754,6 +744,81 @@ class Test_crumbly extends Testee_unit_test_case {
 		// Tests.
 		$this->_subject->breadcrumbs();
 	}
+
+
+    public function test__breadcrumbs__template_group_template_category()
+    {
+		// Retrieve the segments.
+		$segments = array();
+		$segments[1]	= 'shop';
+		$segments[2]	= 'furniture';
+		$segments[3]	= 'C12';
+
+		$this->_ee->uri->expectOnce('segment_array');
+		$this->_ee->uri->setReturnValue('segment_array', $segments);
+
+		// No root breadcrumb (tested separately).
+		$this->_ee->functions->expectNever('fetch_site_index');
+		$this->_ee->TMPL->setReturnValue('fetch_param', 'no', array('root_breadcrumb:include', '*'));
+
+		// Template tag parser.
+		$tagdata = 'Tagdata';
+		$this->_ee->TMPL->expectOnce('__get', array('tagdata'));
+		$this->_ee->TMPL->setReturnValue('__get', $tagdata, array('tagdata'));
+		
+		$site_url = 'http://example.com/';
+		$this->_ee->functions->expectCallCount('create_url', 3);
+
+		// Template group URL.
+		$template_group = new Crumbly_template_group(array('group_id' => 10, 'label' => 'Shop'));
+		$this->_model->expectOnce('get_crumbly_template_group_from_segment', array($segments[1]));
+		$this->_model->setReturnValue('get_crumbly_template_group_from_segment', $template_group);
+
+		$this->_ee->functions->expectAt(0, 'create_url', array($segments[1]));
+		$this->_ee->functions->setReturnValueAt(0, 'create_url', $site_url .$segments[1] .'/');
+
+        // Template URL.
+        $template = new Crumbly_template(array('template_id' => 20, 'label' => 'Furniture'));
+        $this->_model->expectOnce('get_crumbly_template_from_segments', array($segments[1], $segments[2]));
+        $this->_model->setReturnValue('get_crumbly_template_from_segments', $template);
+
+        $this->_ee->functions->expectAt(1, 'create_url', array($segments[1] .'/' .$segments[2]));
+        $this->_ee->functions->setReturnValueAt(1, 'create_url', $site_url .$segments[1] .'/' .$segments[2] .'/');
+
+		// Category.
+		$category = new EI_category(array('cat_id' => 12, 'cat_url_title' => 'seating', 'cat_name' => 'Seating'));
+		$this->_model->expectOnce('get_category_from_segment', array($segments[3]));
+		$this->_model->setReturnValue('get_category_from_segment', $category);
+
+		$this->_ee->functions->expectAt(2, 'create_url', array($segments[1] .'/' .$segments[2] .'/' .$segments[3]));
+		$this->_ee->functions->setReturnValueAt(2, 'create_url', $site_url .$segments[1] .'/' .$segments[2] .'/' .$segments[3] .'/');
+
+		$breadcrumbs = array(
+			array(
+				'breadcrumb_segment'	=> $segments[1],
+				'breadcrumb_title'		=> 'Shop',
+				'breadcrumb_url'		=> $site_url .$segments[1] .'/'
+			),
+			array(
+				'breadcrumb_segment'	=> $segments[2],
+				'breadcrumb_title'		=> 'Furniture',
+				'breadcrumb_url'		=> $site_url .$segments[1] .'/' .$segments[2] .'/'
+			),
+			array(
+				'breadcrumb_segment'	=> $segments[3],
+				'breadcrumb_title'		=> 'Seating',
+				'breadcrumb_url'		=> $site_url .$segments[1] .'/' .$segments[2] .'/' .$segments[3] .'/'
+			)
+		);
+
+		$parsed_tagdata = 'Parsed tagdata';
+
+		$this->_ee->TMPL->expectOnce('parse_variables', array($tagdata, $breadcrumbs));
+		$this->_ee->TMPL->setReturnValue('parse_variables', $parsed_tagdata);
+
+		// Tests.
+		$this->_subject->breadcrumbs();
+    }
 
 
 	public function test__breadcrumbs__include_default_root()

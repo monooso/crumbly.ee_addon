@@ -57,41 +57,7 @@ class Crumbly_mcp {
 			'nav_template_groups' => $this->_base_url .AMP .'method=template_groups'
 		);
 
-		if ($this->_model->get_all_categories())
-		{
-			$nav_array['nav_categories'] = $this->_base_url .AMP .'method=categories';
-		}
-
-		ksort($nav_array);
 		$this->_ee->cp->set_right_nav($nav_array);
-	}
-
-
-	/**
-	 * Categories.
-	 *
-	 * @access	public
-	 * @return	string
-	 */
-	public function categories()
-	{
-		$categories		= $this->_model->get_all_categories();
-		$categories_dd	= array();
-
-		// Prepare the drop down options arrays.
-		foreach ($categories AS $category)
-		{
-			$categories_dd[$category->get_cat_id()] = $category->get_cat_name();
-		}
-		
-		$vars = array(
-			'form_action'		=> $this->_base_qs .AMP .'method=save_categories',
-			'categories'		=> $this->_model->get_all_crumbly_categories(),
-			'categories_dd'		=> $categories_dd,
-			'cp_page_title'		=> $this->_ee->lang->line('hd_categories')
-		);
-		
-		return $this->_ee->load->view('categories', $vars, TRUE);
 	}
 
 
@@ -122,41 +88,6 @@ class Crumbly_mcp {
 	public function index()
 	{
 		return $this->glossary();
-	}
-
-
-	/**
-	 * Saves the Crumbly categories.
-	 *
-	 * @access	public
-	 * @return	void
-	 */
-	public function save_categories()
-	{
-		$categories_input = $this->_ee->input->post('categories');
-
-		if ( ! is_array($categories_input))
-		{
-			$categories_input = array();
-		}
-
-		$this->_model->delete_all_crumbly_categories();
-
-		$success = TRUE;
-
-		foreach ($categories_input AS $category_input)
-		{
-			if ( ! $this->_model->save_crumbly_category(new Crumbly_category($category_input)))
-			{
-				$success = FALSE;
-			}
-		}
-
-		$success
-			? $this->_ee->session->set_flashdata('message_success', $this->_ee->lang->line('msg_categories_saved'))
-			: $this->_ee->session->set_flashdata('message_failure', $this->_ee->lang->line('msg_categories_not_saved'));
-
-		$this->_ee->functions->redirect($this->_base_url .AMP .'method=categories');
 	}
 
 

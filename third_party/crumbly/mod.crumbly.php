@@ -10,16 +10,6 @@
 
 class Crumbly {
 	
-	/* --------------------------------------------------------------
-	 * CONSTANTS
-	 * ------------------------------------------------------------ */
-
-	/**
-	 * Custom URL pattern segment types.
-	 *
-	 * @access	public
-	 * @var		string
-	 */
 	const CRUMBLY_CATEGORY			= 'category';
 	const CRUMBLY_CATEGORY_TRIGGER	= 'category_trigger';
 	const CRUMBLY_ENTRY				= 'entry';
@@ -28,38 +18,9 @@ class Crumbly {
 	const CRUMBLY_TEMPLATE			= 'template';
 	const CRUMBLY_TEMPLATE_GROUP	= 'template_group';
 
-	
-	/* --------------------------------------------------------------
-	 * PUBLIC PROPERTIES
-	 * ------------------------------------------------------------ */
-	
-	/**
-	 * Return data.
-	 *
-	 * @access	public
-	 * @var 	string
-	 */
 	public $return_data = '';
-	
-	
-	/* --------------------------------------------------------------
-	 * PRIVATE PROPERTIES
-	 * ------------------------------------------------------------ */
-	
-	/**
-	 * ExpressionEngine object reference.
-	 *
-	 * @access	private
-	 * @var		object
-	 */
+    
 	private $_ee;
-	
-	/**
-	 * Model.
-	 *
-	 * @access	private
-	 * @var		object
-	 */
 	private $_model;
 	
 	
@@ -168,27 +129,11 @@ class Crumbly {
 
 		$reserved_category_word = $config->item('reserved_category_word');
 		$use_category_name		= (strtolower($config->item('use_category_name')) == 'y' && $reserved_category_word);
+        $auto_pattern           = ! (bool) $pattern;
 
-		// Additional prep work is required if the pattern is empty (i.e. default).
 		if ( ! $pattern)
 		{
 			$pattern = 'template_group/template/entry';
-
-			// But wait! What about categories?
-			if (isset($segments[1]))
-			{
-				// Swanky /category/category-name categories.
-				if ($use_category_name && $segments[1] == $reserved_category_word)
-				{
-					$pattern = self::CRUMBLY_TEMPLATE_GROUP .'/' .self::CRUMBLY_CATEGORY_TRIGGER .'/' .self::CRUMBLY_CATEGORY;
-				}
-
-				// Standard /C12 categories.
-				if ( ! $use_category_name && preg_match('/^c[0-9]+$/i', $segments[1]))
-				{
-					$pattern = self::CRUMBLY_TEMPLATE_GROUP .'/' .self::CRUMBLY_CATEGORY;
-				}
-			}
 		}
 
 		$breadcrumbs			= array();
@@ -197,6 +142,7 @@ class Crumbly {
 		$pattern_total			= count($pattern_segments);
 		$segments_thus_far		= array();
 		$template_group_segment	= '';
+        $next_segment_is_category = FALSE;
 
 		// Deal with each segment in turn.
 		for ($segment_count = 0, $segment_total = count($segments); $segment_count < $segment_total; $segment_count++)
@@ -213,29 +159,49 @@ class Crumbly {
 				$segment_type = $ignore_trailing ? self::CRUMBLY_IGNORE : self::CRUMBLY_GLOSSARY;
 			}
 
+            /**
+             * Categories within "auto" patterns are tricky, because they
+             * can appear in multiple places.
+             *
+             * We check for category patterns and trigger words after everything
+             * else, overriding the segment type if required.
+             */
+
+            if ($auto_pattern)
+            {
+                /**
+                 * If the previous segment was the category trigger word,
+                 * we're now looking for a category.
+                 */
+
+                if ($next_segment_is_category)
+                {
+                    $segment_type = self::CRUMBLY_CATEGORY;
+                    $next_segment_is_category = FALSE;
+                }
+            
+                if ($use_category_name && $segment == $reserved_category_word)
+                {
+                    $pattern_segments   = array();
+                    $pattern_total      = 0;
+                    $segment_type       = self::CRUMBLY_CATEGORY_TRIGGER;
+                    $next_segment_is_category = TRUE;
+                }
+
+                if ( ! $use_category_name && preg_match('/^c[0-9]+$/i', $segment))
+                {
+                    $pattern_segments   = array();
+                    $pattern_total      = 0;
+                    $segment_type       = self::CRUMBLY_CATEGORY;
+                }
+            }
+
 			switch ($segment_type)
 			{
 				case self::CRUMBLY_CATEGORY:
-					if ($crumbly_category = $this->_model->get_crumbly_category_from_segment($segment))
-					{
-						$breadcrumb_title = $crumbly_category->get_label();
-					}
-					else
-					{
-						// Category ID, or category title?
-						if ($use_category_name)
-						{
-							$breadcrumb_title = ($category = $this->_model->get_category_from_cat_url_title($segment))
-								? $category->get_cat_name()
-								: $this->_model->humanize($segment, FALSE);
-						}
-						else
-						{
-							$breadcrumb_title = ($category = $this->_model->get_category_from_cat_id(intval(substr($segment, 1))))
-								? $category->get_cat_name()
-								: $this->_model->humanize($segment, FALSE);
-						}
-					}
+                    $breadcrumb_title = ($category = $this->_model->get_category_from_segment($segment))
+                        ? $category->get_cat_name()
+                        : $this->_model->humanize($segment, FALSE);
 					break;
 
 				case self::CRUMBLY_CATEGORY_TRIGGER:

@@ -327,6 +327,34 @@ class Crumbly_model extends CI_Model {
 
 
 	/**
+	 * Retrieves a category from the specified category ID, or category URL title.
+	 *
+	 * @access	public
+	 * @param	string		$segment		The URL segment containing the category ID or URL title.
+	 * @return	EI_category|FALSE
+	 */
+	public function get_category_from_segment($segment)
+	{
+		if ( ! is_string($segment))
+		{
+			return FALSE;
+		}
+
+		$clause = preg_match('/^c[0-9]+$/i', $segment)
+			? array('cat_id' => substr($segment, 1))
+			: array('cat_url_title' => $segment);
+
+		$db_category = $this->_ee->db
+			->select('cat_id, cat_name, cat_url_title')
+			->get_where('categories', $clause, 1);
+
+		return $db_category->num_rows()
+			? new EI_category($db_category->row_array())
+			: FALSE;
+	}
+
+
+	/**
 	 * Retrieves a channel entry title, given a URL segment. Supports url_title and entry_id.
 	 * Returns FALSE if the entry cannot be found.
 	 *
@@ -354,35 +382,6 @@ class Crumbly_model extends CI_Model {
 
 		return $db_result->num_rows()
 			? $db_result->row()->title
-			: FALSE;
-	}
-
-
-	/**
-	 * Retrieves a Crumbly category from the specified category ID, or category
-	 * URL title.
-	 *
-	 * @access	public
-	 * @param	string		$segment		The URL segment containing the category ID or URL title.
-	 * @return	Crumbly_category|FALSE
-	 */
-	public function get_crumbly_category_from_segment($segment)
-	{
-		if ( ! is_string($segment))
-		{
-			return FALSE;
-		}
-
-		$clause = preg_match('/^c[0-9]+$/i', $segment)
-			? array('cat_id' => substr($segment, 1))
-			: array('cat_url_title' => $segment);
-
-		$db_category = $this->_ee->db
-			->select('cat_id, cat_name, cat_url_title')
-			->get_where('categories', $clause, 1);
-
-		return $db_category->num_rows()
-			? new Crumbly_category($db_category->row_array())
 			: FALSE;
 	}
 
@@ -584,45 +583,11 @@ class Crumbly_model extends CI_Model {
 	public function install_module()
 	{
 		$this->install_module_register();
-		$this->install_module_categories_table();
 		$this->install_module_glossary_table();
 		$this->install_module_templates_table();
 		$this->install_module_template_groups_table();
 		
 		return TRUE;
-	}
-
-
-	/**
-	 * Creates the 'Crumbly Categories' database table.
-	 *
-	 * @access	public
-	 * @return	void
-	 */
-	public function install_module_categories_table()
-	{
-		$this->_ee->load->dbforge();
-
-		$fields = array(
-			'site_id' => array(
-				'constraint'	=> 5,
-				'type'			=> 'INT',
-				'unsigned'		=> TRUE
-			),
-			'cat_id' => array(
-				'constraint'	=> 10,
-				'type'			=> 'INT',
-				'unsigned'		=> TRUE
-			),
-			'label' => array(
-				'constraint'	=> 255,
-				'type'			=> 'VARCHAR'
-			)
-		);
-
-		$this->_ee->dbforge->add_field($fields);
-		$this->_ee->dbforge->add_key('site_id');
-		$this->_ee->dbforge->create_table('crumbly_categories', TRUE);
 	}
 
 
@@ -847,7 +812,6 @@ class Crumbly_model extends CI_Model {
 		$this->_ee->db->delete('modules', array('module_name' => $module_name));
 
 		$this->_ee->load->dbforge();
-		$this->_ee->dbforge->drop_table('crumbly_categories');
 		$this->_ee->dbforge->drop_table('crumbly_glossary');
 		$this->_ee->dbforge->drop_table('crumbly_templates');
 		$this->_ee->dbforge->drop_table('crumbly_template_groups');
