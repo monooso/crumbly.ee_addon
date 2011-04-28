@@ -9,10 +9,6 @@
 
 class Crumbly_mcp {
 
-	/* --------------------------------------------------------------
-	 * PRIVATE PROPERTIES
-	 * ------------------------------------------------------------ */
-
 	private $_ee;
 	private $_model;
 	private $_theme_url;

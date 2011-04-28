@@ -90,15 +90,6 @@ class Test_crumbly_model extends Testee_unit_test_case {
 	}
 
 
-	public function test__delete_all_crumbly_categories__success()
-	{
-		$where = array('site_id' => $this->_site_id);
-		$this->_ee->db->expectOnce('delete', array('crumbly_categories', $where));
-	
-		$this->assertIdentical(TRUE, $this->_subject->delete_all_crumbly_categories());
-	}
-
-
 	public function test__delete_all_crumbly_glossary_terms__success()
 	{
 		$where = array('site_id' => $this->_site_id);

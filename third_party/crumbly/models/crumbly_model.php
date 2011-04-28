@@ -9,7 +9,6 @@
  * @version 		0.7.0
  */
 
-require_once PATH_THIRD .'crumbly/classes/crumbly_category' .EXT;
 require_once PATH_THIRD .'crumbly/classes/crumbly_glossary_term' .EXT;
 require_once PATH_THIRD .'crumbly/classes/crumbly_template' .EXT;
 require_once PATH_THIRD .'crumbly/classes/crumbly_template_group' .EXT;
@@ -19,7 +18,6 @@ require_once PATH_THIRD .'crumbly/classes/EI_template_group' .EXT;
 
 class Crumbly_model extends CI_Model {
 	
-	private $_crumbly_categories;
 	private $_crumbly_glossary;
 	private $_crumbly_groups;
 	private $_crumbly_templates;
@@ -49,19 +47,6 @@ class Crumbly_model extends CI_Model {
 		$this->_ee 				=& get_instance();
 		$this->_package_name	= $package_name ? $package_name : 'crumbly';
 		$this->_package_version	= $package_version ? $package_version : '0.7.0';
-	}
-
-
-	/**
-	 * Deletes all the Crumbly categories for the current site.
-	 *
-	 * @access	public
-	 * @return	bool
-	 */
-	public function delete_all_crumbly_categories()
-	{
-		$this->_ee->db->delete('crumbly_categories', array('site_id' => $this->get_site_id()));
-		return TRUE;
 	}
 
 

@@ -14,7 +14,6 @@ class Mock_crumbly_model {
 	 * PUBLIC METHODS
 	 * ------------------------------------------------------------ */
 
-	public function delete_all_crumbly_categories() {}
 	public function delete_all_crumbly_glossary_terms() {}
 	public function delete_all_crumbly_templates() {}
 	public function delete_all_crumbly_template_groups() {}
@@ -28,7 +27,6 @@ class Mock_crumbly_model {
 	public function get_package_theme_url() {}
 	public function get_template_groups() {}
 	public function humanize($machine = '', $use_glossary = TRUE) {}
-	public function save_crumbly_category(Crumbly_category $category) {}
 	public function save_crumbly_glossary_term(Crumbly_glossary_term $glossary_term) {}
 	public function save_crumbly_template(Crumbly_template $template) {}
 	public function save_crumbly_template_group(Crumbly_template_group $template_group) {}
