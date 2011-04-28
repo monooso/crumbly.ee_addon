@@ -128,32 +128,6 @@ class Crumbly_model extends CI_Model {
 
 
 	/**
-	 * Returns all the Crumbly categories for the current site.
-	 *
-	 * @access	public
-	 * @return	array
-	 */
-	public function get_all_crumbly_categories()
-	{
-		if ( ! $this->_crumbly_categories)
-		{
-			$db_categories = $this->_ee->db
-				->select('cat_id, label')
-				->get_where('crumbly_categories', array('site_id' => $this->get_site_id()));
-
-			$this->_crumbly_categories = array();
-
-			foreach ($db_categories->result_array() AS $db_category)
-			{
-				$this->_crumbly_categories[] = new Crumbly_category($db_category);
-			}
-		}
-
-		return $this->_crumbly_categories;
-	}
-
-
-	/**
 	 * Returns all the Crumbly glossary terms for the current site.
 	 *
 	 * @access	public
