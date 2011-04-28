@@ -660,26 +660,6 @@ class Crumbly_model extends CI_Model {
 
 
 	/**
-	 * Saves the specified Crumbly category to the database.
-	 *
-	 * @access	public
-	 * @param	Crumbly_category		$category		The category to save.
-	 * @return	bool
-	 */
-	public function save_crumbly_category(Crumbly_category $category)
-	{
-		if ( ! $category->get_cat_id() OR ! $category->get_label())
-		{
-			return FALSE;
-		}
-
-		$data = array_merge($category->to_array(), array('site_id' => $this->get_site_id()));
-		$this->_ee->db->insert('crumbly_categories', $data);
-		return TRUE;
-	}
-
-
-	/**
 	 * Saves the specified Crumbly glossary term to the database.
 	 *
 	 * @access	public

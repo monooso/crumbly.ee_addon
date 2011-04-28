@@ -1047,45 +1047,6 @@ class Test_crumbly_model extends Testee_unit_test_case {
 	}
 
 
-	public function test__save_crumbly_category__success()
-	{
-		$cat_id		= 10;
-		$label		= 'Creepy Crawly';
-		$category	= new Crumbly_category(array('cat_id' => $cat_id, 'label' => $label));
-
-		$insert_data = array(
-			'cat_id'	=> $cat_id,
-			'label'		=> $label,
-			'site_id'	=> $this->_site_id
-		);
-
-		$this->_ee->db->expectOnce('insert', array('crumbly_categories', $insert_data));
-		$this->assertIdentical(TRUE, $this->_subject->save_crumbly_category($category));
-	}
-
-
-	public function test__save_crumbly_category__missing_cat_id()
-	{
-		$cat_id		= NULL;
-		$label		= 'Creepy Crawly';
-		$category	= new Crumbly_category(array('cat_id' => $cat_id, 'label' => $label));
-
-		$this->_ee->db->expectNever('insert');
-		$this->assertIdentical(FALSE, $this->_subject->save_crumbly_category($category));
-	}
-
-
-	public function test__save_crumbly_category__missing_label()
-	{
-		$cat_id		= 10;
-		$label		= '';
-		$category	= new Crumbly_category(array('cat_id' => $cat_id, 'label' => $label));
-
-		$this->_ee->db->expectNever('insert');
-		$this->assertIdentical(FALSE, $this->_subject->save_crumbly_category($category));
-	}
-
-
 	public function test__save_crumbly_glossary_term__success()
 	{
 		$definition		= 'Definition';
