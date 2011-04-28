@@ -8,7 +8,14 @@
 
 @media screen {
 
-/* =tables
+/* =input
+ * ------------------------------------------------------------ */
+#crumbly input[type='text'] {
+    width               : 97%;
+}
+
+
+/* =act
  * ------------------------------------------------------------ */
 #crumbly .act {
 	padding-right		: 7px;
@@ -29,6 +36,24 @@
 #crumbly .btn img {
 	display				: inline-block;
 	vertical-align		: middle;
+}
+
+
+/* =no_content
+ * ------------------------------------------------------------ */
+#crumbly .no_content {
+	-moz-border-radius		: 2px;
+	-moz-box-shadow			: inset 0 1px 3px rgba(0, 0, 0, 0.1);
+	-o-border-radius		: 2px;
+	-o-box-shadow			: inset 0 1px 3px rgba(0, 0, 0, 0.1);
+	-webkit-border-radius	: 2px;
+	-webkit-box-shadow		: inset 0 1px 3px rgba(0, 0, 0, 0.1);
+	background				: rgba(0, 0, 0, 0.05);
+	border-radius			: 2px;
+	box-shadow				: inset 0 1px 3px rgba(0, 0, 0, 0.1);
+	margin					: 10px 0;
+	padding					: 15px;
+	text-align				: center;
 }
 
 } /* @media screen */

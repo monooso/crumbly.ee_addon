@@ -12,26 +12,8 @@ require_once PATH_THIRD .'crumbly/tests/mocks/mock.crumbly_model' .EXT;
 
 class Test_crumbly_cp extends Testee_unit_test_case {
 	
-	/* --------------------------------------------------------------
-	 * PRIVATE PROPERTIES
-	 * ------------------------------------------------------------ */
-	
-	/**
-	 * Model.
-	 *
-	 * @access	private
-	 * @var		object
-	 */
 	private $_model;
-	
-	/**
-	 * The test subject.
-	 *
-	 * @access	private
-	 * @var		object
-	 */
 	private $_subject;
-	
 	
 	
 	/* --------------------------------------------------------------

@@ -9,10 +9,6 @@
 
 class Crumbly_mcp {
 
-	/* --------------------------------------------------------------
-	 * PRIVATE PROPERTIES
-	 * ------------------------------------------------------------ */
-
 	private $_ee;
 	private $_model;
 	private $_theme_url;
@@ -51,11 +47,13 @@ class Crumbly_mcp {
 
 		$this->_ee->cp->add_to_head('<link rel="stylesheet" type="text/css" href="' .$this->_theme_url .'css/cp.css" />');
 
-		$this->_ee->cp->set_right_nav(array(
+		$nav_array = array(
 			'nav_glossary'		=> $this->_base_url .AMP .'method=glossary',
 			'nav_templates'		=> $this->_base_url .AMP .'method=templates',
 			'nav_template_groups' => $this->_base_url .AMP .'method=template_groups'
-		));
+		);
+
+		$this->_ee->cp->set_right_nav($nav_array);
 	}
 
 
