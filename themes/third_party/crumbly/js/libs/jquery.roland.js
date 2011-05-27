@@ -12,6 +12,8 @@
 
         return this.each(function() {
             $container = $(this);
+            updateIndexes($container, opts);
+            updateNav($container, opts);
 
             // Adds a row.
             $container.find('.' + opts.addRowClass).bind('click', function(e) {
@@ -46,6 +48,7 @@
                 $cloneRow = $link.triggerHandler('preAddRow', [eventData]);
 
                 if ($cloneRow === false) {
+                    console.log('No row any more');
                     return;
                 }
 
