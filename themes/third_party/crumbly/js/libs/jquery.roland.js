@@ -44,12 +44,14 @@
                 });
 
                 // Pre-add event. Only checks return value from last listener.
-                eventData = {container : $container, options : opts, newRow : $cloneRow};
-                $cloneRow = $link.triggerHandler('preAddRow', [eventData]);
+                if ($link.data('events').preAddRow !== undefined) {
+                    eventData = {container : $container, options : opts, newRow : $cloneRow};
+                    $cloneRow = $link.triggerHandler('preAddRow', [eventData]);
 
-                if ($cloneRow === false) {
-                    console.log('No row any more');
-                    return;
+                    // Returning FALSE prevents the row being added.
+                    if ($cloneRow === false) {
+                        return;
+                    }
                 }
 
                 // If the 'add row' link lives inside a row, insert the new row after it.
@@ -57,8 +59,10 @@
                 typeof $parentRow === 'object' ? $parentRow.after($cloneRow) : $lastRow.append($cloneRow);
 
                 // Post-add event.
-                $eventData = {container : $container, options : opts};
-                $link.triggerHandler('postAddRow', [eventData]);
+                if ($link.data('events').postAddRow !== undefined) {
+                    eventData = {container : $container, options : opts};
+                    $link.triggerHandler('postAddRow', [eventData]);
+                }
 
                 // Update everything.
                 updateIndexes($container, opts);
