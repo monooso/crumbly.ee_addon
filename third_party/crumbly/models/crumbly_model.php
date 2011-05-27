@@ -6,7 +6,7 @@
  * @author			Stephen Lewis <stephen@experienceinternet.co.uk>
  * @copyright		Experience Internet
  * @package			Crumbly
- * @version 		0.8.0
+ * @version 		0.9.0
  */
 
 require_once PATH_THIRD .'crumbly/classes/crumbly_glossary_term' .EXT;
@@ -46,7 +46,7 @@ class Crumbly_model extends CI_Model {
 
 		$this->_ee 				=& get_instance();
 		$this->_package_name	= $package_name ? $package_name : 'crumbly';
-		$this->_package_version	= $package_version ? $package_version : '0.8.0';
+		$this->_package_version	= $package_version ? $package_version : '0.9.0';
 	}
 
 

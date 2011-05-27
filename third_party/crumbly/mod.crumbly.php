@@ -57,49 +57,58 @@ class Crumbly {
 	public function breadcrumbs()
 	{
 		// Shortcuts.
+        $config = $this->_ee->config;
 		$fns	= $this->_ee->functions;
 		$lang	= $this->_ee->lang;
 		$tmpl	= $this->_ee->TMPL;
 
-		// Retrieve the URL segments. Can't do much without them.
-		if ( ! $segments = $this->_ee->uri->segment_array())
-		{
-			$breadcrumbs = array();
+        /**
+         * The segments array, as retrieved from the EE URI class, is 1-based.
+         * For our purposes, this is pointless hassle, so we convert it to a
+         * zero-based array, before proceeding.
+         */
+
+        $segments       = array_values($this->_ee->uri->segment_array());
+        $breadcrumbs    = array();
+
+        // Is this a 'Pages' page?
+        $pages          = ($site_pages = $config->item('site_pages')) ? $site_pages[$this->_model->get_site_id()]['uris'] : array();
+        $page_pattern   = '#^/' .preg_quote(implode('/', $segments), '#') .'/?#i';
+        $pages_url      = FALSE;
+
+        foreach ($pages AS $entry_id => $url_title)
+        {
+            if (preg_match($page_pattern, $url_title))
+            {
+                $pages_url = TRUE;
+                break;
+            }
+        }
+
+        if ($pages_url)
+        {
+            $breadcrumbs = $this->_build_breadcrumbs_from_pages_url($segments, $pages);
+        }
+        else
+        {
+            // Is this a custom user-supplied URL structure?
+            $url_pattern = ($url_pattern = $tmpl->fetch_param('custom_url:pattern'))
+                ? $url_pattern : '';
+
+            $breadcrumbs = $this->_build_breadcrumbs_from_url_pattern($segments, $url_pattern);
 		}
-		else
-		{
-			/**
-			 * The segments array, as retrieved from the EE URI class, is 1-based.
-			 * For our purposes, this is pointless hassle, so we convert it to a
-			 * zero-based array, before proceeding.
-			 */
 
-			$segments = array_values($segments);
-			
-			/**
-			 * Are we dealing with a 'standard' URL structure, which may be decyphered automatically,
-			 * or a custom user-supplied URL structure.
-			 */
+        // Include a 'root' breadcrumb?
+        if ($tmpl->fetch_param('root_breadcrumb:include', 'yes') == 'yes')
+        {
+            $lang->loadfile($this->_model->get_package_name());
 
-			if ( ! $url_pattern = $tmpl->fetch_param('custom_url:pattern'))
-			{
-				$url_pattern = '';
-			}
-
-			$breadcrumbs = $this->_build_breadcrumbs_from_url_pattern($segments, $url_pattern);
-		}
-
-		// Include a 'root' breadcrumb?
-		if ($tmpl->fetch_param('root_breadcrumb:include', 'yes') == 'yes')
-		{
-			$lang->loadfile($this->_model->get_package_name());
-
-			array_unshift($breadcrumbs, array(
-				'breadcrumb_segment'	=> '',
-				'breadcrumb_title'		=> $tmpl->fetch_param('root_breadcrumb:label', $lang->line('default_root_label')),
-				'breadcrumb_url'		=> $tmpl->fetch_param('root_breadcrumb:url', $fns->fetch_site_index())
-			));
-		}
+            array_unshift($breadcrumbs, array(
+                'breadcrumb_segment'	=> '',
+                'breadcrumb_title'		=> $tmpl->fetch_param('root_breadcrumb:label', $lang->line('default_root_label')),
+                'breadcrumb_url'		=> $tmpl->fetch_param('root_breadcrumb:url', $fns->fetch_site_index())
+            ));
+        }
 
 		return $tmpl->parse_variables($tmpl->tagdata, $breadcrumbs);
 	}
@@ -120,12 +129,9 @@ class Crumbly {
 	 */
 	private function _build_breadcrumbs_from_url_pattern(Array $segments = array(), $pattern = '')
 	{
-		// Shortcuts.
 		$config	= $this->_ee->config;
 		$fns	= $this->_ee->functions;
-		$lang	= $this->_ee->lang;
 		$tmpl	= $this->_ee->TMPL;
-		$uri	= $this->_ee->uri;
 
 		$reserved_category_word = $config->item('reserved_category_word');
 		$use_category_name		= (strtolower($config->item('use_category_name')) == 'y' && $reserved_category_word);
@@ -257,6 +263,59 @@ class Crumbly {
 
 		return $breadcrumbs;
 	}
+
+
+    /**
+     * Builds the breadcrumbs array for a 'Pages' URL.
+     *
+     * @access    public
+     * @param    array        $segments        The URL segments.
+     * @param    array        $pages        The 'Pages' for this site.
+     * @return    array
+     */
+    public function _build_breadcrumbs_from_pages_url(Array $segments = array(), Array $pages = array())
+    {
+        $tmpl               = $this->_ee->TMPL;
+        $breadcrumbs        = array();
+        $segments_thus_far  = array();
+        $include_unassigned = (strtolower($tmpl->fetch_param('pages:include_unassigned', 'no')) == 'yes');
+
+        foreach ($segments AS $segment)
+        {
+            $segments_thus_far[]    = $segment;
+            $page_found             = FALSE;
+            $pattern                = '#^/' .preg_quote(implode('/', $segments_thus_far), '#') .'/?' .'$#i';
+
+            foreach ($pages AS $entry_id => $url_title)
+            {
+                if (preg_match($pattern, $url_title))
+                {
+                    $breadcrumb_title = ($breadcrumb_title = $this->_model->get_channel_entry_title_from_entry_id($entry_id))
+                        ? $breadcrumb_title : $this->_model->humanize($segment);
+
+                    $breadcrumbs[] = array(
+                        'breadcrumb_segment'    => $segment,
+                        'breadcrumb_title'      => $breadcrumb_title,
+                        'breadcrumb_url'        => $this->_ee->functions->create_url(implode('/', $segments_thus_far))
+                    );
+
+                    $page_found = TRUE;
+                    continue;
+                }
+            }
+
+            if ( ! $page_found && $include_unassigned)
+            {
+                $breadcrumbs[] = array(
+                    'breadcrumb_segment'    => $segment,
+                    'breadcrumb_title'      => $this->_model->humanize($segment),
+                    'breadcrumb_url'        => ''
+                );
+            }
+        }
+
+        return $breadcrumbs;
+    }
 
 }
 
