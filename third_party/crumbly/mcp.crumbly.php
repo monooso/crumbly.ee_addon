@@ -41,7 +41,7 @@ class Crumbly_mcp {
 		$this->_ee->load->library('table');
 
 		$this->_ee->cp->set_breadcrumb($this->_base_url, $this->_ee->lang->line('crumbly_module_name'));
-		$this->_ee->cp->add_to_foot('<script type="text/javascript" src="' .$this->_theme_url .'js/jquery.roland.js"></script>');
+		$this->_ee->cp->add_to_foot('<script type="text/javascript" src="' .$this->_theme_url .'js/libs/jquery.roland.js"></script>');
 		$this->_ee->cp->add_to_foot('<script type="text/javascript" src="' .$this->_theme_url .'js/cp.js"></script>');
 		$this->_ee->javascript->compile();
 
