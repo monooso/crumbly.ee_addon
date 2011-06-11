@@ -43,6 +43,6 @@
 
 </div><!-- /#crumbly -->
 
-<div class="submit_wrapper"><?=form_submit(array('name' => 'submit', 'value' => lang('lbl_save_glossary'), 'class' => 'submit')); ?></div>
+<p><?=form_submit(array('name' => 'submit', 'value' => lang('lbl_save_glossary'), 'class' => 'submit')); ?></p>
 
 <?=form_close(); ?>

@@ -41,6 +41,6 @@
 
 </div><!-- /#crumbly -->
 
-<div class="submit_wrapper"><?=form_submit(array('name' => 'submit', 'value' => lang('lbl_save_template_groups'), 'class' => 'submit')); ?></div>
+<p><?=form_submit(array('name' => 'submit', 'value' => lang('lbl_save_template_groups'), 'class' => 'submit')); ?></p>
 
 <?=form_close(); ?>
