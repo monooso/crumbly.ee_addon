@@ -41,7 +41,7 @@ class Crumbly_mcp {
 		$this->_ee->load->library('table');
 
 		$this->_ee->cp->set_breadcrumb($this->_base_url, $this->_ee->lang->line('crumbly_module_name'));
-		$this->_ee->cp->add_to_foot('<script type="text/javascript" src="' .$this->_theme_url .'js/jquery.roland.js"></script>');
+		$this->_ee->cp->add_to_foot('<script type="text/javascript" src="' .$this->_theme_url .'js/libs/jquery.roland.js"></script>');
 		$this->_ee->cp->add_to_foot('<script type="text/javascript" src="' .$this->_theme_url .'js/cp.js"></script>');
 		$this->_ee->javascript->compile();
 
@@ -203,7 +203,7 @@ class Crumbly_mcp {
 	public function templates()
 	{
 		$template_groups	= $this->_model->get_all_template_groups();
-		$templates_dd		= array();
+		$templates_dd		= array('' => $this->_ee->lang->line('lbl_template_prompt'));
 
 		// Prepare the drop down options arrays.
 		foreach ($template_groups AS $template_group)
@@ -251,7 +251,7 @@ class Crumbly_mcp {
 	public function template_groups()
 	{
 		$template_groups	= $this->_model->get_all_template_groups();
-		$template_groups_dd	= array();
+		$template_groups_dd	= array('' => $this->_ee->lang->line('lbl_template_group_prompt'));
 
 		// Prepare the drop down options arrays.
 		foreach ($template_groups AS $template_group)

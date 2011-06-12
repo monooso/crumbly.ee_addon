@@ -12,40 +12,10 @@ require_once PATH_THIRD .'crumbly/models/crumbly_model' .EXT;
 
 class Test_crumbly_model extends Testee_unit_test_case {
 	
-	/* --------------------------------------------------------------
-	 * PRIVATE PROPERTIES
-	 * ------------------------------------------------------------ */
-	
-	/**
-	 * Package name.
-	 *
-	 * @access	private
-	 * @var		string
-	 */
+    private $_namespace;
 	private $_package_name;
-	
-	/**
-	 * Package version.
-	 *
-	 * @access	private
-	 * @var		string
-	 */
 	private $_package_version;
-	
-	/**
-	 * Site ID.
-	 *
-	 * @access	private
-	 * @var		int
-	 */
 	private $_site_id;
-	
-	/**
-	 * The test subject.
-	 *
-	 * @access	private
-	 * @var		object
-	 */
 	private $_subject;
 	
 	
@@ -64,28 +34,34 @@ class Test_crumbly_model extends Testee_unit_test_case {
 	{
 		parent::setUp();
 		
-		// Dummy package name and version.
+		// Dummy properties.
+        $this->_namespace       = 'example_namespace';
 		$this->_package_name 	= 'example_package';
 		$this->_package_version	= '1.0.0';
 		
 		// Dummy site ID value.
 		$this->_site_id = 10;
 		$this->_ee->config->setReturnValue('item', $this->_site_id, array('site_id'));
+
+        // Session cache.
+        $this->_ee->session->cache = array();
 		
 		// The test subject.
-		$this->_subject = new Crumbly_model($this->_package_name, $this->_package_version);
+		$this->_subject = new Crumbly_model($this->_package_name, $this->_package_version, $this->_namespace);
 	}
 
 
-	public function test__constructor__package_name_and_version()
+	public function test__constructor__package_name_package_version_namespace()
 	{
 		// Dummy values.
+        $namespace          = 'Example_namespace';
 		$package_name 		= 'Example_package';
 		$package_version	= '1.0.0';
 
 		// Tests.
-		$subject = new Crumbly_model($package_name, $package_version);
-		$this->assertIdentical($package_name, $subject->get_package_name());
+		$subject = new Crumbly_model($package_name, $package_version, $namespace);
+		$this->assertIdentical(strtolower($namespace), $subject->get_namespace());
+		$this->assertIdentical(strtolower($package_name), $subject->get_package_name());
 		$this->assertIdentical($package_version, $subject->get_package_version());
 	}
 
@@ -177,6 +153,26 @@ class Test_crumbly_model extends Testee_unit_test_case {
 	}
 
 
+    public function test__get_all_categories__cached_in_session()
+    {
+        $db = $this->_ee->db;
+        $session = $this->_ee->session;
+
+        $categories = array(
+            new EI_category(array('cat_id' => '10', 'cat_name' => 'cat', 'cat_url_title' => 'feline')),
+            new EI_category(array('cat_id' => '20', 'cat_name' => 'dog', 'cat_url_title' => 'canine')),
+            new EI_category(array('cat_id' => '30', 'cat_name' => 'ant', 'cat_url_title' => 'insect')),
+            new EI_category(array('cat_id' => '40', 'cat_name' => 'dec', 'cat_url_title' => 'asinine'))
+        );
+
+        $session->cache = array($this->_namespace => array($this->_package_name => array('categories' => $categories)));
+        $db->expectNever('select');
+        $db->expectNever('get_where');
+    
+        $this->assertIdentical($categories, $this->_subject->get_all_categories());
+    }
+
+
 	public function test__get_all_crumbly_glossary_terms__success()
 	{
 		$this->_ee->db->expectOnce('select', array('glossary_definition, glossary_term'));
@@ -210,6 +206,26 @@ class Test_crumbly_model extends Testee_unit_test_case {
 			$this->assertIdentical($result[$count], $return[$count]);
 		}
 	}
+
+
+    public function test__get_all_crumbly_glossary_terms__cached_in_session()
+    {
+        $db = $this->_ee->db;
+        $session = $this->_ee->session;
+
+        $glossary = array(
+            new Crumbly_glossary_term(array('glossary_definition' => 'cat', 'glossary_term' => 'Feline')),
+            new Crumbly_glossary_term(array('glossary_definition' => 'dog', 'glossary_term' => 'Canine')),
+            new Crumbly_glossary_term(array('glossary_definition' => 'cow', 'glossary_term' => 'Bovine')),
+            new Crumbly_glossary_term(array('glossary_definition' => 'horse', 'glossary_term' => 'Equine'))
+        );
+
+        $session->cache = array($this->_namespace => array($this->_package_name => array('crumbly_glossary' => $glossary)));
+        $db->expectNever('select');
+        $db->expectNever('get_where');
+    
+        $this->assertIdentical($glossary, $this->_subject->get_all_crumbly_glossary_terms());
+    }
 
 
 	public function test__get_all_crumbly_templates__success()
@@ -262,6 +278,26 @@ class Test_crumbly_model extends Testee_unit_test_case {
 	}
 
 
+    public function test__get_all_crumbly_template__cached_in_session()
+    {
+        $db = $this->_ee->db;
+        $session = $this->_ee->session;
+
+        $templates = array(
+            new Crumbly_template(array('label' => 'About Us', 'template_id' => '10')),
+            new Crumbly_template(array('label' => 'Latest News', 'template_id' => '20')),
+            new Crumbly_template(array('label' => 'Get in Touch', 'template_id' => '30')),
+            new Crumbly_template(array('label' => 'Goodies', 'template_id' => '40'))
+        );
+
+        $session->cache = array($this->_namespace => array($this->_package_name => array('crumbly_templates' => $templates)));
+        $db->expectNever('select');
+        $db->expectNever('get_where');
+    
+        $this->assertIdentical($templates, $this->_subject->get_all_crumbly_templates());
+    }
+
+
 	public function test__get_all_crumbly_template_groups__success()
 	{
 		$this->_ee->db->expectOnce('select', array('group_id, label'));
@@ -312,13 +348,35 @@ class Test_crumbly_model extends Testee_unit_test_case {
 	}
 
 
+    public function test__get_all_crumbly_template_groups__cached_in_session()
+    {
+        $db = $this->_ee->db;
+        $session = $this->_ee->session;
+
+        $groups = array(
+            new Crumbly_template_group(array('group_id' => '10', 'label' => 'About Us')),
+            new Crumbly_template_group(array('group_id' => '10', 'label' => 'Latest News')),
+            new Crumbly_template_group(array('group_id' => '20', 'label' => 'Get in Touch')),
+            new Crumbly_template_group(array('group_id' => '20', 'label' => 'Goodies'))
+        );
+
+        $session->cache = array($this->_namespace => array($this->_package_name => array('crumbly_template_groups' => $groups)));
+        $db->expectNever('select');
+        $db->expectNever('get_where');
+    
+        $this->assertIdentical($groups, $this->_subject->get_all_crumbly_template_groups());
+    }
+
+
 	public function test__get_all_templates__success()
 	{
-		$this->_ee->db->expectOnce('select', array('group_id, template_id, template_name'));
-		$this->_ee->db->expectOnce('get_where', array('templates', array('site_id' => $this->_site_id, 'template_type' => 'webpage')));
+        $hidden     = '_';
+        $config     = $this->_ee->config;
+        $config->setReturnValue('item', $hidden, array('hidden_template_indicator'));
 
-		$db_result = $this->_get_mock('db_query');
-		$db_rows = array(
+        $db         = $this->_ee->db;
+		$db_result  = $this->_get_mock('db_query');
+		$db_rows    = array(
 			array(
 				'group_id'		=> '10',
 				'template_id'	=> '15',
@@ -331,7 +389,14 @@ class Test_crumbly_model extends Testee_unit_test_case {
 			)
 		);
 
-		$this->_ee->db->setReturnReference('get_where', $db_result);
+        $where_clauses = array('site_id' => $this->_site_id, 'template_type' => 'webpage');
+
+        $db->expectOnce('select', array('group_id, template_id, template_name'));
+        $db->expectOnce('where', array($where_clauses));
+        $db->expectOnce('not_like', array('template_name', $hidden, 'after'));
+        $db->expectOnce('get', array('templates'));
+
+        $db->setReturnReference('get', $db_result);
 		$db_result->setReturnValue('result_array', $db_rows);
 
 		foreach ($db_rows AS $db_row)
@@ -349,20 +414,65 @@ class Test_crumbly_model extends Testee_unit_test_case {
 	}
 
 
+	public function test__get_all_templates__hidden_template_indicator_not_set()
+	{
+        $hidden     = '.';
+        $config     = $this->_ee->config;
+        $config->setReturnValue('item', '', array('hidden_template_indicator'));
+
+        $db         = $this->_ee->db;
+		$db_result  = $this->_get_mock('db_query');
+		$db_rows    = array();
+        $where_clauses = array('site_id' => $this->_site_id, 'template_type' => 'webpage');
+
+        $db->expectOnce('select', array('group_id, template_id, template_name'));
+        $db->expectOnce('where', array($where_clauses));
+        $db->expectOnce('not_like', array('template_name', $hidden, 'after'));
+        $db->expectOnce('get', array('templates'));
+
+        $db->setReturnReference('get', $db_result);
+		$db_result->setReturnValue('result_array', $db_rows);
+
+		$this->_subject->get_all_templates();
+	}
+
+
 	public function test__get_all_templates__no_templates()
 	{
 		$db_result	= $this->_get_mock('db_query');
 		$db_rows	= array();
 
-		$this->_ee->db->setReturnReference('get_where', $db_result);
+		$this->_ee->db->setReturnReference('get', $db_result);
 		$db_result->setReturnValue('result_array', $db_rows);
 
 		$this->assertIdentical(array(), $this->_subject->get_all_templates());
 	}
 
 
+    public function test__get_all_templates__cached_in_session()
+    {
+        $session    = $this->_ee->session;
+        $templates  = array(
+            new EI_template(array('group_id' => '10', 'template_id' => '5', 'template_name' => 'index')),
+            new EI_template(array('group_id' => '10', 'template_id' => '15', 'template_name' => 'entry')),
+            new EI_template(array('group_id' => '20', 'template_id' => '25', 'template_name' => 'index')),
+            new EI_template(array('group_id' => '20', 'template_id' => '35', 'template_name' => 'directions'))
+        );
+
+        $session->cache = array($this->_namespace => array($this->_package_name => array('templates' => $templates)));
+        
+        $this->_ee->db->expectNever('get');
+        $this->assertIdentical($templates, $this->_subject->get_all_templates());
+    }
+
+
 	public function test__get_all_template_groups__success()
 	{
+        $config     = $this->_ee->config;
+        $hidden     = '_';
+        $config->setReturnValue('item', $hidden, array('hidden_template_indicator'));
+
+        $db         = $this->_ee->db;
 		$db_result	= $this->_get_mock('db_query');
 		$db_rows	= array(
 			array(
@@ -379,10 +489,12 @@ class Test_crumbly_model extends Testee_unit_test_case {
 			)
 		);
 
-		$this->_ee->db->expectOnce('select', array('group_id, group_name'));
-		$this->_ee->db->expectOnce('get_where', array('template_groups', array('site_id' => $this->_site_id)));
+		$db->expectOnce('select', array('group_id, group_name'));
+        $db->expectOnce('where', array('site_id', $this->_site_id));
+        $db->expectOnce('not_like', array('group_name', $hidden, 'after'));
+        $db->expectOnce('get', array('template_groups'));
 
-		$this->_ee->db->setReturnReference('get_where', $db_result);
+		$db->setReturnReference('get', $db_result);
 		$db_result->setReturnValue('result_array', $db_rows);
 
 		foreach ($db_rows AS $db_row)
@@ -400,16 +512,56 @@ class Test_crumbly_model extends Testee_unit_test_case {
 	}
 
 
+	public function test__get_all_template_groups__hidden_template_indicator_not_set()
+	{
+        $config     = $this->_ee->config;
+        $hidden     = '.';
+        $config->setReturnValue('item', '', array('hidden_template_indicator'));
+
+        $db         = $this->_ee->db;
+		$db_result	= $this->_get_mock('db_query');
+
+		$db->expectOnce('select', array('group_id, group_name'));
+        $db->expectOnce('where', array('site_id', $this->_site_id));
+        $db->expectOnce('not_like', array('group_name', $hidden, 'after'));
+        $db->expectOnce('get', array('template_groups'));
+
+		$db->setReturnReference('get', $db_result);
+        $db_result->setReturnValue('result_array', array());
+
+		$this->_subject->get_all_template_groups();
+	}
+
+
 	public function test__get_all_template_groups__no_templates()
 	{
 		$db_result	= $this->_get_mock('db_query');
 		$db_rows	= array();
 
-		$this->_ee->db->setReturnReference('get_where', $db_result);
+		$this->_ee->db->setReturnReference('get', $db_result);
 		$db_result->setReturnValue('result_array', $db_rows);
 
 		$this->assertIdentical(array(), $this->_subject->get_all_template_groups());
 	}
+
+
+    public function test__get_all_template_groups__cached_in_session()
+    {
+        $db = $this->_ee->db;
+        $session = $this->_ee->session;
+
+        $groups = array(
+            new EI_template_group(array('group_id' => '10', 'group_name' => 'about')),
+            new EI_template_group(array('group_id' => '10', 'group_name' => 'blog')),
+            new EI_template_group(array('group_id' => '20', 'group_name' => 'contact')),
+            new EI_template_group(array('group_id' => '20', 'group_name' => 'products'))
+        );
+
+        $session->cache = array($this->_namespace => array($this->_package_name => array('template_groups' => $groups)));
+        $db->expectNever('get');
+    
+        $this->assertIdentical($groups, $this->_subject->get_all_template_groups());
+    }
 
 
 	public function test__get_channel_entry_title_from_segment__url_title_success()
@@ -769,13 +921,8 @@ class Test_crumbly_model extends Testee_unit_test_case {
 	
 	public function test__get_templates_by_template_group__success()
 	{
-		$group_id = 10;
-
-		$this->_ee->db->expectOnce('select', array('group_id, template_id, template_name'));
-		$this->_ee->db->expectOnce('get_where', array(
-			'templates',
-			array('group_id' => $group_id, 'template_type' => 'webpage')
-		));
+		$group_id       = 10;
+        $other_group_id = 20;
 
 		$db_result = $this->_get_mock('db_query');
 		$db_rows = array(
@@ -784,20 +931,25 @@ class Test_crumbly_model extends Testee_unit_test_case {
 				'template_id'	=> '15',
 				'template_name'	=> 'template_a'
 			),
+            array(
+                'group_id'      => $other_group_id,
+                'template_id'   => '20',
+                'template_name' => 'template_b'
+            ),
 			array(
 				'group_id'		=> $group_id,
 				'template_id'	=> '25',
-				'template_name'	=> 'template_b'
+				'template_name'	=> 'template_c'
 			)
 		);
 
-		$this->_ee->db->setReturnReference('get_where', $db_result);
+		$this->_ee->db->setReturnReference('get', $db_result);
 		$db_result->setReturnValue('result_array', $db_rows);
 
-		foreach ($db_rows AS $db_row)
-		{
-			$expected_result[] = new EI_template($db_row);
-		}
+        $expected_result = array(
+            new EI_template($db_rows[0]),
+            new EI_template($db_rows[2])
+        );
 
 		$actual_result = $this->_subject->get_templates_by_template_group($group_id);
 		$this->assertIdentical(count($actual_result), count($expected_result));
@@ -814,7 +966,7 @@ class Test_crumbly_model extends Testee_unit_test_case {
 		$group_id	= 10;
 		$db_result	= $this->_get_mock('db_query');
 
-		$this->_ee->db->setReturnReference('get_where', $db_result);
+		$this->_ee->db->setReturnReference('get', $db_result);
 		$db_result->setReturnValue('result_array', array());
 	
 		$this->assertIdentical(array(), $this->_subject->get_templates_by_template_group($group_id));
@@ -825,8 +977,7 @@ class Test_crumbly_model extends Testee_unit_test_case {
 	{
 		$group_id = FALSE;
 
-		$this->_ee->db->expectNever('select');
-		$this->_ee->db->expectNever('get_where');
+		$this->_ee->db->expectNever('get');
 		$this->assertIdentical(FALSE, $this->_subject->get_templates_by_template_group($group_id));
 	}
 

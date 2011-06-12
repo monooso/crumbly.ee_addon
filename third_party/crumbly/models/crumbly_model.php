@@ -18,13 +18,27 @@ require_once PATH_THIRD .'crumbly/classes/EI_template_group' .EXT;
 
 class Crumbly_model extends CI_Model {
 	
-	private $_crumbly_glossary;
-	private $_crumbly_groups;
-	private $_crumbly_templates;
 	private $_ee;
+    private $_namespace;
 	private $_package_name;
 	private $_package_version;
 	private $_site_id;
+
+
+    /* --------------------------------------------------------------
+     * PRIVATE METHODS
+     * ------------------------------------------------------------ */
+    
+    /**
+     * Returns a reference to the package cache.
+     *
+     * @access  private
+     * @return  array
+     */
+    private function &_get_cache()
+    {
+        return $this->_ee->session->cache[$this->get_namespace()][$this->get_package_name()];
+    }
 	
 	
 	
@@ -38,15 +52,28 @@ class Crumbly_model extends CI_Model {
 	 * @access	public
 	 * @param 	string		$package_name		The package name. Used during testing.
 	 * @param	string		$package_version	The package version. Used during testing.
+	 * @param	string		$namespace          The global namespace. Used during testing.
 	 * @return	void
 	 */
-	public function __construct($package_name = '', $package_version = '')
+	public function __construct($package_name = '', $package_version = '', $namespace = '')
 	{
 		parent::__construct();
 
 		$this->_ee 				=& get_instance();
-		$this->_package_name	= $package_name ? $package_name : 'crumbly';
+        $this->_namespace       = $namespace ? strtolower($namespace) : 'experience';
+		$this->_package_name	= $package_name ? strtolower($package_name) : 'crumbly';
 		$this->_package_version	= $package_version ? $package_version : '0.9.0';
+
+        // Initialise the add-on cache.
+        if ( ! array_key_exists($this->_namespace, $this->_ee->session->cache))
+        {
+            $this->_ee->session->cache[$this->_namespace] = array();
+        }
+
+        if ( ! array_key_exists($this->_package_name, $this->_ee->session->cache[$this->_namespace]))
+        {
+            $this->_ee->session->cache[$this->_namespace][$this->_package_name] = array();
+        }
 	}
 
 
@@ -97,18 +124,25 @@ class Crumbly_model extends CI_Model {
 	 */
 	public function get_all_categories()
 	{
-		$db_categories = $this->_ee->db
-			->select('cat_id, cat_name, cat_url_title')
-			->get_where('categories', array('site_id' => $this->get_site_id()));
+        $cache =& $this->_get_cache();
 
-		$categories = array();
+        if ( ! array_key_exists('categories', $cache))
+        {
+            $db_categories = $this->_ee->db
+                ->select('cat_id, cat_name, cat_url_title')
+                ->get_where('categories', array('site_id' => $this->get_site_id()));
 
-		foreach ($db_categories->result_array() AS $db_category)
-		{
-			$categories[] = new EI_category($db_category);
-		}
+            $categories = array();
 
-		return $categories;
+            foreach ($db_categories->result_array() AS $db_category)
+            {
+                $categories[] = new EI_category($db_category);
+            }
+            
+            $cache['categories'] = $categories;
+        }
+
+		return $cache['categories'];
 	}
 
 
@@ -120,21 +154,25 @@ class Crumbly_model extends CI_Model {
 	 */
 	public function get_all_crumbly_glossary_terms()
 	{
-		if ( ! $this->_crumbly_glossary)
+        $cache =& $this->_get_cache();
+
+		if ( ! array_key_exists('crumbly_glossary', $cache))
 		{
 			$db_terms = $this->_ee->db
 				->select('glossary_definition, glossary_term')
 				->get_where('crumbly_glossary', array('site_id' => $this->get_site_id()));
 
-			$this->_crumbly_glossary = array();
+			$glossary = array();
 
 			foreach ($db_terms->result_array() AS $db_term)
 			{
-				$this->_crumbly_glossary[] = new Crumbly_glossary_term($db_term);
+				$glossary[] = new Crumbly_glossary_term($db_term);
 			}
+
+            $cache['crumbly_glossary'] = $glossary;
 		}
 
-		return $this->_crumbly_glossary;
+        return $cache['crumbly_glossary'];
 	}
 
 
@@ -146,21 +184,25 @@ class Crumbly_model extends CI_Model {
 	 */
 	public function get_all_crumbly_templates()
 	{
-		if ( ! $this->_crumbly_templates)
+        $cache =& $this->_get_cache();
+
+        if ( ! array_key_exists('crumbly_templates', $cache))
 		{
 			$db_templates = $this->_ee->db
 				->select('label, template_id')
 				->get_where('crumbly_templates', array('site_id' => $this->get_site_id()));
 
-			$this->_crumbly_templates = array();
+            $templates = array();
 
 			foreach ($db_templates->result_array() AS $db_template)
 			{
-				$this->_crumbly_templates[] = new Crumbly_template($db_template);
+				$templates[] = new Crumbly_template($db_template);
 			}
+
+            $cache['crumbly_templates'] = $templates;
 		}
 
-		return $this->_crumbly_templates;
+        return $cache['crumbly_templates'];
 	}
 
 
@@ -172,21 +214,25 @@ class Crumbly_model extends CI_Model {
 	 */
 	public function get_all_crumbly_template_groups()
 	{
-		if ( ! $this->_crumbly_groups)
+        $cache =& $this->_get_cache();
+
+        if ( ! array_key_exists('crumbly_template_groups', $cache))
 		{
 			$db_groups = $this->_ee->db
 				->select('group_id, label')
 				->get_where('crumbly_template_groups', array('site_id' => $this->get_site_id()));
 
-			$this->_crumbly_groups = array();
+            $groups = array();
 
 			foreach ($db_groups->result_array() AS $db_group)
 			{
-				$this->_crumbly_groups[] = new Crumbly_template_group($db_group);
+				$groups[] = new Crumbly_template_group($db_group);
 			}
+
+            $cache['crumbly_template_groups'] = $groups;
 		}
 
-		return $this->_crumbly_groups;
+        return $cache['crumbly_template_groups'];
 	}
 
 
@@ -198,18 +244,31 @@ class Crumbly_model extends CI_Model {
 	 */
 	public function get_all_templates()
 	{
-		$db_templates = $this->_ee->db
-			->select('group_id, template_id, template_name')
-			->get_where('templates', array('site_id' => $this->get_site_id(), 'template_type' => 'webpage'));
+        $cache =& $this->_get_cache();
 
-		$templates = array();
+        if ( ! array_key_exists('templates', $cache))
+        {
+            $hidden = ($hidden = $this->_ee->config->item('hidden_template_indicator'))
+                ? $hidden
+                : '.';
 
-		foreach ($db_templates->result_array() AS $db_template)
-		{
-			$templates[] = new EI_template($db_template);
-		}
+            $db_templates = $this->_ee->db
+                ->select('group_id, template_id, template_name')
+                ->where(array('site_id' => $this->get_site_id(), 'template_type' => 'webpage'))
+                ->not_like('template_name', $hidden, 'after')
+                ->get('templates');
 
-		return $templates;
+            $templates = array();
+
+            foreach ($db_templates->result_array() AS $db_template)
+            {
+                $templates[] = new EI_template($db_template);
+            }
+
+            $cache['templates'] = $templates;
+        }
+
+		return $cache['templates'];
 	}
 
 
@@ -221,18 +280,30 @@ class Crumbly_model extends CI_Model {
 	 */
 	public function get_all_template_groups()
 	{
-		$db_groups = $this->_ee->db
-			->select('group_id, group_name')
-			->get_where('template_groups', array('site_id' => $this->get_site_id()));
+        $cache =& $this->_get_cache();
+        if ( ! array_key_exists('template_groups', $cache))
+        {
+            $hidden = ($hidden = $this->_ee->config->item('hidden_template_indicator'))
+                ? $hidden
+                : '.';
 
-		$groups = array();
+            $db_groups = $this->_ee->db
+                ->select('group_id, group_name')
+                ->where('site_id', $this->get_site_id())
+                ->not_like('group_name', $hidden, 'after')
+                ->get('template_groups');
 
-		foreach ($db_groups->result_array() AS $db_group)
-		{
-			$groups[] = new EI_template_group($db_group);
-		}
+            $groups = array();
 
-		return $groups;
+            foreach ($db_groups->result_array() AS $db_group)
+            {
+                $groups[] = new EI_template_group($db_group);
+            }
+
+            $cache['template_groups'] = $groups;
+        }
+
+        return $cache['template_groups'];
 	}
 
 
@@ -358,6 +429,18 @@ class Crumbly_model extends CI_Model {
 			? new Crumbly_template_group($db_group->row_array())
 			: FALSE;
 	}
+
+
+    /**
+     * Returns the namespace.
+     *
+     * @access  public
+     * @return  string
+     */
+    public function get_namespace()
+    {
+        return $this->_namespace;
+    }
 	
 	
 	/**
@@ -432,18 +515,18 @@ class Crumbly_model extends CI_Model {
 			return FALSE;
 		}
 
-		$db_templates = $this->_ee->db
-			->select('group_id, template_id, template_name')
-			->get_where('templates', array('group_id' => $group_id, 'template_type' => 'webpage'));
+        $all_templates = $this->get_all_templates();
+		$group_templates = array();
 
-		$templates = array();
+        foreach ($all_templates AS $template)
+        {
+            if ($template->get_group_id() == $group_id)
+            {
+                $group_templates[] = $template;
+            }
+        }
 
-		foreach ($db_templates->result_array() AS $db_template)
-		{
-			$templates[] = new EI_template($db_template);
-		}
-
-		return $templates;
+		return $group_templates;
 	}
 	
 	

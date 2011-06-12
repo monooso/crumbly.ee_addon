@@ -16,8 +16,8 @@
 			<td><?=form_dropdown('templates[0][template_id]', $templates_dd); ?></td>
 			<td><input type="text" name="templates[0][label]"></td>
 			<td class="act">
-				<a class="remove btn" href="#"><img height="17" src="/themes/third_party/crumbly/img/minus.png" width="16"></a>
-				<a class="add btn" href="#"><img height="17" src="/themes/third_party/crumbly/img/plus.png" width="16"></a>
+				<a class="remove_row btn" href="#"><img height="17" src="/themes/third_party/crumbly/img/minus.png" width="16"></a>
+				<a class="add_row btn" href="#"><img height="17" src="/themes/third_party/crumbly/img/plus.png" width="16"></a>
 			</td>
 		</tr>
 		<?php
@@ -26,10 +26,10 @@
 		?>
 			<tr class="row">
 				<td><?=form_dropdown('templates[0][template_id]', $templates_dd, $template->get_template_id()); ?></td>
-				<td><input type="text" name="templates[0][label]" value="<?=$template->get_label(); ?>"></td>
+				<td><input type="text" name="templates[0][label]" value="<?=form_prep($template->get_label()); ?>"></td>
 				<td class="act">
-					<a class="remove btn" href="#"><img height="17" src="/themes/third_party/crumbly/img/minus.png" width="16"></a>
-					<a class="add btn" href="#"><img height="17" src="/themes/third_party/crumbly/img/plus.png" width="16"></a>
+					<a class="remove_row btn" href="#"><img height="17" src="/themes/third_party/crumbly/img/minus.png" width="16"></a>
+					<a class="add_row btn" href="#"><img height="17" src="/themes/third_party/crumbly/img/plus.png" width="16"></a>
 				</td>
 			</tr>
 		<?php
@@ -41,6 +41,6 @@
 
 </div><!-- /#crumbly -->
 
-<div class="submit_wrapper"><?=form_submit(array('name' => 'submit', 'value' => lang('lbl_save_templates'), 'class' => 'submit')); ?></div>
+<p><?=form_submit(array('name' => 'submit', 'value' => lang('lbl_save_templates'), 'class' => 'submit')); ?></p>
 
 <?=form_close(); ?>
