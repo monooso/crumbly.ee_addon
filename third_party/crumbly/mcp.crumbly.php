@@ -203,7 +203,7 @@ class Crumbly_mcp {
 	public function templates()
 	{
 		$template_groups	= $this->_model->get_all_template_groups();
-		$templates_dd		= array();
+		$templates_dd		= array('' => $this->_ee->lang->line('lbl_template_prompt'));
 
 		// Prepare the drop down options arrays.
 		foreach ($template_groups AS $template_group)
@@ -251,7 +251,7 @@ class Crumbly_mcp {
 	public function template_groups()
 	{
 		$template_groups	= $this->_model->get_all_template_groups();
-		$template_groups_dd	= array();
+		$template_groups_dd	= array('' => $this->_ee->lang->line('lbl_template_group_prompt'));
 
 		// Prepare the drop down options arrays.
 		foreach ($template_groups AS $template_group)

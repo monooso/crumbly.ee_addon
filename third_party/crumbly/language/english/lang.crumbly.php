@@ -36,6 +36,9 @@ $lang = array(
 'lbl_save_templates'			=> 'Save Templates',
 'lbl_save_template_groups'		=> 'Save Template Groups',
 
+'lbl_template_prompt'           => 'Select a template&hellip;',
+'lbl_template_group_prompt'     => 'Select a template group&hellip;',
+
 // Status messages.
 'msg_categories_saved'			=> 'Your categories have been saved.',
 'msg_categories_not_saved'		=> 'There was a problem saving one or more of your categories.',
