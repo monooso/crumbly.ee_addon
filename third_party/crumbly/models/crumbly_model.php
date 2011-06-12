@@ -248,9 +248,15 @@ class Crumbly_model extends CI_Model {
 
         if ( ! array_key_exists('templates', $cache))
         {
+            $hidden = ($hidden = $this->_ee->config->item('hidden_template_indicator'))
+                ? $hidden
+                : '.';
+
             $db_templates = $this->_ee->db
                 ->select('group_id, template_id, template_name')
-                ->get_where('templates', array('site_id' => $this->get_site_id(), 'template_type' => 'webpage'));
+                ->where(array('site_id' => $this->get_site_id(), 'template_type' => 'webpage'))
+                ->not_like('template_name', $hidden, 'after')
+                ->get('templates');
 
             $templates = array();
 
@@ -277,9 +283,15 @@ class Crumbly_model extends CI_Model {
         $cache =& $this->_get_cache();
         if ( ! array_key_exists('template_groups', $cache))
         {
+            $hidden = ($hidden = $this->_ee->config->item('hidden_template_indicator'))
+                ? $hidden
+                : '.';
+
             $db_groups = $this->_ee->db
                 ->select('group_id, group_name')
-                ->get_where('template_groups', array('site_id' => $this->get_site_id()));
+                ->where('site_id', $this->get_site_id())
+                ->not_like('group_name', $hidden, 'after')
+                ->get('template_groups');
 
             $groups = array();
 
