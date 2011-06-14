@@ -13,7 +13,7 @@ $lang = array(
  * REQUIRED
  * ------------------------------------------------------------ */
 'crumbly_module_name'			=> 'Crumbly',
-'crumbly_module_description'	=> 'Breadcrumbs made simple.',
+'crumbly_module_description'	=> 'Custom breadcrumbs made easy.',
 
 /* --------------------------------------------------------------
  * MODULE TEMPLATE TAGS
