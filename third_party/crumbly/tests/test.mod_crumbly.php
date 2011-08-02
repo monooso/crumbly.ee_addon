@@ -1100,15 +1100,15 @@ class Test_crumbly extends Testee_unit_test_case {
         $segment_2_title    = 'Our People';
         $segment_3_title    = 'Mr. Jonathan Doe';
 
-        $this->_model->expectCallCount('get_channel_entry_title_from_entry_id', 2);
+        $this->_model->expectCallCount('get_channel_entry_title_from_segment', 2);
 
         // 'people' segment title.
-        $this->_model->expectAt(0, 'get_channel_entry_title_from_entry_id', array(10));
-        $this->_model->setReturnValueAt(0, 'get_channel_entry_title_from_entry_id', $segment_2_title);
+        $this->_model->expectAt(0, 'get_channel_entry_title_from_segment', array(10));
+        $this->_model->setReturnValueAt(0, 'get_channel_entry_title_from_segment', $segment_2_title);
 
         // 'john-doe' segment title.
-        $this->_model->expectAt(1, 'get_channel_entry_title_from_entry_id', array(20));
-        $this->_model->setReturnValueAt(1, 'get_channel_entry_title_from_entry_id', $segment_3_title);
+        $this->_model->expectAt(1, 'get_channel_entry_title_from_segment', array(20));
+        $this->_model->setReturnValueAt(1, 'get_channel_entry_title_from_segment', $segment_3_title);
 
         // These should never be called.
         $this->_model->expectNever('get_category_from_segment');
@@ -1180,19 +1180,19 @@ class Test_crumbly extends Testee_unit_test_case {
         $segment_2_title    = 'Our People';
         $segment_3_title    = 'Mr. Jonathan Doe';
 
-        $this->_model->expectCallCount('get_channel_entry_title_from_entry_id', 2);
+        $this->_model->expectCallCount('get_channel_entry_title_from_segment', 2);
 
         // Unassinged 'about' segment title.
         $this->_model->expectOnce('humanize', array($segments[1]));
         $this->_model->setReturnValue('humanize', $segment_1_title, array($segments[1]));
 
         // 'people' segment title.
-        $this->_model->expectAt(0, 'get_channel_entry_title_from_entry_id', array(10));
-        $this->_model->setReturnValueAt(0, 'get_channel_entry_title_from_entry_id', $segment_2_title);
+        $this->_model->expectAt(0, 'get_channel_entry_title_from_segment', array(10));
+        $this->_model->setReturnValueAt(0, 'get_channel_entry_title_from_segment', $segment_2_title);
 
         // 'john-doe' segment title.
-        $this->_model->expectAt(1, 'get_channel_entry_title_from_entry_id', array(20));
-        $this->_model->setReturnValueAt(1, 'get_channel_entry_title_from_entry_id', $segment_3_title);
+        $this->_model->expectAt(1, 'get_channel_entry_title_from_segment', array(20));
+        $this->_model->setReturnValueAt(1, 'get_channel_entry_title_from_segment', $segment_3_title);
 
         // These should never be called.
         $this->_model->expectNever('get_category_from_segment');

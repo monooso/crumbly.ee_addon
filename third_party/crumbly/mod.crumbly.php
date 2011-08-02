@@ -290,7 +290,7 @@ class Crumbly {
             {
                 if (preg_match($pattern, $url_title))
                 {
-                    $breadcrumb_title = ($breadcrumb_title = $this->_model->get_channel_entry_title_from_entry_id($entry_id))
+                    $breadcrumb_title = ($breadcrumb_title = $this->_model->get_channel_entry_title_from_segment($entry_id))
                         ? $breadcrumb_title : $this->_model->humanize($segment);
 
                     $breadcrumbs[] = array(
