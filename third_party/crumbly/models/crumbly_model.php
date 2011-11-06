@@ -6,7 +6,7 @@
  * @author          Stephen Lewis <stephen@experienceinternet.co.uk>
  * @copyright       Experience Internet
  * @package         Crumbly
- * @version         1.0.1
+ * @version         1.0.2
  */
 
 require_once PATH_THIRD .'crumbly/classes/crumbly_glossary_term' .EXT;
@@ -62,7 +62,7 @@ class Crumbly_model extends CI_Model {
         $this->_ee              =& get_instance();
         $this->_namespace       = $namespace ? strtolower($namespace) : 'experience';
         $this->_package_name    = $package_name ? strtolower($package_name) : 'crumbly';
-        $this->_package_version = $package_version ? $package_version : '1.0.1';
+        $this->_package_version = $package_version ? $package_version : '1.0.2';
 
         // Initialise the add-on cache.
         if ( ! array_key_exists($this->_namespace, $this->_ee->session->cache))
