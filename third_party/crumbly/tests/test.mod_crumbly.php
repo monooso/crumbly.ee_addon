@@ -10,7 +10,7 @@
 
 require_once PATH_THIRD .'crumbly/mod.crumbly' .EXT;
 require_once PATH_THIRD .'crumbly/classes/EI_category' .EXT;
-require_once PATH_THIRD .'crumbly/tests/mocks/mock.crumbly_model' .EXT;
+require_once PATH_THIRD .'crumbly/models/crumbly_model' .EXT;
 
 class Test_crumbly extends Testee_unit_test_case {
     
@@ -34,15 +34,13 @@ class Test_crumbly extends Testee_unit_test_case {
     parent::setUp();
     
     // Generate the mock model.
-    Mock::generate('Mock_crumbly_model', get_class($this) .'_mock_model');
-    $this->_model = $this->_get_mock('model');
-    $this->EE->crumbly_model =& $this->_model;
+    Mock::generate('Crumbly_model', get_class($this) .'_mock_model');
+    $this->_model             = $this->_get_mock('model');
+    $this->EE->crumbly_model  = $this->_model;
 
-    // Site ID.
     $this->_site_id = 10;
     $this->EE->crumbly_model->setReturnValue('get_site_id', $this->_site_id);
     
-    // The test subject.
     $this->_subject = new Crumbly();
   }
   
@@ -261,14 +259,6 @@ class Test_crumbly extends Testee_unit_test_case {
     $segments[2]    = $template;
 
     $this->EE->uri->setReturnValue('segment_array', $segments);
-
-    // Retrieve the package settings.
-    $settings = array(
-      'glossary' => array(),
-      'template_groups' => array()
-    );
-
-    $this->_model->setReturnValue('get_package_settings', $settings);
 
     // Retrieve the tag parameters (no root breadcrumb).
     $this->EE->TMPL->setReturnValue('fetch_param', 'no', array('root_breadcrumb:include', 'yes'));
