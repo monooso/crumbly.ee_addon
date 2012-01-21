@@ -3,110 +3,81 @@
 /**
  * Crumbly module update.
  *
- * @author			Stephen Lewis <stephen@experienceinternet.co.uk>
- * @copyright		Experience Internet
- * @package			Crumbly */
+ * @author      Stephen Lewis <stephen@experienceinternet.co.uk>
+ * @copyright   Experience Internet
+ * @package     Crumbly */
 
 class Crumbly_upd {
-	
-	/* --------------------------------------------------------------
-	 * PRIVATE PROPERTIES
-	 * ------------------------------------------------------------ */
+  
+  public $version;
+  
+  private $EE;
+  private $_model;
+  
+  
+  
+  /* --------------------------------------------------------------
+   * PUBLIC METHODS
+   * ------------------------------------------------------------ */
+  
+  /**
+   * Constructor.
+   *
+   * @access  public
+   * @return  void
+   */
+  public function __construct()
+  {
+    $this->EE =& get_instance();
 
-	/**
-	 * Version.
-	 *
-	 * @access	public
-	 * @var		string
-	 */
-	public $version;
-	
-	
-	
-	/* --------------------------------------------------------------
-	 * PRIVATE PROPERTIES
-	 * ------------------------------------------------------------ */
-	
-	/**
-	 * ExpressionEngine object reference.
-	 *
-	 * @access	private
-	 * @var		object
-	 */
-	private $_ee;
-	
-	/**
-	 * Model.
-	 *
-	 * @access	private
-	 * @var		object
-	 */
-	private $_model;
-	
-	
-	
-	/* --------------------------------------------------------------
-	 * PUBLIC METHODS
-	 * ------------------------------------------------------------ */
-	
-	/**
-	 * Constructor.
-	 *
-	 * @access	public
-	 * @return	void
-	 */
-	public function __construct()
-	{
-		$this->_ee =& get_instance();
+    // We need to explicitly set the package path.
+    $this->EE->load->add_package_path(PATH_THIRD .'crumbly/');
+    $this->EE->load->model('crumbly_model');
 
-		// We need to explicitly set the package path.
-		$this->_ee->load->add_package_path(PATH_THIRD .'crumbly/');
-		$this->_ee->load->model('crumbly_model');
-		$this->_model = $this->_ee->crumbly_model;
-		
-		// Set the version.
-		$this->version = $this->_model->get_package_version();
-	}
-	
-	
-	/**
-	 * Installs the module.
-	 *
-	 * @access	public
-	 * @return	bool
-	 */
-	public function install()
-	{
-		return $this->_model->install_module();
-	}
+    $this->_model   = $this->EE->crumbly_model;
+    $this->version  = $this->_model->get_package_version();
+  }
+  
+  
+  /**
+   * Installs the module.
+   *
+   * @access  public
+   * @return  bool
+   */
+  public function install()
+  {
+    return $this->_model->install_module();
+  }
 
 
-	/**
-	 * Uninstalls the module.
-	 *
-	 * @access	public
-	 * @return	bool
-	 */
-	public function uninstall()
-	{
-		return $this->_model->uninstall_module();
-	}
+  /**
+   * Uninstalls the module.
+   *
+   * @access  public
+   * @return  bool
+   */
+  public function uninstall()
+  {
+    return $this->_model->uninstall_module();
+  }
 
 
-	/**
-	 * Updates the module.
-	 *
-	 * @access	public
-	 * @param	string		$installed_version		The installed version.
-	 * @return	bool
-	 */
-	public function update($installed_version = '')
-	{
-		return $this->_model->update_module($installed_version);
-	}
-	
+  /**
+   * Updates the module.
+   *
+   * @access  public
+   * @param string    $installed_version    The installed version.
+   * @return  bool
+   */
+  public function update($installed_version = '')
+  {
+    return $this->_model->update_module($installed_version);
+  }
+
+
 }
 
 
-/* End of file		: upd.crumbly.php */
-/* File location	: third_party/crumbly/upd.crumbly.php */
+/* End of file    : upd.crumbly.php */
+/* File location  : third_party/crumbly/upd.crumbly.php */
