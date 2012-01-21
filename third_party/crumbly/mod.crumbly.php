@@ -20,7 +20,7 @@ class Crumbly {
 
   public $return_data = '';
   
-  private $_ee;
+  private $EE;
   private $_model;
   
   
@@ -37,9 +37,9 @@ class Crumbly {
    */
   public function __construct()
   {
-    $this->_ee =& get_instance();
-    $this->_ee->load->model('crumbly_model');
-    $this->_model = $this->_ee->crumbly_model;
+    $this->EE =& get_instance();
+    $this->EE->load->model('crumbly_model');
+    $this->_model = $this->EE->crumbly_model;
   }
   
   
@@ -57,10 +57,10 @@ class Crumbly {
   public function breadcrumbs()
   {
     // Shortcuts.
-    $config = $this->_ee->config;
-    $fns    = $this->_ee->functions;
-    $lang   = $this->_ee->lang;
-    $tmpl   = $this->_ee->TMPL;
+    $config = $this->EE->config;
+    $fns    = $this->EE->functions;
+    $lang   = $this->EE->lang;
+    $tmpl   = $this->EE->TMPL;
 
     /**
      * The segments array, as retrieved from the EE URI class, is 1-based.
@@ -68,8 +68,12 @@ class Crumbly {
      * zero-based array, before proceeding.
      */
 
-    $segments       = array_values($this->_ee->uri->segment_array());
+    $segments       = array_values($this->EE->uri->segment_array());
     $breadcrumbs    = array();
+
+    // Should we reverse the order of the returned breadcrumbs (useful for a 
+    // "title trail")?
+    $reverse = ($tmpl->fetch_param('breadcrumbs:reverse') == 'yes');
 
     // Is this a 'Pages' page?
     $pages          = ($site_pages = $config->item('site_pages')) ? $site_pages[$this->_model->get_site_id()]['uris'] : array();
@@ -87,7 +91,8 @@ class Crumbly {
 
     if ($pages_url)
     {
-      $breadcrumbs = $this->_build_breadcrumbs_from_pages_url($segments, $pages);
+      $breadcrumbs = $this->_build_breadcrumbs_from_pages_url(
+        $segments, $pages, $reverse);
     }
     else
     {
@@ -95,7 +100,8 @@ class Crumbly {
       $url_pattern = ($url_pattern = $tmpl->fetch_param('custom_url:pattern'))
         ? $url_pattern : '';
 
-      $breadcrumbs = $this->_build_breadcrumbs_from_url_pattern($segments, $url_pattern);
+      $breadcrumbs = $this->_build_breadcrumbs_from_url_pattern(
+        $segments, $url_pattern, $reverse);
     }
 
     // Include a 'root' breadcrumb?
@@ -123,15 +129,18 @@ class Crumbly {
    * Builds a breadcrumbs array, based on a custom user-supplied URL structure.
    *
    * @access  private
-   * @param   array       $segments       The URL segments. Zero-based.
-   * @param   string      $pattern        The custom URL pattern. Optional.
+   * @param   array     $segments     The URL segments. Zero-based.
+   * @param   string    $pattern      The custom URL pattern. Optional.
+   * @param   bool      $reverse      Reverse the breadcrumbs?
    * @return  array
    */
-  private function _build_breadcrumbs_from_url_pattern(Array $segments = array(), $pattern = '')
+  private function _build_breadcrumbs_from_url_pattern(
+    Array $segments = array(), $pattern = '', $reverse = FALSE
+  )
   {
-    $config = $this->_ee->config;
-    $fns    = $this->_ee->functions;
-    $tmpl   = $this->_ee->TMPL;
+    $config = $this->EE->config;
+    $fns    = $this->EE->functions;
+    $tmpl   = $this->EE->TMPL;
 
     $reserved_category_word = $config->item('reserved_category_word');
     $use_category_name      = (strtolower($config->item('use_category_name')) == 'y' && $reserved_category_word);
@@ -254,12 +263,17 @@ class Crumbly {
       }
 
       // Add the breadcrumb.
-      $segments_thus_far[]    = $segment;
-      $breadcrumbs[]          = array(
-        'breadcrumb_segment'    => $segment,
-        'breadcrumb_title'      => $breadcrumb_title,
-        'breadcrumb_url'        => $fns->create_url(implode('/', $segments_thus_far))
+      $segments_thus_far[]  = $segment;
+      $breadcrumbs[]        = array(
+        'breadcrumb_segment'  => $segment,
+        'breadcrumb_title'    => $breadcrumb_title,
+        'breadcrumb_url'  => $fns->create_url(implode('/', $segments_thus_far))
       );
+    }
+
+    if ($reverse === TRUE)
+    {
+      $breadcrumbs = array_reverse($breadcrumbs);
     }
 
     return $breadcrumbs;
@@ -270,13 +284,16 @@ class Crumbly {
    * Builds the breadcrumbs array for a 'Pages' URL.
    *
    * @access    public
-   * @param    array        $segments        The URL segments.
-   * @param    array        $pages        The 'Pages' for this site.
+   * @param     array     $segments     The URL segments.
+   * @param     array     $pages        The 'Pages' for this site.
+   * @param     bool      $reverse      Reverse the breadcrumbs?
    * @return    array
    */
-  public function _build_breadcrumbs_from_pages_url(Array $segments = array(), Array $pages = array())
+  public function _build_breadcrumbs_from_pages_url(
+    Array $segments = array(), Array $pages = array(), $reverse = FALSE
+  )
   {
-    $tmpl               = $this->_ee->TMPL;
+    $tmpl               = $this->EE->TMPL;
     $breadcrumbs        = array();
     $segments_thus_far  = array();
     $include_unassigned = (strtolower($tmpl->fetch_param('pages:include_unassigned', 'no')) == 'yes');
@@ -297,7 +314,7 @@ class Crumbly {
           $breadcrumbs[] = array(
             'breadcrumb_segment'    => $segment,
             'breadcrumb_title'      => $breadcrumb_title,
-            'breadcrumb_url'        => $this->_ee->functions->create_url(implode('/', $segments_thus_far))
+            'breadcrumb_url'        => $this->EE->functions->create_url(implode('/', $segments_thus_far))
           );
 
           $page_found = TRUE;
@@ -313,6 +330,11 @@ class Crumbly {
           'breadcrumb_url'        => ''
         );
       }
+    }
+
+    if ($reverse === TRUE)
+    {
+      $breadcrumbs = array_reverse($breadcrumbs);
     }
 
     return $breadcrumbs;
