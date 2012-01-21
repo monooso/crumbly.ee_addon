@@ -32,7 +32,7 @@ class Test_crumbly_cp extends Testee_unit_test_case {
 		
 		Mock::generate('Mock_crumbly_model', get_class($this) .'_mock_model');
 		$this->_model				= $this->_get_mock('model');
-		$this->_ee->crumbly_model	= $this->_model;
+		$this->EE->crumbly_model	= $this->_model;
 		
 		$this->_subject = new Crumbly_mcp();
 	}
@@ -45,7 +45,7 @@ class Test_crumbly_cp extends Testee_unit_test_case {
 			array('glossary_term' => 'staff', 'glossary_definition' => 'Corporate Minions')
 		);
 
-		$this->_ee->input->setReturnValue('post', $input, array('glossary'));
+		$this->EE->input->setReturnValue('post', $input, array('glossary'));
 
 		$this->_model->expectOnce('delete_all_crumbly_glossary_terms');
 		$this->_model->expectCallCount('save_crumbly_glossary_term', count($input));
@@ -58,9 +58,9 @@ class Test_crumbly_cp extends Testee_unit_test_case {
 		}
 
 		$message = 'message';
-		$this->_ee->lang->setReturnValue('line', $message, array('msg_glossary_terms_saved'));
-		$this->_ee->session->expectOnce('set_flashdata', array('message_success', $message));
-		$this->_ee->functions->expectOnce('redirect', array(new PatternExpectation('/method=glossary/')));
+		$this->EE->lang->setReturnValue('line', $message, array('msg_glossary_terms_saved'));
+		$this->EE->session->expectOnce('set_flashdata', array('message_success', $message));
+		$this->EE->functions->expectOnce('redirect', array(new PatternExpectation('/method=glossary/')));
 	
 		$this->_subject->save_glossary();
 	}
@@ -73,16 +73,16 @@ class Test_crumbly_cp extends Testee_unit_test_case {
 			array('glossary_term' => 'staff', 'glossary_definition' => 'Corporate Minions')
 		);
 
-		$this->_ee->input->setReturnValue('post', $input, array('glossary'));
+		$this->EE->input->setReturnValue('post', $input, array('glossary'));
 
 		$this->_model->expectOnce('delete_all_crumbly_glossary_terms');
 		$this->_model->expectCallCount('save_crumbly_glossary_term', count($input));
 		$this->_model->setReturnValue('save_crumbly_glossary_term', FALSE);
 
 		$message = 'message';
-		$this->_ee->lang->setReturnValue('line', $message, array('msg_glossary_terms_not_saved'));
-		$this->_ee->session->expectOnce('set_flashdata', array('message_failure', $message));
-		$this->_ee->functions->expectOnce('redirect', array(new PatternExpectation('/method=glossary/')));
+		$this->EE->lang->setReturnValue('line', $message, array('msg_glossary_terms_not_saved'));
+		$this->EE->session->expectOnce('set_flashdata', array('message_failure', $message));
+		$this->EE->functions->expectOnce('redirect', array(new PatternExpectation('/method=glossary/')));
 	
 		$this->_subject->save_glossary();
 	}
@@ -91,15 +91,15 @@ class Test_crumbly_cp extends Testee_unit_test_case {
 	public function test__save_glossary__no_input()
 	{
 		$input = FALSE;
-		$this->_ee->input->setReturnValue('post', $input, array('glossary'));
+		$this->EE->input->setReturnValue('post', $input, array('glossary'));
 
 		$this->_model->expectOnce('delete_all_crumbly_glossary_terms');
 		$this->_model->expectNever('save_crumbly_glossary_term');
 		
 		$message = 'message';
-		$this->_ee->lang->setReturnValue('line', $message, array('msg_glossary_terms_saved'));
-		$this->_ee->session->expectOnce('set_flashdata', array('message_success', $message));
-		$this->_ee->functions->expectOnce('redirect', array(new PatternExpectation('/method=glossary/')));
+		$this->EE->lang->setReturnValue('line', $message, array('msg_glossary_terms_saved'));
+		$this->EE->session->expectOnce('set_flashdata', array('message_success', $message));
+		$this->EE->functions->expectOnce('redirect', array(new PatternExpectation('/method=glossary/')));
 	
 		$this->_subject->save_glossary();
 	}
@@ -112,7 +112,7 @@ class Test_crumbly_cp extends Testee_unit_test_case {
 			array('template_id' => '20', 'label' => 'Another Lovely Template')
 		);
 
-		$this->_ee->input->setReturnValue('post', $input, array('templates'));
+		$this->EE->input->setReturnValue('post', $input, array('templates'));
 
 		$this->_model->expectOnce('delete_all_crumbly_templates');
 		$this->_model->expectCallCount('save_crumbly_template', count($input));
@@ -125,9 +125,9 @@ class Test_crumbly_cp extends Testee_unit_test_case {
 		}
 
 		$message = 'message';
-		$this->_ee->lang->setReturnValue('line', $message, array('msg_templates_saved'));
-		$this->_ee->session->expectOnce('set_flashdata', array('message_success', $message));
-		$this->_ee->functions->expectOnce('redirect', array(new PatternExpectation('/method=templates/')));
+		$this->EE->lang->setReturnValue('line', $message, array('msg_templates_saved'));
+		$this->EE->session->expectOnce('set_flashdata', array('message_success', $message));
+		$this->EE->functions->expectOnce('redirect', array(new PatternExpectation('/method=templates/')));
 
 		$this->_subject->save_templates();
 	}
@@ -140,16 +140,16 @@ class Test_crumbly_cp extends Testee_unit_test_case {
 			array('template_id' => '20', 'label' => 'Another Lovely Template')
 		);
 
-		$this->_ee->input->setReturnValue('post', $input, array('templates'));
+		$this->EE->input->setReturnValue('post', $input, array('templates'));
 
 		$this->_model->expectOnce('delete_all_crumbly_templates');
 		$this->_model->expectCallCount('save_crumbly_template', count($input));
 		$this->_model->setReturnValue('save_crumbly_template', FALSE);
 
 		$message = 'message';
-		$this->_ee->lang->setReturnValue('line', $message, array('msg_templates_not_saved'));
-		$this->_ee->session->expectOnce('set_flashdata', array('message_failure', $message));
-		$this->_ee->functions->expectOnce('redirect', array(new PatternExpectation('/method=templates/')));
+		$this->EE->lang->setReturnValue('line', $message, array('msg_templates_not_saved'));
+		$this->EE->session->expectOnce('set_flashdata', array('message_failure', $message));
+		$this->EE->functions->expectOnce('redirect', array(new PatternExpectation('/method=templates/')));
 	
 		$this->_subject->save_templates();
 	}
@@ -158,15 +158,15 @@ class Test_crumbly_cp extends Testee_unit_test_case {
 	public function test__save_templates__no_input()
 	{
 		$input = FALSE;
-		$this->_ee->input->setReturnValue('post', $input, array('templates'));
+		$this->EE->input->setReturnValue('post', $input, array('templates'));
 
 		$this->_model->expectOnce('delete_all_crumbly_templates');
 		$this->_model->expectNever('save_crumbly_template');
 		
 		$message = 'message';
-		$this->_ee->lang->setReturnValue('line', $message, array('msg_templates_saved'));
-		$this->_ee->session->expectOnce('set_flashdata', array('message_success', $message));
-		$this->_ee->functions->expectOnce('redirect', array(new PatternExpectation('/method=templates/')));
+		$this->EE->lang->setReturnValue('line', $message, array('msg_templates_saved'));
+		$this->EE->session->expectOnce('set_flashdata', array('message_success', $message));
+		$this->EE->functions->expectOnce('redirect', array(new PatternExpectation('/method=templates/')));
 	
 		$this->_subject->save_templates();
 	}
@@ -179,7 +179,7 @@ class Test_crumbly_cp extends Testee_unit_test_case {
 			array('group_id' => '20', 'label' => 'Another Lovely Group')
 		);
 
-		$this->_ee->input->setReturnValue('post', $input, array('template_groups'));
+		$this->EE->input->setReturnValue('post', $input, array('template_groups'));
 
 		$this->_model->expectOnce('delete_all_crumbly_template_groups');
 		$this->_model->expectCallCount('save_crumbly_template_group', count($input));
@@ -192,9 +192,9 @@ class Test_crumbly_cp extends Testee_unit_test_case {
 		}
 
 		$message = 'message';
-		$this->_ee->lang->setReturnValue('line', $message, array('msg_template_groups_saved'));
-		$this->_ee->session->expectOnce('set_flashdata', array('message_success', $message));
-		$this->_ee->functions->expectOnce('redirect', array(new PatternExpectation('/method=template_groups$/')));
+		$this->EE->lang->setReturnValue('line', $message, array('msg_template_groups_saved'));
+		$this->EE->session->expectOnce('set_flashdata', array('message_success', $message));
+		$this->EE->functions->expectOnce('redirect', array(new PatternExpectation('/method=template_groups$/')));
 
 		$this->_subject->save_template_groups();
 	}
@@ -207,16 +207,16 @@ class Test_crumbly_cp extends Testee_unit_test_case {
 			array('group_id' => '20', 'label' => 'Another Lovely Group')
 		);
 
-		$this->_ee->input->setReturnValue('post', $input, array('template_groups'));
+		$this->EE->input->setReturnValue('post', $input, array('template_groups'));
 
 		$this->_model->expectOnce('delete_all_crumbly_template_groups');
 		$this->_model->expectCallCount('save_crumbly_template_group', count($input));
 		$this->_model->setReturnValue('save_crumbly_template_group', FALSE);
 
 		$message = 'message';
-		$this->_ee->lang->setReturnValue('line', $message, array('msg_template_groups_not_saved'));
-		$this->_ee->session->expectOnce('set_flashdata', array('message_failure', $message));
-		$this->_ee->functions->expectOnce('redirect', array(new PatternExpectation('/method=template_groups$/')));
+		$this->EE->lang->setReturnValue('line', $message, array('msg_template_groups_not_saved'));
+		$this->EE->session->expectOnce('set_flashdata', array('message_failure', $message));
+		$this->EE->functions->expectOnce('redirect', array(new PatternExpectation('/method=template_groups$/')));
 
 		$this->_subject->save_template_groups();
 	}
@@ -225,15 +225,15 @@ class Test_crumbly_cp extends Testee_unit_test_case {
 	public function test__save_template_groups__no_input()
 	{
 		$input = FALSE;
-		$this->_ee->input->setReturnValue('post', $input, array('template_groups'));
+		$this->EE->input->setReturnValue('post', $input, array('template_groups'));
 
 		$this->_model->expectOnce('delete_all_crumbly_template_groups');
 		$this->_model->expectNever('save_crumbly_template_group');
 
 		$message = 'message';
-		$this->_ee->lang->setReturnValue('line', $message, array('msg_template_groups_saved'));
-		$this->_ee->session->expectOnce('set_flashdata', array('message_success', $message));
-		$this->_ee->functions->expectOnce('redirect', array(new PatternExpectation('/method=template_groups$/')));
+		$this->EE->lang->setReturnValue('line', $message, array('msg_template_groups_saved'));
+		$this->EE->session->expectOnce('set_flashdata', array('message_success', $message));
+		$this->EE->functions->expectOnce('redirect', array(new PatternExpectation('/method=template_groups$/')));
 
 		$this->_subject->save_template_groups();
 	}
