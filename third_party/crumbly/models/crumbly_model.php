@@ -423,8 +423,7 @@ class Crumbly_model extends CI_Model {
     }
 
     $db_group = $this->EE->db
-      ->select('crumbly_template_groups.group_id,
-          crumbly_template_groups.label')
+      ->select('crumbly_template_groups.group_id, crumbly_template_groups.label')
       ->from('crumbly_template_groups')
       ->join('template_groups',
           'template_groups.group_id = crumbly_template_groups.group_id',
