@@ -8,9 +8,9 @@
  * @package         Crumbly
  */
 
-require_once PATH_THIRD .'crumbly/mod.crumbly' .EXT;
-require_once PATH_THIRD .'crumbly/classes/EI_category' .EXT;
-require_once PATH_THIRD .'crumbly/models/crumbly_model' .EXT;
+require_once PATH_THIRD .'crumbly/mod.crumbly.php';
+require_once PATH_THIRD .'crumbly/classes/EI_category.php';
+require_once PATH_THIRD .'crumbly/models/crumbly_model.php';
 
 class Test_crumbly extends Testee_unit_test_case {
     

@@ -5,10 +5,11 @@
  *
  * @author      Stephen Lewis <stephen@experienceinternet.co.uk>
  * @copyright   Experience Internet
- * @package     Crumbly */
+ * @package     Crumbly
+ */
 
-require_once PATH_THIRD .'crumbly/upd.crumbly' .EXT;
-require_once PATH_THIRD .'crumbly/models/crumbly_model' .EXT;
+require_once PATH_THIRD .'crumbly/upd.crumbly.php';
+require_once PATH_THIRD .'crumbly/models/crumbly_model.php';
 
 class Test_crumbly_upd extends Testee_unit_test_case {
   

@@ -1,4 +1,4 @@
-<?php if ( ! defined('EXT')) exit('Invalid file request.');
+<?php if ( ! defined('BASEPATH')) exit('Invalid file request.');
 
 /**
  * Crumbly model.
@@ -9,12 +9,12 @@
  * @version         1.0.2
  */
 
-require_once PATH_THIRD .'crumbly/classes/crumbly_glossary_term' .EXT;
-require_once PATH_THIRD .'crumbly/classes/crumbly_template' .EXT;
-require_once PATH_THIRD .'crumbly/classes/crumbly_template_group' .EXT;
-require_once PATH_THIRD .'crumbly/classes/EI_category' .EXT;
-require_once PATH_THIRD .'crumbly/classes/EI_template' .EXT;
-require_once PATH_THIRD .'crumbly/classes/EI_template_group' .EXT;
+require_once PATH_THIRD .'crumbly/classes/crumbly_glossary_term.php';
+require_once PATH_THIRD .'crumbly/classes/crumbly_template.php';
+require_once PATH_THIRD .'crumbly/classes/crumbly_template_group.php';
+require_once PATH_THIRD .'crumbly/classes/EI_category.php';
+require_once PATH_THIRD .'crumbly/classes/EI_template.php';
+require_once PATH_THIRD .'crumbly/classes/EI_template_group.php';
 
 class Crumbly_model extends CI_Model {
     

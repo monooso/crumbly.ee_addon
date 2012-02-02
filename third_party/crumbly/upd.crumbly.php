@@ -5,7 +5,8 @@
  *
  * @author      Stephen Lewis <stephen@experienceinternet.co.uk>
  * @copyright   Experience Internet
- * @package     Crumbly */
+ * @package     Crumbly
+ */
 
 class Crumbly_upd {
   
