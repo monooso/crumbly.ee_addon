@@ -53,7 +53,7 @@ class Crumbly_model extends CI_Model {
       ? strtolower($package_name) : 'crumbly';
 
     $this->_package_version = $package_version
-      ? $package_version : '1.0.2';
+      ? $package_version : '1.1.0';
 
     // Initialise the add-on cache.
     if ( ! array_key_exists($this->_namespace, $this->EE->session->cache))
@@ -371,15 +371,17 @@ class Crumbly_model extends CI_Model {
 
 
   /**
-   * Retrieves a Crumbly template from the specified template group, matching the given URL segment,
-   * if one exists.
+   * Retrieves a Crumbly template from the specified template group, matching 
+   * the given URL segment, if one exists.
    *
    * @access  public
-   * @param   string          $group_segment          The template group URL title.
-   * @param   string          $template_segment       The template URL title.
+   * @param   string      $group_segment          The template group URL title.
+   * @param   string      $template_segment       The template URL title.
    * @return  Crumbly_template|FALSE
    */
-  public function get_crumbly_template_from_segments($group_segment, $template_segment)
+  public function get_crumbly_template_from_segments($group_segment,
+    $template_segment
+  )
   {
     if ( ! $group_segment OR ! is_string($group_segment)
         OR ! $template_segment OR ! is_string($template_segment))
