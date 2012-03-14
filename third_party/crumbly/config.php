@@ -11,7 +11,7 @@
 if ( ! defined('CAMPAIGNER_NAME'))
 {
   define('CRUMBLY_NAME', 'Crumbly');
-  define('CRUMBLY_VERSION', '1.1.0');
+  define('CRUMBLY_VERSION', '1.2.0');
 }
 
 $config['name']     = CRUMBLY_NAME;
