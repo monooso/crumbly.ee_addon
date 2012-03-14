@@ -6,7 +6,7 @@
  * @author          Stephen Lewis <stephen@experienceinternet.co.uk>
  * @copyright       Experience Internet
  * @package         Crumbly
- * @version         1.1.0
+ * @version         1.2.0
  */
 
 require_once dirname(__FILE__) .'/../config.php';
