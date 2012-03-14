@@ -289,32 +289,45 @@ class Crumbly {
    * @param     bool      $reverse      Reverse the breadcrumbs?
    * @return    array
    */
-  public function _build_breadcrumbs_from_pages_url(
-    Array $segments = array(), Array $pages = array(), $reverse = FALSE
+  public function _build_breadcrumbs_from_pages_url(Array $segments = array(),
+    Array $pages = array(), $reverse = FALSE
   )
   {
     $tmpl               = $this->EE->TMPL;
     $breadcrumbs        = array();
     $segments_thus_far  = array();
-    $include_unassigned = (strtolower($tmpl->fetch_param('pages:include_unassigned', 'no')) == 'yes');
+
+    $include_unassigned = (strtolower(
+      $tmpl->fetch_param('pages:include_unassigned', 'no')) == 'yes');
 
     foreach ($segments AS $segment)
     {
-      $segments_thus_far[]    = $segment;
-      $page_found             = FALSE;
-      $pattern                = '#^/' .preg_quote(implode('/', $segments_thus_far), '#') .'/?' .'$#i';
+      $segments_thus_far[] = $segment;
+      $page_found = FALSE;
+
+      $current_url = $this->EE->functions->create_url(
+        implode('/', $segments_thus_far));
+
+      $pattern = '#^/'
+        .preg_quote(implode('/', $segments_thus_far), '#')
+        .'/?' .'$#i';
 
       foreach ($pages AS $entry_id => $url_title)
       {
         if (preg_match($pattern, $url_title))
         {
-          $breadcrumb_title = ($breadcrumb_title = $this->_model->get_channel_entry_title_from_segment($entry_id))
-            ? $breadcrumb_title : $this->_model->humanize($segment);
+          $breadcrumb_title
+            = $this->_model->get_channel_entry_title_from_segment($entry_id);
+
+          if ( ! $breadcrumb_title)
+          {
+            $breadcrumb_title = $this->_model->humanize($segment);
+          }
 
           $breadcrumbs[] = array(
-            'breadcrumb_segment'    => $segment,
-            'breadcrumb_title'      => $breadcrumb_title,
-            'breadcrumb_url'        => $this->EE->functions->create_url(implode('/', $segments_thus_far))
+            'breadcrumb_segment'  => $segment,
+            'breadcrumb_title'    => $breadcrumb_title,
+            'breadcrumb_url'      => $current_url
           );
 
           $page_found = TRUE;
@@ -325,9 +338,9 @@ class Crumbly {
       if ( ! $page_found && $include_unassigned)
       {
         $breadcrumbs[] = array(
-          'breadcrumb_segment'    => $segment,
-          'breadcrumb_title'      => $this->_model->humanize($segment),
-          'breadcrumb_url'        => ''
+          'breadcrumb_segment'  => $segment,
+          'breadcrumb_title'    => $this->_model->humanize($segment),
+          'breadcrumb_url'      => $current_url
         );
       }
     }
