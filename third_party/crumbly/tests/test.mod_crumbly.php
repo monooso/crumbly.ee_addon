@@ -1137,9 +1137,19 @@ class Test_crumbly extends Testee_unit_test_case {
       // Create URL expectations.
       $site_url = 'http://example.com/';
 
-      $this->EE->functions->expectCallCount('create_url', 2);
-      $this->EE->functions->setReturnValue('create_url', $site_url .$segments[1] .'/' .$segments[2] .'/', array($segments[1] .'/' .$segments[2]));
-      $this->EE->functions->setReturnValue('create_url', $site_url .$segments[1] .'/' .$segments[2] .'/' .$segments[3] .'/', array($segments[1] .'/' .$segments[2] .'/' .$segments[3]));
+      $this->EE->functions->expectCallCount('create_url', 3);
+
+      $this->EE->functions->returns('create_url',
+        $site_url .$segments[1] .'/',
+        array($segments[1]));
+
+      $this->EE->functions->returns('create_url',
+        $site_url .$segments[1] .'/' .$segments[2] .'/',
+        array($segments[1] .'/' .$segments[2]));
+
+      $this->EE->functions->returns('create_url',
+        $site_url .$segments[1] .'/' .$segments[2] .'/' .$segments[3] .'/',
+        array($segments[1] .'/' .$segments[2] .'/' .$segments[3]));
 
       // Retrieve the Pages information.
       $pages = array();
@@ -1216,19 +1226,29 @@ class Test_crumbly extends Testee_unit_test_case {
       // Create URL expectations.
       $site_url = 'http://example.com/';
 
-      $this->EE->functions->expectCallCount('create_url', 2);
-      $this->EE->functions->setReturnValue('create_url', $site_url .$segments[1] .'/' .$segments[2] .'/', array($segments[1] .'/' .$segments[2]));
-      $this->EE->functions->setReturnValue('create_url', $site_url .$segments[1] .'/' .$segments[2] .'/' .$segments[3] .'/', array($segments[1] .'/' .$segments[2] .'/' .$segments[3]));
+      $this->EE->functions->expectCallCount('create_url', 3);
+
+      $this->EE->functions->returns('create_url',
+        $site_url .$segments[1] .'/',
+        array($segments[1]));
+
+      $this->EE->functions->returns('create_url',
+        $site_url .$segments[1] .'/' .$segments[2] .'/',
+        array($segments[1] .'/' .$segments[2]));
+
+      $this->EE->functions->returns('create_url',
+        $site_url .$segments[1] .'/' .$segments[2] .'/' .$segments[3] .'/',
+        array($segments[1] .'/' .$segments[2] .'/' .$segments[3]));
 
       // Retrieve the Pages information.
       $pages = array();
       $pages[$this->_site_id] = array(
-          'url'       => '/' .implode('/', $segments) .'/',
-          'uris'      => array(
-              10 => '/' .$segments[1] .'/' .$segments[2],
-              20 => '/' .$segments[1] .'/' .$segments[2] .'/' .$segments[3] .'/'
-          ),
-          'templates' => array('10' => 100, '20' => 200)
+        'url'       => '/' .implode('/', $segments) .'/',
+        'uris'      => array(
+          10 => '/' .$segments[1] .'/' .$segments[2],
+          20 => '/' .$segments[1] .'/' .$segments[2] .'/' .$segments[3] .'/'
+        ),
+        'templates' => array('10' => 100, '20' => 200)
       );
       
       $this->EE->config->setReturnValue('item', $pages, array('site_pages'));
@@ -1263,21 +1283,21 @@ class Test_crumbly extends Testee_unit_test_case {
 
       // Expected breadcrumbs.
       $breadcrumbs = array(
-          array(
-              'breadcrumb_segment'    => $segments[1],
-              'breadcrumb_title'      => $segment_1_title,
-              'breadcrumb_url'        => ''
-          ),
-          array(
-              'breadcrumb_segment'    => $segments[2],
-              'breadcrumb_title'      => $segment_2_title,
-              'breadcrumb_url'        => $site_url .$segments[1] .'/' .$segments[2] .'/'
-          ),
-          array(
-              'breadcrumb_segment'    => $segments[3],
-              'breadcrumb_title'      => $segment_3_title,
-              'breadcrumb_url'        => $site_url .$segments[1] .'/' .$segments[2] .'/' .$segments[3] .'/'
-          )
+        array(
+          'breadcrumb_segment'  => $segments[1],
+          'breadcrumb_title'    => $segment_1_title,
+          'breadcrumb_url'      => $site_url .$segments[1] .'/'
+        ),
+        array(
+          'breadcrumb_segment'  => $segments[2],
+          'breadcrumb_title'    => $segment_2_title,
+          'breadcrumb_url'      => $site_url .$segments[1] .'/' .$segments[2] .'/'
+        ),
+        array(
+          'breadcrumb_segment'  => $segments[3],
+          'breadcrumb_title'    => $segment_3_title,
+          'breadcrumb_url'      => $site_url .$segments[1] .'/' .$segments[2] .'/' .$segments[3] .'/'
+        )
       );
 
       // Parsed tagdata
