@@ -9,12 +9,13 @@
  * @version         1.1.0
  */
 
-require_once PATH_THIRD .'crumbly/classes/crumbly_glossary_term.php';
-require_once PATH_THIRD .'crumbly/classes/crumbly_template.php';
-require_once PATH_THIRD .'crumbly/classes/crumbly_template_group.php';
-require_once PATH_THIRD .'crumbly/classes/EI_category.php';
-require_once PATH_THIRD .'crumbly/classes/EI_template.php';
-require_once PATH_THIRD .'crumbly/classes/EI_template_group.php';
+require_once dirname(__FILE__) .'/../config.php';
+require_once dirname(__FILE__) .'/../classes/crumbly_glossary_term.php';
+require_once dirname(__FILE__) .'/../classes/crumbly_template.php';
+require_once dirname(__FILE__) .'/../classes/crumbly_template_group.php';
+require_once dirname(__FILE__) .'/../classes/EI_category.php';
+require_once dirname(__FILE__) .'/../classes/EI_template.php';
+require_once dirname(__FILE__) .'/../classes/EI_template_group.php';
 
 class Crumbly_model extends CI_Model {
 
@@ -49,11 +50,18 @@ class Crumbly_model extends CI_Model {
     $this->_namespace = $namespace
       ? strtolower($namespace) : 'experience';
 
+    /**
+     * Constants defined in the NSM Add-on Updater config.php file, so we don't 
+     * have the package name and version defined in multiple locations.
+     */
+
     $this->_package_name = $package_name
-      ? strtolower($package_name) : 'crumbly';
+      ? strtolower($package_name)
+      : strtolower(CRUMBLY_NAME);
 
     $this->_package_version = $package_version
-      ? $package_version : '1.1.0';
+      ? $package_version
+      : CRUMBLY_VERSION;
 
     // Initialise the add-on cache.
     if ( ! array_key_exists($this->_namespace, $this->EE->session->cache))
