@@ -6,12 +6,13 @@
  * @author          Stephen Lewis (http://github.com/experience/)
  * @copyright       Experience Internet
  * @package         Crumbly
+ * @version         1.2.1
  */
 
 if ( ! defined('CAMPAIGNER_NAME'))
 {
   define('CRUMBLY_NAME', 'Crumbly');
-  define('CRUMBLY_VERSION', '1.2.0');
+  define('CRUMBLY_VERSION', '1.2.1');
 }
 
 $config['name']     = CRUMBLY_NAME;
