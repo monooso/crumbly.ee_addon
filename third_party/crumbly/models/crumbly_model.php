@@ -6,7 +6,6 @@
  * @author          Stephen Lewis <stephen@experienceinternet.co.uk>
  * @copyright       Experience Internet
  * @package         Crumbly
- * @version         1.2.0
  */
 
 require_once dirname(__FILE__) .'/../config.php';
@@ -585,7 +584,7 @@ class Crumbly_model extends CI_Model {
     $separator = $this->EE->config->item('word_separator') == 'underscore'
       ? '_' : '-';
 
-    return ucwords(str_replace($separator, ' ', $machine));
+    return ucwords(str_replace($separator, ' ', urldecode($machine)));
   }
 
 
