@@ -1025,6 +1025,21 @@ class Test_crumbly_model extends Testee_unit_test_case {
   }
 
 
+  public function test__humanize__no_glossary_url_decodes_the_string()
+  {
+    // Dummy values.
+    $machine  = urlencode('jack_white -- blunderbuss');
+    $human    = 'Jack White -- Blunderbuss';
+
+    // Retrieve the word separator.
+    $this->EE->config->expectOnce('item', array('word_separator'));
+    $this->EE->config->setReturnValue('item', 'underscore', array('word_separator'));
+
+    // Run the tests.
+    $this->assertIdentical($human, $this->_subject->humanize($machine, FALSE));
+  }
+
+
   public function test__humanize__glossary_success()
   {
     $machine  = 'room';
