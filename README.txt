@@ -4,6 +4,3 @@ It really is that easy.
 
 Documentation:
 http://experienceinternet.co.uk/software/crumbly/docs/
-
-Support:
-http://support.experienceinternet.co.uk/discussions/crumbly/
