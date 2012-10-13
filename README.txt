@@ -3,4 +3,4 @@ Crumbly is the most powerful, most flexible ExpressionEngine breadcrumb manager 
 It really is that easy.
 
 Documentation:
-http://experienceinternet.co.uk/software/crumbly/docs/
+https://github.com/experience/crumbly.ee_addon/wiki/_pages/
