@@ -12,7 +12,7 @@
 if ( ! defined('CRUMBLY_NAME'))
 {
   define('CRUMBLY_NAME', 'Crumbly');
-  define('CRUMBLY_VERSION', '1.2.1');
+  define('CRUMBLY_VERSION', '1.2.2');
 }
 
 $config['name']     = CRUMBLY_NAME;
