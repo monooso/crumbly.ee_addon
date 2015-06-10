@@ -16,8 +16,8 @@
       <td><?=form_dropdown('template_groups[0][group_id]', $template_groups_dd); ?></td>
       <td><input type="text" name="template_groups[0][label]"></td>
       <td class="act">
-        <a class="remove_row btn" href="#"><img height="17" src="/themes/third_party/crumbly/img/minus.png" width="16"></a>
-        <a class="add_row btn" href="#"><img height="17" src="/themes/third_party/crumbly/img/plus.png" width="16"></a>
+        <a class="remove_row btn" href="#"><img height="17" src="<?php echo URL_THIRD_THEMES; ?>crumbly/img/minus.png" width="16"></a>
+        <a class="add_row btn" href="#"><img height="17" src="<?php echo URL_THIRD_THEMES; ?>crumbly/img/plus.png" width="16"></a>
       </td>
     </tr>
   <?php
@@ -28,8 +28,8 @@
       <td><?=form_dropdown('template_groups[0][group_id]', $template_groups_dd, $template_group->get_group_id()); ?></td>
       <td><input type="text" name="template_groups[0][label]" value="<?=form_prep($template_group->get_label()); ?>"></td>
       <td class="act">
-        <a class="remove_row btn" href="#"><img height="17" src="/themes/third_party/crumbly/img/minus.png" width="16"></a>
-        <a class="add_row btn" href="#"><img height="17" src="/themes/third_party/crumbly/img/plus.png" width="16"></a>
+        <a class="remove_row btn" href="#"><img height="17" src="<?php echo URL_THIRD_THEMES; ?>crumbly/img/minus.png" width="16"></a>
+        <a class="add_row btn" href="#"><img height="17" src="<?php echo URL_THIRD_THEMES; ?>crumbly/img/plus.png" width="16"></a>
       </td>
     </tr>
   <?php
