@@ -30,7 +30,7 @@
       <td><input type="text" name="glossary[0][glossary_term]" value="<?=form_prep($glossary_item->get_glossary_term()); ?>"></td>
             <td><input type="text" name="glossary[0][glossary_definition]" value="<?=form_prep($glossary_item->get_glossary_definition()); ?>"></td>
       <td class="act">
-        <a class="remove_row btn" href="#"><img height="17" src="<?php echo PURL_THIRD_THEMES; ?>crumbly/img/minus.png" width="16"></a>
+        <a class="remove_row btn" href="#"><img height="17" src="<?php echo URL_THIRD_THEMES; ?>crumbly/img/minus.png" width="16"></a>
         <a class="add_row btn" href="#"><img height="17" src="<?php echo URL_THIRD_THEMES; ?>crumbly/img/plus.png" width="16"></a>
       </td>
     </tr>
